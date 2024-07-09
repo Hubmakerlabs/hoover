@@ -24,5 +24,6 @@
 !*.rs
 !*.toml
 !*.file
+!.gitkeep
 # ...even if they are in subdirectories
 !*/
