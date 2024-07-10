@@ -162,6 +162,9 @@ A short form post
 
 The state at the `created_at` timestamp of the follow list of the user.
 
+This can be represented as a diff for each update event and snapshotted 
+periodically to reduce total storage space utilization.
+
 - `repost`
 
 A simple broadcasting of a note with the attribution of reposting to a user.
@@ -258,7 +261,6 @@ type EmbedRecord_ViewRecord struct {
 	// value: The record data itself.
 	Value *util.LexiconTypeDecoder `json:"value" cborgen:"value"`
 }
-
 ```
 
 These have an "embeds" record associated with them, which in `nostr` are 
@@ -314,32 +316,29 @@ to AO.
 
 ### Follows
 
-Bluesky has a record that keeps track of relationships that represent 
-inbound and outbound graph vectors as follows:
+A cumulative snapshot view of follow graphs, both inbound and outbound can 
+be requested from a Bluesky server. Again like most other events except for 
+posts these are snapshots and do not represent direct user activity, so they 
+have to be polled regularly to remain up to date.
+
+For this reason, these lists need to be stored as diffs on Arweave AO.
 
 ```go
-// GraphDefs_Relationship is a "relationship" in the app.bsky.graph.defs schema.
-//
-// lists the bi-directional graph relationships between one actor (not indicated in the object), and the target actors (the DID included in the object)
-//
-// RECORDTYPE: GraphDefs_Relationship
-type GraphDefs_Relationship struct {
-	LexiconTypeID string `json:"$type,const=app.bsky.graph.defs#relationship" cborgen:"$type,const=app.bsky.graph.defs#relationship"`
-	Did           string `json:"did" cborgen:"did"`
-	// followedBy: if the actor is followed by this DID, contains the AT-URI of the follow record
-	FollowedBy *string `json:"followedBy,omitempty" cborgen:"followedBy,omitempty"`
-	// following: if the actor follows this DID, this is the AT-URI of the follow record
-	Following *string `json:"following,omitempty" cborgen:"following,omitempty"`
+
+// GraphGetFollowers_Output is the output of a app.bsky.graph.getFollowers call.
+type GraphGetFollowers_Output struct {
+	Cursor    *string                  `json:"cursor,omitempty" cborgen:"cursor,omitempty"`
+	Followers []*ActorDefs_ProfileView `json:"followers" cborgen:"followers"`
+	Subject   *ActorDefs_ProfileView   `json:"subject" cborgen:"subject"`
+}
+
+// GraphGetFollows_Output is the output of a app.bsky.graph.getFollows call.
+type GraphGetFollows_Output struct {
+	Cursor  *string                  `json:"cursor,omitempty" cborgen:"cursor,omitempty"`
+	Follows []*ActorDefs_ProfileView `json:"follows" cborgen:"follows"`
+	Subject *ActorDefs_ProfileView   `json:"subject" cborgen:"subject"`
 }
 ```
-
-Since really we only need one side of this, and this schema clearly provides 
-for two of these for bidirectional searches this is unnecessary in a 
-database where you can pull this follow type event from.
-
-The state of this graph will change as these are added and removed, so for 
-aggregation purposes periodically for each DID this graph will have to be 
-walked to construct the state change records.
 
 ### Bluesky Event Data Format Encoding
 
