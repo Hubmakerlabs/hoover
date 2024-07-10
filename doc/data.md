@@ -346,3 +346,109 @@ The primary types of events that this aggregator will gather will be
 constructed in the following ways for storage on the Arweave AO:
 
 ## farcaster
+
+Farcaster is also quite distinct from both `nostr` and `bluesky` but 
+something in-between.
+
+The data is aggregated, as in, the data is aggregated together like a 
+centralised distributed data application, but with a less distinct 
+centralisation due to being built on top of a large internationally 
+distributed cluster of replicas, instead of federated, and unlike `nostr` 
+has a consistency across replicas that is enforced rather than completely 
+ad-hoc and pure decentralised.
+
+There is 4 main types of data that need to be mapped to Arweave AO:
+
+- User
+- Cast
+- Recast
+- Follow
+- Reaction
+
+### User
+
+```go
+type User struct {
+	Fid              int            `json:"fid"`
+	Username         string         `json:"username"`
+	DisplayName      string         `json:"displayName"`
+	Pfp              Pfp            `json:"pfp"`
+	Profile          Profile        `json:"profile"`
+	FollowerCount    int            `json:"followerCount"`
+	FollowingCount   int            `json:"followingCount"`
+	ReferrerUsername string         `json:"referrerUsername"`
+	ViewerContext    *ViewerContext `json:"viewerContext"`
+}
+
+type Profile struct {
+	Bio Bio `json:"bio"`
+}
+
+type Bio struct {
+	Text     string   `json:"text"`
+	Mentions []string `json:"mentions"`
+}
+
+type Pfp struct {
+	Url      string `json:"url"`
+	Verified bool   `json:"verified"`
+}
+```
+
+### Cast
+
+```go
+type Cast struct {
+	Hash          string         `json:"hash"`
+	ThreadHash    string         `json:"threadHash"`
+	ParentHash    string         `json:"parentHash"`
+	ParentAuthor  *users.User    `json:"parentAuthor"`
+	Author        *users.User    `json:"author"`
+	Text          string         `json:"text"`
+	Timestamp     uint64         `json:"timestamp"`
+	Replies       *Replies       `json:"replies"`
+	Reactions     *Reactions     `json:"reactions"`
+	Recasts       *Recasts       `json:"recasts"`
+	Watches       *Watches       `json:"watches"`
+	Recast        bool           `json:"recast"`
+	ViewerContext *ViewerContext `json:"viewerContext"`
+}
+```
+
+### Recast
+
+```go
+type Recasts struct {
+    Count   int         `json:"count"`
+    Recasts []*Recaster `json:"recasters"`
+}
+
+type Recaster struct {
+	Fid         uint64 `json:"fid"`
+	Username    string `json:"username"`
+	DisplayName string `json:"displayName"`
+	RecastHash  string `json:"recastHash"`
+}
+```
+
+### Follow
+
+```go
+type Follow struct {
+	FollowerFid  int64 `json:"follower_fid"`
+	FollowingFid int64 `json:"following_fid"`
+}
+```
+
+### Reaction
+
+```go
+type Reaction struct {
+	Type      string      `json:"type"`
+	Hash      string      `json:"hash"`
+	Reactor   *users.User `json:"reactor"`
+	Timestamp uint64      `json:"timestamp"`
+	CastHash  string      `json:"castHash"`
+}
+```
+
