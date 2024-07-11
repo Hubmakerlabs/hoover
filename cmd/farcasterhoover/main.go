@@ -1,11 +1,10 @@
 package main
 
 import (
-	"fmt"
-
 	_ "github.com/everFinance/goar"
+	_ "github.com/noctisatrae/farseer/protos"
 )
 
 func main() {
-	fmt.Println("hello world")
+	//
 }
