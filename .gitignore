@@ -31,5 +31,8 @@
 !*.h
 !*.c
 !*.proto
+!bundleData
+!*.item
+!*.bin
 # ...even if they are in subdirectories
 !*/

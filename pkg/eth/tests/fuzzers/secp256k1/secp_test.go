@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/Hubmakerlabs/hoover/pkg/eth/crypto/secp256k1"
+	"github.com/mleku/btcec/v2"
 )
 
 func TestFuzzer(t *testing.T) {
