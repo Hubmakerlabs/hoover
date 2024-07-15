@@ -6,6 +6,8 @@
 
 # Ignore everything
 *
+# especially intellij things
+.idea
 # But not these files...
 !/.gitignore
 !*.go
@@ -25,5 +27,9 @@
 !*.toml
 !*.file
 !.gitkeep
+!pkg/eth/**
+!*.h
+!*.c
+!*.proto
 # ...even if they are in subdirectories
 !*/
