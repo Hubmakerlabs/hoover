@@ -70,6 +70,7 @@ require (
 	github.com/minio/sha256-simd v1.0.1
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/mleku/btcec/v2 v2.3.2-2
+	github.com/mleku/nodl v0.0.1
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/panjf2000/ants/v2 v2.10.0
 	github.com/peterh/liner v1.2.2
