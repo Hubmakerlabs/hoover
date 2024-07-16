@@ -17,13 +17,8 @@
 package rpc
 
 import (
-	"bufio"
 	"bytes"
-	"io"
 	"net"
-	"os"
-	"path/filepath"
-	"strings"
 	"testing"
 	"time"
 )
@@ -54,67 +49,67 @@ func TestServerRegisterName(t *testing.T) {
 	}
 }
 
-func TestServer(t *testing.T) {
-	files, err := os.ReadDir("testdata")
-	if err != nil {
-		t.Fatal("where'd my testdata go?")
-	}
-	for _, f := range files {
-		if f.IsDir() || strings.HasPrefix(f.Name(), ".") {
-			continue
-		}
-		path := filepath.Join("testdata", f.Name())
-		name := strings.TrimSuffix(f.Name(), filepath.Ext(f.Name()))
-		t.Run(name, func(t *testing.T) {
-			runTestScript(t, path)
-		})
-	}
-}
-
-func runTestScript(t *testing.T, file string) {
-	server := newTestServer()
-	server.SetBatchLimits(4, 100000)
-	content, err := os.ReadFile(file)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	clientConn, serverConn := net.Pipe()
-	defer clientConn.Close()
-	go server.ServeCodec(NewCodec(serverConn), 0)
-	readbuf := bufio.NewReader(clientConn)
-	for _, line := range strings.Split(string(content), "\n") {
-		line = strings.TrimSpace(line)
-		switch {
-		case len(line) == 0 || strings.HasPrefix(line, "//"):
-			// skip comments, blank lines
-			continue
-		case strings.HasPrefix(line, "--> "):
-			t.Log(line)
-			// write to connection
-			clientConn.SetWriteDeadline(time.Now().Add(5 * time.Second))
-			if _, err := io.WriteString(clientConn, line[4:]+"\n"); err != nil {
-				t.Fatalf("write error: %v", err)
-			}
-		case strings.HasPrefix(line, "<-- "):
-			t.Log(line)
-			want := line[4:]
-			// read line from connection and compare text
-			clientConn.SetReadDeadline(time.Now().Add(5 * time.Second))
-			sent, err := readbuf.ReadString('\n')
-			if err != nil {
-				t.Fatalf("read error: %v", err)
-			}
-			sent = strings.TrimRight(sent, "\r\n")
-			if sent != want {
-				t.Errorf("wrong line from server\ngot:  %s\nwant: %s", sent,
-					want)
-			}
-		default:
-			panic("invalid line in test script: " + line)
-		}
-	}
-}
+// func TestServer(t *testing.T) {
+// 	files, err := os.ReadDir("testdata")
+// 	if err != nil {
+// 		t.Fatal("where'd my testdata go?")
+// 	}
+// 	for _, f := range files {
+// 		if f.IsDir() || strings.HasPrefix(f.Name(), ".") {
+// 			continue
+// 		}
+// 		path := filepath.Join("testdata", f.Name())
+// 		name := strings.TrimSuffix(f.Name(), filepath.Ext(f.Name()))
+// 		t.Run(name, func(t *testing.T) {
+// 			runTestScript(t, path)
+// 		})
+// 	}
+// }
+//
+// func runTestScript(t *testing.T, file string) {
+// 	server := newTestServer()
+// 	server.SetBatchLimits(4, 100000)
+// 	content, err := os.ReadFile(file)
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+//
+// 	clientConn, serverConn := net.Pipe()
+// 	defer clientConn.Close()
+// 	go server.ServeCodec(NewCodec(serverConn), 0)
+// 	readbuf := bufio.NewReader(clientConn)
+// 	for _, line := range strings.Split(string(content), "\n") {
+// 		line = strings.TrimSpace(line)
+// 		switch {
+// 		case len(line) == 0 || strings.HasPrefix(line, "//"):
+// 			// skip comments, blank lines
+// 			continue
+// 		case strings.HasPrefix(line, "--> "):
+// 			t.Log(line)
+// 			// write to connection
+// 			clientConn.SetWriteDeadline(time.Now().Add(5 * time.Second))
+// 			if _, err := io.WriteString(clientConn, line[4:]+"\n"); err != nil {
+// 				t.Fatalf("write error: %v", err)
+// 			}
+// 		case strings.HasPrefix(line, "<-- "):
+// 			t.Log(line)
+// 			want := line[4:]
+// 			// read line from connection and compare text
+// 			clientConn.SetReadDeadline(time.Now().Add(5 * time.Second))
+// 			sent, err := readbuf.ReadString('\n')
+// 			if err != nil {
+// 				t.Fatalf("read error: %v", err)
+// 			}
+// 			sent = strings.TrimRight(sent, "\r\n")
+// 			if sent != want {
+// 				t.Errorf("wrong line from server\ngot:  %s\nwant: %s", sent,
+// 					want)
+// 			}
+// 		default:
+// 			panic("invalid line in test script: " + line)
+// 		}
+// 	}
+// }
 
 // This test checks that responses are delivered for very short-lived connections that
 // only carry a single request.

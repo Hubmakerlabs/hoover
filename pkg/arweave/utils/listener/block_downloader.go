@@ -13,6 +13,7 @@ import (
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/utils/model"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/utils/monitoring"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/utils/task"
+	"github.com/cenkalti/backoff/v4"
 	"gorm.io/gorm"
 )
 
