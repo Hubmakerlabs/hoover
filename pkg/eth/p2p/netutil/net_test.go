@@ -37,13 +37,15 @@ func TestParseNetlist(t *testing.T) {
 			wantList: &Netlist{},
 		},
 		{
-			input:    "127.0.0.0/8",
-			wantErr:  nil,
-			wantList: &Netlist{{IP: net.IP{127, 0, 0, 0}, Mask: net.CIDRMask(8, 32)}},
+			input:   "127.0.0.0/8",
+			wantErr: nil,
+			wantList: &Netlist{{IP: net.IP{127, 0, 0, 0},
+				Mask: net.CIDRMask(8, 32)}},
 		},
 		{
-			input:   "127.0.0.0/44",
-			wantErr: &net.ParseError{Type: "CIDR address", Text: "127.0.0.0/44"},
+			input: "127.0.0.0/44",
+			wantErr: &net.ParseError{Type: "CIDR address",
+				Text: "127.0.0.0/44"},
 		},
 		{
 			input: "127.0.0.0/16, 23.23.23.23/24,",
@@ -161,7 +163,8 @@ func TestCheckRelayIP(t *testing.T) {
 	for _, test := range tests {
 		err := CheckRelayIP(parseIP(test.sender), parseIP(test.addr))
 		if err != test.want {
-			t.Errorf("%s from %s: got %q, want %q", test.addr, test.sender, err, test.want)
+			t.Errorf("%s from %s: got %q, want %q", test.addr, test.sender, err,
+				test.want)
 		}
 	}
 }
@@ -190,8 +193,10 @@ func TestSameNet(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		if ok := SameNet(test.bits, parseIP(test.ip), parseIP(test.other)); ok != test.want {
-			t.Errorf("SameNet(%d, %s, %s) == %t, want %t", test.bits, test.ip, test.other, ok, test.want)
+		if ok := SameNet(test.bits, parseIP(test.ip),
+			parseIP(test.other)); ok != test.want {
+			t.Errorf("SameNet(%d, %s, %s) == %t, want %t", test.bits, test.ip,
+				test.other, ok, test.want)
 		}
 	}
 }

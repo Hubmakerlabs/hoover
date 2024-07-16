@@ -4,11 +4,10 @@ import (
 	"errors"
 	"io"
 
-	"github.com/minio/sha256-simd"
-
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/utils"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goether"
+	"github.com/minio/sha256-simd"
 )
 
 type ItemSigner struct {

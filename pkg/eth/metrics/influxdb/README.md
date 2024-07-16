@@ -1,7 +1,8 @@
 go-metrics-influxdb
 ===================
 
-This is a reporter for the [go-metrics](https://github.com/rcrowley/go-metrics) library which will post the metrics to [InfluxDB](https://influxdb.com/).
+This is a reporter for the [go-metrics](https://github.com/rcrowley/go-metrics)
+library which will post the metrics to [InfluxDB](https://influxdb.com/).
 
 Note
 ----
@@ -27,4 +28,5 @@ go influxdb.InfluxDB(
 License
 -------
 
-go-metrics-influxdb is licensed under the MIT license. See the LICENSE file for details.
+go-metrics-influxdb is licensed under the MIT license. See the LICENSE file for
+details.

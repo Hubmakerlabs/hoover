@@ -8,9 +8,8 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/minio/sha256-simd"
-
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
+	"github.com/minio/sha256-simd"
 )
 
 func PrepareChunks(tx *types.Transaction, data interface{},

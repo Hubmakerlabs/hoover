@@ -577,8 +577,8 @@ func (b *SimulatedBackend) EstimateGas(ctx context.Context,
 
 	// Determine the lowest and highest possible gas limits to binary search in between
 	var (
-		lo  uint64 = params.TxGas - 1
-		hi  uint64
+		lo = params.TxGas - 1
+		hi uint64
 		cap uint64
 	)
 	if call.Gas >= params.TxGas {

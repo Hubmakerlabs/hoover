@@ -59,7 +59,7 @@ type Event struct {
 	// Msg is set if the type is EventTypeMsg
 	Msg *Msg `json:"msg,omitempty"`
 
-	//Optionally provide data (currently for simulation frontends only)
+	// Optionally provide data (currently for simulation frontends only)
 	Data interface{} `json:"data"`
 }
 
@@ -99,11 +99,16 @@ func ControlEvent(v interface{}) *Event {
 func (e *Event) String() string {
 	switch e.Type {
 	case EventTypeNode:
-		return fmt.Sprintf("<node-event> id: %s up: %t", e.Node.ID().TerminalString(), e.Node.Up())
+		return fmt.Sprintf("<node-event> id: %s up: %t",
+			e.Node.ID().TerminalString(), e.Node.Up())
 	case EventTypeConn:
-		return fmt.Sprintf("<conn-event> nodes: %s->%s up: %t", e.Conn.One.TerminalString(), e.Conn.Other.TerminalString(), e.Conn.Up)
+		return fmt.Sprintf("<conn-event> nodes: %s->%s up: %t",
+			e.Conn.One.TerminalString(), e.Conn.Other.TerminalString(),
+			e.Conn.Up)
 	case EventTypeMsg:
-		return fmt.Sprintf("<msg-event> nodes: %s->%s proto: %s, code: %d, received: %t", e.Msg.One.TerminalString(), e.Msg.Other.TerminalString(), e.Msg.Protocol, e.Msg.Code, e.Msg.Received)
+		return fmt.Sprintf("<msg-event> nodes: %s->%s proto: %s, code: %d, received: %t",
+			e.Msg.One.TerminalString(), e.Msg.Other.TerminalString(),
+			e.Msg.Protocol, e.Msg.Code, e.Msg.Received)
 	default:
 		return ""
 	}

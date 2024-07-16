@@ -123,7 +123,8 @@ func (n *Notifier) CreateSubscription() *Subscription {
 	} else if n.callReturned {
 		panic("can't create subscription after subscribe call has returned")
 	}
-	n.sub = &Subscription{ID: n.h.idgen(), namespace: n.namespace, err: make(chan error, 1)}
+	n.sub = &Subscription{ID: n.h.idgen(), namespace: n.namespace,
+		err: make(chan error, 1)}
 	return n.sub
 }
 
@@ -182,7 +183,8 @@ func (n *Notifier) activate() error {
 }
 
 func (n *Notifier) send(sub *Subscription, data json.RawMessage) error {
-	params, _ := json.Marshal(&subscriptionResult{ID: string(sub.ID), Result: data})
+	params, _ := json.Marshal(&subscriptionResult{ID: string(sub.ID),
+		Result: data})
 	ctx := context.Background()
 
 	msg := &jsonrpcMessage{
@@ -239,7 +241,8 @@ type ClientSubscription struct {
 // This is the sentinel value sent on sub.quit when Unsubscribe is called.
 var errUnsubscribed = errors.New("unsubscribed")
 
-func newClientSubscription(c *Client, namespace string, channel reflect.Value) *ClientSubscription {
+func newClientSubscription(c *Client, namespace string,
+	channel reflect.Value) *ClientSubscription {
 	sub := &ClientSubscription{
 		client:      c,
 		namespace:   namespace,
@@ -374,7 +377,8 @@ func (sub *ClientSubscription) forward() (unsubscribeServer bool, err error) {
 	}
 }
 
-func (sub *ClientSubscription) unmarshal(result json.RawMessage) (interface{}, error) {
+func (sub *ClientSubscription) unmarshal(result json.RawMessage) (interface{},
+	error) {
 	val := reflect.New(sub.etype)
 	err := json.Unmarshal(result, val.Interface())
 	return val.Elem().Interface(), err
@@ -382,5 +386,6 @@ func (sub *ClientSubscription) unmarshal(result json.RawMessage) (interface{}, e
 
 func (sub *ClientSubscription) requestUnsubscribe() error {
 	var result interface{}
-	return sub.client.Call(&result, sub.namespace+unsubscribeMethodSuffix, sub.subid)
+	return sub.client.Call(&result, sub.namespace+unsubscribeMethodSuffix,
+		sub.subid)
 }

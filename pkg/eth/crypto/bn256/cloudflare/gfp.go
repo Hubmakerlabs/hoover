@@ -31,7 +31,8 @@ func (e *gfP) Set(f *gfP) {
 }
 
 func (e *gfP) Invert(f *gfP) {
-	bits := [4]uint64{0x3c208c16d87cfd45, 0x97816a916871ca8d, 0xb85045b68181585d, 0x30644e72e131a029}
+	bits := [4]uint64{0x3c208c16d87cfd45, 0x97816a916871ca8d,
+		0xb85045b68181585d, 0x30644e72e131a029}
 
 	sum, power := &gfP{}, &gfP{}
 	sum.Set(rN1)

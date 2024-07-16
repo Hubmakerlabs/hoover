@@ -21,10 +21,10 @@ func TestVerifyBundleSigs(t *testing.T) {
 
 	bundle := schema.Bundle{
 		Items: []schema.BundleItem{
-			schema.BundleItem{
+			{
 				From: signer1.Address.String(),
 			},
-			schema.BundleItem{
+			{
 				From: signer2.Address.String(),
 			},
 		},

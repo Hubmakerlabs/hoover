@@ -52,10 +52,12 @@ func TestCountValues(t *testing.T) {
 	for i, test := range tests {
 		count, err := CountValues(unhex(test.input))
 		if count != test.count {
-			t.Errorf("test %d: count mismatch, got %d want %d\ninput: %s", i, count, test.count, test.input)
+			t.Errorf("test %d: count mismatch, got %d want %d\ninput: %s", i,
+				count, test.count, test.input)
 		}
 		if !errors.Is(err, test.err) {
-			t.Errorf("test %d: err mismatch, got %q want %q\ninput: %s", i, err, test.err, test.input)
+			t.Errorf("test %d: err mismatch, got %q want %q\ninput: %s", i, err,
+				test.err, test.input)
 		}
 	}
 }
@@ -68,8 +70,10 @@ func TestSplitString(t *testing.T) {
 		"C88363617483646F67",
 		"F8384C6F72656D20697073756D20646F6C6F722073697420616D65742C20636F6E7365637465747572206164697069736963696E6720656C6974",
 	} {
-		if _, _, err := SplitString(unhex(test)); !errors.Is(err, ErrExpectedString) {
-			t.Errorf("test %d: error mismatch: have %q, want %q", i, err, ErrExpectedString)
+		if _, _, err := SplitString(unhex(test)); !errors.Is(err,
+			ErrExpectedString) {
+			t.Errorf("test %d: error mismatch: have %q, want %q", i, err,
+				ErrExpectedString)
 		}
 	}
 }
@@ -86,8 +90,10 @@ func TestSplitList(t *testing.T) {
 		"83646F67",
 		"B8384C6F72656D20697073756D20646F6C6F722073697420616D65742C20636F6E7365637465747572206164697069736963696E6720656C6974",
 	} {
-		if _, _, err := SplitList(unhex(test)); !errors.Is(err, ErrExpectedList) {
-			t.Errorf("test %d: error mismatch: have %q, want %q", i, err, ErrExpectedList)
+		if _, _, err := SplitList(unhex(test)); !errors.Is(err,
+			ErrExpectedList) {
+			t.Errorf("test %d: error mismatch: have %q, want %q", i, err,
+				ErrExpectedList)
 		}
 	}
 }
@@ -118,19 +124,23 @@ func TestSplitUint64(t *testing.T) {
 		{"8100", 0, "8100", ErrCanonSize},
 		{"8200FF", 0, "8200FF", ErrCanonInt},
 		{"8103FF", 0, "8103FF", ErrCanonSize},
-		{"89FAFAFAFAFAFAFAFAFAFF", 0, "89FAFAFAFAFAFAFAFAFAFF", errUintOverflow},
+		{"89FAFAFAFAFAFAFAFAFAFF", 0, "89FAFAFAFAFAFAFAFAFAFF",
+			errUintOverflow},
 	}
 
 	for i, test := range tests {
 		val, rest, err := SplitUint64(unhex(test.input))
 		if val != test.val {
-			t.Errorf("test %d: val mismatch: got %x, want %x (input %q)", i, val, test.val, test.input)
+			t.Errorf("test %d: val mismatch: got %x, want %x (input %q)", i,
+				val, test.val, test.input)
 		}
 		if !bytes.Equal(rest, unhex(test.rest)) {
-			t.Errorf("test %d: rest mismatch: got %x, want %s (input %q)", i, rest, test.rest, test.input)
+			t.Errorf("test %d: rest mismatch: got %x, want %s (input %q)", i,
+				rest, test.rest, test.input)
 		}
 		if err != test.err {
-			t.Errorf("test %d: error mismatch: got %q, want %q", i, err, test.err)
+			t.Errorf("test %d: error mismatch: got %q, want %q", i, err,
+				test.err)
 		}
 	}
 }
@@ -167,8 +177,10 @@ func TestSplit(t *testing.T) {
 		{input: "C60607080902", err: ErrValueTooLarge, rest: "C60607080902"},
 
 		// size check overflow
-		{input: "BFFFFFFFFFFFFFFFFF", err: ErrValueTooLarge, rest: "BFFFFFFFFFFFFFFFFF"},
-		{input: "FFFFFFFFFFFFFFFFFF", err: ErrValueTooLarge, rest: "FFFFFFFFFFFFFFFFFF"},
+		{input: "BFFFFFFFFFFFFFFFFF", err: ErrValueTooLarge,
+			rest: "BFFFFFFFFFFFFFFFFF"},
+		{input: "FFFFFFFFFFFFFFFFFF", err: ErrValueTooLarge,
+			rest: "FFFFFFFFFFFFFFFFFF"},
 
 		{
 			input: "B838FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
@@ -205,16 +217,19 @@ func TestSplit(t *testing.T) {
 	for i, test := range tests {
 		kind, val, rest, err := Split(unhex(test.input))
 		if kind != test.kind {
-			t.Errorf("test %d: kind mismatch: got %v, want %v", i, kind, test.kind)
+			t.Errorf("test %d: kind mismatch: got %v, want %v", i, kind,
+				test.kind)
 		}
 		if !bytes.Equal(val, unhex(test.val)) {
 			t.Errorf("test %d: val mismatch: got %x, want %s", i, val, test.val)
 		}
 		if !bytes.Equal(rest, unhex(test.rest)) {
-			t.Errorf("test %d: rest mismatch: got %x, want %s", i, rest, test.rest)
+			t.Errorf("test %d: rest mismatch: got %x, want %s", i, rest,
+				test.rest)
 		}
 		if err != test.err {
-			t.Errorf("test %d: error mismatch: got %q, want %q", i, err, test.err)
+			t.Errorf("test %d: error mismatch: got %q, want %q", i, err,
+				test.err)
 		}
 	}
 }
@@ -252,11 +267,13 @@ func TestReadSize(t *testing.T) {
 	for _, test := range tests {
 		size, err := readSize(unhex(test.input), test.slen)
 		if err != test.err {
-			t.Errorf("readSize(%s, %d): error mismatch: got %q, want %q", test.input, test.slen, err, test.err)
+			t.Errorf("readSize(%s, %d): error mismatch: got %q, want %q",
+				test.input, test.slen, err, test.err)
 			continue
 		}
 		if size != test.size {
-			t.Errorf("readSize(%s, %d): size mismatch: got %#x, want %#x", test.input, test.slen, size, test.size)
+			t.Errorf("readSize(%s, %d): size mismatch: got %#x, want %#x",
+				test.input, test.slen, size, test.size)
 		}
 	}
 }
@@ -281,7 +298,8 @@ func TestAppendUint64(t *testing.T) {
 	for _, test := range tests {
 		x := AppendUint64(test.slice, test.input)
 		if !bytes.Equal(x, unhex(test.output)) {
-			t.Errorf("AppendUint64(%v, %d): got %x, want %s", test.slice, test.input, x, test.output)
+			t.Errorf("AppendUint64(%v, %d): got %x, want %s", test.slice,
+				test.input, x, test.output)
 		}
 
 		// Check that IntSize returns the appended size.
@@ -332,7 +350,8 @@ func TestBytesSize(t *testing.T) {
 		// Sanity check:
 		enc, _ := EncodeToBytes(test.v)
 		if uint64(len(enc)) != test.size {
-			t.Errorf("len(EncodeToBytes(%#x)) -> %d, test says %d", test.v, len(enc), test.size)
+			t.Errorf("len(EncodeToBytes(%#x)) -> %d, test says %d", test.v,
+				len(enc), test.size)
 		}
 	}
 }

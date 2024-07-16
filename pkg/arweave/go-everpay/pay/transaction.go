@@ -4,11 +4,9 @@ import (
 	"encoding/json"
 	"math/big"
 
-	"github.com/Hubmakerlabs/hoover/pkg/arweave/go-everpay/common"
-
-	"github.com/Hubmakerlabs/hoover/pkg/arweave/go-everpay/pay/schema"
-
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/go-everpay/account"
+	"github.com/Hubmakerlabs/hoover/pkg/arweave/go-everpay/common"
+	"github.com/Hubmakerlabs/hoover/pkg/arweave/go-everpay/pay/schema"
 	tokSchema "github.com/Hubmakerlabs/hoover/pkg/arweave/go-everpay/token/schema"
 )
 

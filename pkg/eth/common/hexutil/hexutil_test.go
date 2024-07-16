@@ -45,7 +45,8 @@ var (
 		{referenceBig("0"), "0x0"},
 		{referenceBig("1"), "0x1"},
 		{referenceBig("ff"), "0xff"},
-		{referenceBig("112233445566778899aabbccddeeff"), "0x112233445566778899aabbccddeeff"},
+		{referenceBig("112233445566778899aabbccddeeff"),
+			"0x112233445566778899aabbccddeeff"},
 		{referenceBig("80a7f2c1bcc396c00"), "0x80a7f2c1bcc396c00"},
 		{referenceBig("-80a7f2c1bcc396c00"), "-0x80a7f2c1bcc396c00"},
 	}
@@ -80,7 +81,8 @@ var (
 		{input: `0xffffffffff`, want: []byte{0xff, 0xff, 0xff, 0xff, 0xff}},
 		{
 			input: `0xffffffffffffffffffffffffffffffffffff`,
-			want:  []byte{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+			want: []byte{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 		},
 	}
 
@@ -152,7 +154,8 @@ func TestDecode(t *testing.T) {
 			continue
 		}
 		if !bytes.Equal(test.want.([]byte), dec) {
-			t.Errorf("input %s: value mismatch: got %x, want %x", test.input, dec, test.want)
+			t.Errorf("input %s: value mismatch: got %x, want %x", test.input,
+				dec, test.want)
 			continue
 		}
 	}
@@ -174,7 +177,8 @@ func TestDecodeBig(t *testing.T) {
 			continue
 		}
 		if dec.Cmp(test.want.(*big.Int)) != 0 {
-			t.Errorf("input %s: value mismatch: got %x, want %x", test.input, dec, test.want)
+			t.Errorf("input %s: value mismatch: got %x, want %x", test.input,
+				dec, test.want)
 			continue
 		}
 	}
@@ -196,7 +200,8 @@ func TestDecodeUint64(t *testing.T) {
 			continue
 		}
 		if dec != test.want.(uint64) {
-			t.Errorf("input %s: value mismatch: got %x, want %x", test.input, dec, test.want)
+			t.Errorf("input %s: value mismatch: got %x, want %x", test.input,
+				dec, test.want)
 			continue
 		}
 	}

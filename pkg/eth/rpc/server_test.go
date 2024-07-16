@@ -38,7 +38,8 @@ func TestServerRegisterName(t *testing.T) {
 	}
 
 	if len(server.services.services) != 2 {
-		t.Fatalf("Expected 2 service entries, got %d", len(server.services.services))
+		t.Fatalf("Expected 2 service entries, got %d",
+			len(server.services.services))
 	}
 
 	svc, ok := server.services.services[svcName]
@@ -48,7 +49,8 @@ func TestServerRegisterName(t *testing.T) {
 
 	wantCallbacks := 14
 	if len(svc.callbacks) != wantCallbacks {
-		t.Errorf("Expected %d callbacks for service 'service', got %d", wantCallbacks, len(svc.callbacks))
+		t.Errorf("Expected %d callbacks for service 'service', got %d",
+			wantCallbacks, len(svc.callbacks))
 	}
 }
 
@@ -105,7 +107,8 @@ func runTestScript(t *testing.T, file string) {
 			}
 			sent = strings.TrimRight(sent, "\r\n")
 			if sent != want {
-				t.Errorf("wrong line from server\ngot:  %s\nwant: %s", sent, want)
+				t.Errorf("wrong line from server\ngot:  %s\nwant: %s", sent,
+					want)
 			}
 		default:
 			panic("invalid line in test script: " + line)
@@ -177,7 +180,8 @@ func TestServerBatchResponseSizeLimit(t *testing.T) {
 		// We expect the first two queries to be ok, but after that the size limit takes effect.
 		if i < 2 {
 			if batch[i].Error != nil {
-				t.Fatalf("batch elem %d has unexpected error: %v", i, batch[i].Error)
+				t.Fatalf("batch elem %d has unexpected error: %v", i,
+					batch[i].Error)
 			}
 			continue
 		}
@@ -188,7 +192,8 @@ func TestServerBatchResponseSizeLimit(t *testing.T) {
 		}
 		wantedCode := errcodeResponseTooLarge
 		if re.ErrorCode() != wantedCode {
-			t.Errorf("batch elem %d wrong error code, have %d want %d", i, re.ErrorCode(), wantedCode)
+			t.Errorf("batch elem %d wrong error code, have %d want %d", i,
+				re.ErrorCode(), wantedCode)
 		}
 	}
 }

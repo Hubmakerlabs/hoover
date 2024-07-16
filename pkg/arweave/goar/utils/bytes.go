@@ -22,7 +22,8 @@ func ShortTo2ByteArray(long int) []byte {
 }
 
 func LongTo32ByteArray(long int) []byte {
-	byteArray := []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+	byteArray := []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 	for i := 0; i < len(byteArray); i++ {
 		byt := long & 0xff
 		byteArray[i] = byte(byt)

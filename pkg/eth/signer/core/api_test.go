@@ -73,7 +73,7 @@ func (ui *headlessUi) ApproveTx(request *core.SignTxRequest) (core.SignTxRespons
 
 func (ui *headlessUi) ApproveSignData(request *core.SignDataRequest) (core.SignDataResponse,
 	error) {
-	approved := (<-ui.approveCh == "Y")
+	approved := <-ui.approveCh == "Y"
 	return core.SignDataResponse{approved}, nil
 }
 

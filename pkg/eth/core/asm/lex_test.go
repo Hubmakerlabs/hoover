@@ -41,53 +41,66 @@ func TestLexer(t *testing.T) {
 			tokens: []token{{typ: lineStart}, {typ: eof}},
 		},
 		{
-			input:  "0x12345678",
-			tokens: []token{{typ: lineStart}, {typ: number, text: "0x12345678"}, {typ: eof}},
+			input: "0x12345678",
+			tokens: []token{{typ: lineStart}, {typ: number, text: "0x12345678"},
+				{typ: eof}},
 		},
 		{
-			input:  "0x123ggg",
-			tokens: []token{{typ: lineStart}, {typ: number, text: "0x123"}, {typ: element, text: "ggg"}, {typ: eof}},
+			input: "0x123ggg",
+			tokens: []token{{typ: lineStart}, {typ: number, text: "0x123"},
+				{typ: element, text: "ggg"}, {typ: eof}},
 		},
 		{
-			input:  "12345678",
-			tokens: []token{{typ: lineStart}, {typ: number, text: "12345678"}, {typ: eof}},
+			input: "12345678",
+			tokens: []token{{typ: lineStart}, {typ: number, text: "12345678"},
+				{typ: eof}},
 		},
 		{
-			input:  "123abc",
-			tokens: []token{{typ: lineStart}, {typ: number, text: "123"}, {typ: element, text: "abc"}, {typ: eof}},
+			input: "123abc",
+			tokens: []token{{typ: lineStart}, {typ: number, text: "123"},
+				{typ: element, text: "abc"}, {typ: eof}},
 		},
 		{
-			input:  "0123abc",
-			tokens: []token{{typ: lineStart}, {typ: number, text: "0123"}, {typ: element, text: "abc"}, {typ: eof}},
+			input: "0123abc",
+			tokens: []token{{typ: lineStart}, {typ: number, text: "0123"},
+				{typ: element, text: "abc"}, {typ: eof}},
 		},
 		{
-			input:  "00123abc",
-			tokens: []token{{typ: lineStart}, {typ: number, text: "00123"}, {typ: element, text: "abc"}, {typ: eof}},
+			input: "00123abc",
+			tokens: []token{{typ: lineStart}, {typ: number, text: "00123"},
+				{typ: element, text: "abc"}, {typ: eof}},
 		},
 		{
-			input:  "@foo",
-			tokens: []token{{typ: lineStart}, {typ: label, text: "foo"}, {typ: eof}},
+			input: "@foo",
+			tokens: []token{{typ: lineStart}, {typ: label, text: "foo"},
+				{typ: eof}},
 		},
 		{
-			input:  "@label123",
-			tokens: []token{{typ: lineStart}, {typ: label, text: "label123"}, {typ: eof}},
+			input: "@label123",
+			tokens: []token{{typ: lineStart}, {typ: label, text: "label123"},
+				{typ: eof}},
 		},
 		// Comment after label
 		{
-			input:  "@label123 ;; comment",
-			tokens: []token{{typ: lineStart}, {typ: label, text: "label123"}, {typ: eof}},
+			input: "@label123 ;; comment",
+			tokens: []token{{typ: lineStart}, {typ: label, text: "label123"},
+				{typ: eof}},
 		},
 		// Comment after instruction
 		{
-			input:  "push 3 ;; comment\nadd",
-			tokens: []token{{typ: lineStart}, {typ: element, text: "push"}, {typ: number, text: "3"}, {typ: lineEnd, text: "\n"}, {typ: lineStart, lineno: 1}, {typ: element, lineno: 1, text: "add"}, {typ: eof, lineno: 1}},
+			input: "push 3 ;; comment\nadd",
+			tokens: []token{{typ: lineStart}, {typ: element, text: "push"},
+				{typ: number, text: "3"}, {typ: lineEnd, text: "\n"},
+				{typ: lineStart, lineno: 1},
+				{typ: element, lineno: 1, text: "add"}, {typ: eof, lineno: 1}},
 		},
 	}
 
 	for _, test := range tests {
 		tokens := lexAll(test.input)
 		if !reflect.DeepEqual(tokens, test.tokens) {
-			t.Errorf("input %q\ngot:  %+v\nwant: %+v", test.input, tokens, test.tokens)
+			t.Errorf("input %q\ngot:  %+v\nwant: %+v", test.input, tokens,
+				test.tokens)
 		}
 	}
 }

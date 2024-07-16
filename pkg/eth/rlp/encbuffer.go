@@ -192,7 +192,8 @@ func (buf *encBuffer) writeUint256(z *uint256.Int) {
 // list adds a new list header to the header stack. It returns the index of the header.
 // Call listEnd with this index after encoding the content of the list.
 func (buf *encBuffer) list() int {
-	buf.lheads = append(buf.lheads, listhead{offset: len(buf.str), size: buf.lhsize})
+	buf.lheads = append(buf.lheads,
+		listhead{offset: len(buf.str), size: buf.lhsize})
 	return len(buf.lheads) - 1
 }
 

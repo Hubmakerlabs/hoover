@@ -62,7 +62,8 @@ func (f *Feed) init(etype reflect.Type) {
 	f.removeSub = make(chan interface{})
 	f.sendLock = make(chan struct{}, 1)
 	f.sendLock <- struct{}{}
-	f.sendCases = caseList{{Chan: reflect.ValueOf(f.removeSub), Dir: reflect.SelectRecv}}
+	f.sendCases = caseList{{Chan: reflect.ValueOf(f.removeSub),
+		Dir: reflect.SelectRecv}}
 }
 
 // Subscribe adds a channel to the feed. Future sends will be delivered on the channel
@@ -80,7 +81,8 @@ func (f *Feed) Subscribe(channel interface{}) Subscription {
 
 	f.once.Do(func() { f.init(chantyp.Elem()) })
 	if f.etype != chantyp.Elem() {
-		panic(feedTypeError{op: "Subscribe", got: chantyp, want: reflect.ChanOf(reflect.SendDir, f.etype)})
+		panic(feedTypeError{op: "Subscribe", got: chantyp,
+			want: reflect.ChanOf(reflect.SendDir, f.etype)})
 	}
 
 	f.mu.Lock()

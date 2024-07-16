@@ -27,7 +27,8 @@ import (
 // Before the copy is executed, there is a callback can be registered to
 // manipulate the dest file.
 // It is perfectly valid to have destPath == srcPath.
-func copyFrom(srcPath, destPath string, offset uint64, before func(f *os.File) error) error {
+func copyFrom(srcPath, destPath string, offset uint64,
+	before func(f *os.File) error) error {
 	// Create a temp file in the same dir where we want it to wind up
 	f, err := os.CreateTemp(filepath.Dir(destPath), "*")
 	if err != nil {

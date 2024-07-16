@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/minio/sha256-simd"
-
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/utils"
 	"github.com/everFinance/gojwk"
+	"github.com/minio/sha256-simd"
 )
 
 type Signer struct {

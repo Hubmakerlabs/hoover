@@ -51,7 +51,8 @@ func TestTest(t *testing.T) {
 	if !results[1].Failed || results[1].Output != "output\nfailed\n" {
 		t.Fatalf("wrong result for failing test: %#v", results[1])
 	}
-	if !results[2].Failed || !strings.HasPrefix(results[2].Output, "panic: oh no\n") {
+	if !results[2].Failed || !strings.HasPrefix(results[2].Output,
+		"panic: oh no\n") {
 		t.Fatalf("wrong result for panicking test: %#v", results[2])
 	}
 }

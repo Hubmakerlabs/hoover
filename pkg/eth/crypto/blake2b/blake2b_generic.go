@@ -44,7 +44,8 @@ func hashBlocksGeneric(h *[8]uint64, c *[2]uint64, flag uint64, blocks []byte) {
 	c[0], c[1] = c0, c1
 }
 
-func fGeneric(h *[8]uint64, m *[16]uint64, c0, c1 uint64, flag uint64, rounds uint64) {
+func fGeneric(h *[8]uint64, m *[16]uint64, c0, c1 uint64, flag uint64,
+	rounds uint64) {
 	v0, v1, v2, v3, v4, v5, v6, v7 := h[0], h[1], h[2], h[3], h[4], h[5], h[6], h[7]
 	v8, v9, v10, v11, v12, v13, v14, v15 := iv[0], iv[1], iv[2], iv[3], iv[4], iv[5], iv[6], iv[7]
 	v12 ^= c0

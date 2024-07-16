@@ -38,10 +38,12 @@ func TestSstack(t *testing.T) {
 		// Make sure the contents of the resulting slices are ok
 		for i := 0; i < size; i++ {
 			if i%2 == 0 && data[i] != secs[i/2] {
-				t.Errorf("push/pop mismatch: have %v, want %v.", secs[i/2], data[i])
+				t.Errorf("push/pop mismatch: have %v, want %v.", secs[i/2],
+					data[i])
 			}
 			if i%2 == 1 && data[i] != rest[len(rest)-i/2-1] {
-				t.Errorf("push/pop mismatch: have %v, want %v.", rest[len(rest)-i/2-1], data[i])
+				t.Errorf("push/pop mismatch: have %v, want %v.",
+					rest[len(rest)-i/2-1], data[i])
 			}
 		}
 	}
@@ -64,7 +66,8 @@ func TestSstackSort(t *testing.T) {
 	for _, val := range data {
 		out := stack.Pop()
 		if out != val {
-			t.Errorf("push/pop mismatch after sort: have %v, want %v.", out, val)
+			t.Errorf("push/pop mismatch after sort: have %v, want %v.", out,
+				val)
 		}
 	}
 }
@@ -93,7 +96,8 @@ func TestSstackReset(t *testing.T) {
 		}
 		for i := 0; i < size; i++ {
 			if i%2 == 0 && data[i] != secs[i/2] {
-				t.Errorf("push/pop mismatch: have %v, want %v.", secs[i/2], data[i])
+				t.Errorf("push/pop mismatch: have %v, want %v.", secs[i/2],
+					data[i])
 			}
 		}
 	}

@@ -15,5 +15,6 @@ contract Contract {
 }
 ```
 
-The trace should show a revert, with the revert reason for both the top-call as well
+The trace should show a revert, with the revert reason for both the top-call as
+well
 as the inner call.

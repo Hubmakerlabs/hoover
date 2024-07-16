@@ -18,10 +18,11 @@ package miner
 
 import (
 	"encoding/binary"
-	"github.com/minio/sha256-simd"
 	"math/big"
 	"sync"
 	"time"
+
+	"github.com/minio/sha256-simd"
 
 	"github.com/Hubmakerlabs/hoover/pkg/eth/beacon/engine"
 	"github.com/Hubmakerlabs/hoover/pkg/eth/common"

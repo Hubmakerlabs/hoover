@@ -34,7 +34,8 @@ func TestStorageSizeString(t *testing.T) {
 
 	for _, test := range tests {
 		if test.size.String() != test.str {
-			t.Errorf("%f: got %q, want %q", float64(test.size), test.size.String(), test.str)
+			t.Errorf("%f: got %q, want %q", float64(test.size),
+				test.size.String(), test.str)
 		}
 	}
 }
@@ -53,7 +54,8 @@ func TestStorageSizeTerminalString(t *testing.T) {
 
 	for _, test := range tests {
 		if test.size.TerminalString() != test.str {
-			t.Errorf("%f: got %q, want %q", float64(test.size), test.size.TerminalString(), test.str)
+			t.Errorf("%f: got %q, want %q", float64(test.size),
+				test.size.TerminalString(), test.str)
 		}
 	}
 }

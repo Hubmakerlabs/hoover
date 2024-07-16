@@ -898,7 +898,8 @@ func TestTransactionFetcherBroadcasts(t *testing.T) {
 			// up, but the dangling request is left alone to avoid doing multiple
 			// concurrent requests.
 			doTxEnqueue{peer: "A",
-				txs:    []*types.Transaction{testTxs[0], testTxs[1], testTxs[2]},
+				txs: []*types.Transaction{testTxs[0], testTxs[1],
+					testTxs[2]},
 				direct: false},
 			isWaiting(nil),
 			isScheduled{
@@ -910,7 +911,8 @@ func TestTransactionFetcherBroadcasts(t *testing.T) {
 			},
 			// Deliver the requested hashes
 			doTxEnqueue{peer: "A",
-				txs:    []*types.Transaction{testTxs[0], testTxs[1], testTxs[2]},
+				txs: []*types.Transaction{testTxs[0], testTxs[1],
+					testTxs[2]},
 				direct: true},
 			isScheduled{nil, nil, nil},
 		},

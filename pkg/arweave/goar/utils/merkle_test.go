@@ -27,7 +27,7 @@ func TestGenerateLeaves(t *testing.T) {
 	data, _ := Base64Decode("NzcyNg")
 
 	assert.Equal(t, "z3rQGxyiqdQuOh2dxDst176oOKmW3S9MwQNTEh4DK1U",
-		(Base64Encode(generateLeaves(chunkData(data))[0].ID)))
+		Base64Encode(generateLeaves(chunkData(data))[0].ID))
 }
 
 // func TestChunkStream(t *testing.T) {

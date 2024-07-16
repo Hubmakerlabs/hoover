@@ -50,11 +50,13 @@ func TestKeyLengthIterator(t *testing.T) {
 		}
 		delete(expectedKeys, string(key))
 		if len(key) != keyLen {
-			t.Fatalf("Found unexpected key in key length iterator with length %d", len(key))
+			t.Fatalf("Found unexpected key in key length iterator with length %d",
+				len(key))
 		}
 	}
 
 	if len(expectedKeys) != 0 {
-		t.Fatalf("Expected all keys of length %d to be removed from expected keys during iteration", keyLen)
+		t.Fatalf("Expected all keys of length %d to be removed from expected keys during iteration",
+			keyLen)
 	}
 }

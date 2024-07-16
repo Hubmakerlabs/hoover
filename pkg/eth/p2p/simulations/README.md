@@ -7,7 +7,8 @@ extracting useful information.
 
 ## Nodes
 
-Each node in a simulation network runs multiple services by wrapping a collection
+Each node in a simulation network runs multiple services by wrapping a
+collection
 of objects which implement the `node.Service` interface meaning they:
 
 * can be started and stopped
@@ -28,7 +29,8 @@ A service initializer is a function with the following signature:
 func(ctx *adapters.ServiceContext) (node.Service, error)
 ```
 
-These initializers should be registered by calling the `adapters.RegisterServices`
+These initializers should be registered by calling
+the `adapters.RegisterServices`
 function in an `init()` hook:
 
 ```go
@@ -66,17 +68,17 @@ localhost ports.
 ## Network
 
 A simulation network is created with an ID and default service. The default
-service is used if a node is created without an explicit service. The 
-network has exposed methods for creating, starting, stopping, connecting 
+service is used if a node is created without an explicit service. The
+network has exposed methods for creating, starting, stopping, connecting
 and disconnecting nodes. It also emits events when certain actions occur.
 
 ### Events
 
 A simulation network emits the following events:
 
-* node event       - when nodes are created / started / stopped
+* node event - when nodes are created / started / stopped
 * connection event - when nodes are connected / disconnected
-* message event    - when a protocol message is sent between two nodes
+* message event - when a protocol message is sent between two nodes
 
 The events have a "control" flag which when set indicates that the event is the
 outcome of a controlled simulation action (e.g. creating a node or explicitly
@@ -101,10 +103,10 @@ with a `Step` which has the following fields:
 * `Action` - a function that performs some action in the network
 
 * `Expect` - an expectation function which returns whether or not a
-    given node meets the expectation
+  given node meets the expectation
 
 * `Trigger` - a channel that receives node IDs which then trigger a check
-    of the expectation function to be performed against that node
+  of the expectation function to be performed against that node
 
 As a concrete example, consider a simulated network of Ethereum nodes. An
 `Action` could be the sending of a transaction, `Expect` it being included in

@@ -35,7 +35,8 @@ var (
 	errInvalidKeyLength = errors.New("invalid, key length != 104")
 )
 
-func parsePrivateKey(key string) (k ed25519.PrivateKey, header []byte, keyNum []byte, err error) {
+func parsePrivateKey(key string) (k ed25519.PrivateKey, header []byte,
+	keyNum []byte, err error) {
 	keydata, err := base64.StdEncoding.DecodeString(key)
 	if err != nil {
 		return nil, nil, nil, err
@@ -53,7 +54,8 @@ func parsePrivateKey(key string) (k ed25519.PrivateKey, header []byte, keyNum []
 //
 // This accepts base64 keys in the format created by the 'signify' tool.
 // The signature is written to the 'output' file.
-func SignFile(input string, output string, key string, untrustedComment string, trustedComment string) error {
+func SignFile(input string, output string, key string, untrustedComment string,
+	trustedComment string) error {
 	// Pre-check comments and ensure they're set to something.
 	if strings.IndexByte(untrustedComment, '\n') >= 0 {
 		return errors.New("untrusted comment must not contain newline")

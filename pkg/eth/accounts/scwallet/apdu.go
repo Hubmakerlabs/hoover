@@ -46,7 +46,8 @@ func (ca commandAPDU) serialize() ([]byte, error) {
 		return nil, err
 	}
 	if len(ca.Data) > 0 {
-		if err := binary.Write(buf, binary.BigEndian, uint8(len(ca.Data))); err != nil {
+		if err := binary.Write(buf, binary.BigEndian,
+			uint8(len(ca.Data))); err != nil {
 			return nil, err
 		}
 		if err := binary.Write(buf, binary.BigEndian, ca.Data); err != nil {
@@ -68,7 +69,8 @@ type responseAPDU struct {
 // deserialize deserializes a response APDU.
 func (ra *responseAPDU) deserialize(data []byte) error {
 	if len(data) < 2 {
-		return fmt.Errorf("can not deserialize data: payload too short (%d < 2)", len(data))
+		return fmt.Errorf("can not deserialize data: payload too short (%d < 2)",
+			len(data))
 	}
 
 	ra.Data = make([]byte, len(data)-2)

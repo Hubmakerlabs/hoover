@@ -120,7 +120,8 @@ func TestResettingTimerWithFivePercentiles(t *testing.T) {
 			values:  []int64{},
 			start:   1,
 			end:     101,
-			wantP05: 5.050000000000001, wantP20: 20.200000000000003, wantP50: 50.5, wantP95: 95.94999999999999, wantP99: 99.99,
+			wantP05: 5.050000000000001, wantP20: 20.200000000000003,
+			wantP50: 50.5, wantP95: 95.94999999999999, wantP99: 99.99,
 			wantMin: 1, wantMax: 100, wantMean: 50.5,
 		},
 		{
@@ -176,7 +177,8 @@ func TestResettingTimerWithFivePercentiles(t *testing.T) {
 		}
 
 		if tt.wantMean != snap.Mean() {
-			t.Errorf("%d: mean: got %.2f, want %.2f", ind, snap.Mean(), tt.wantMean)
+			t.Errorf("%d: mean: got %.2f, want %.2f", ind, snap.Mean(),
+				tt.wantMean)
 		}
 		if tt.wantP05 != ps[0] {
 			t.Errorf("%d: p05: got %v, want %v", ind, ps[0], tt.wantP05)

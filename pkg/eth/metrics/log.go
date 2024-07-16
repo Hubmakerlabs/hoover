@@ -67,8 +67,10 @@ func LogScaled(r Registry, freq time.Duration, scale time.Duration, l Logger) {
 				ps := t.Percentiles([]float64{0.5, 0.75, 0.95, 0.99, 0.999})
 				l.Printf("timer %s\n", name)
 				l.Printf("  count:       %9d\n", t.Count())
-				l.Printf("  min:         %12.2f%s\n", float64(t.Min())/du, duSuffix)
-				l.Printf("  max:         %12.2f%s\n", float64(t.Max())/du, duSuffix)
+				l.Printf("  min:         %12.2f%s\n", float64(t.Min())/du,
+					duSuffix)
+				l.Printf("  max:         %12.2f%s\n", float64(t.Max())/du,
+					duSuffix)
 				l.Printf("  mean:        %12.2f%s\n", t.Mean()/du, duSuffix)
 				l.Printf("  stddev:      %12.2f%s\n", t.StdDev()/du, duSuffix)
 				l.Printf("  median:      %12.2f%s\n", ps[0]/du, duSuffix)

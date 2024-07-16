@@ -29,20 +29,23 @@ var (
 
 type emptySnapshot struct{}
 
-func (*emptySnapshot) Count() int64                       { return 0 }
-func (*emptySnapshot) Max() int64                         { return 0 }
-func (*emptySnapshot) Mean() float64                      { return 0.0 }
-func (*emptySnapshot) Min() int64                         { return 0 }
-func (*emptySnapshot) Percentile(p float64) float64       { return 0.0 }
-func (*emptySnapshot) Percentiles(ps []float64) []float64 { return make([]float64, len(ps)) }
-func (*emptySnapshot) Size() int                          { return 0 }
-func (*emptySnapshot) StdDev() float64                    { return 0.0 }
-func (*emptySnapshot) Sum() int64                         { return 0 }
-func (*emptySnapshot) Values() []int64                    { return []int64{} }
-func (*emptySnapshot) Variance() float64                  { return 0.0 }
-func (*emptySnapshot) Value() int64                       { return 0 }
-func (*emptySnapshot) Rate() float64                      { return 0.0 }
-func (*emptySnapshot) Rate1() float64                     { return 0.0 }
-func (*emptySnapshot) Rate5() float64                     { return 0.0 }
-func (*emptySnapshot) Rate15() float64                    { return 0.0 }
-func (*emptySnapshot) RateMean() float64                  { return 0.0 }
+func (*emptySnapshot) Count() int64                 { return 0 }
+func (*emptySnapshot) Max() int64                   { return 0 }
+func (*emptySnapshot) Mean() float64                { return 0.0 }
+func (*emptySnapshot) Min() int64                   { return 0 }
+func (*emptySnapshot) Percentile(p float64) float64 { return 0.0 }
+func (*emptySnapshot) Percentiles(ps []float64) []float64 {
+	return make([]float64,
+		len(ps))
+}
+func (*emptySnapshot) Size() int         { return 0 }
+func (*emptySnapshot) StdDev() float64   { return 0.0 }
+func (*emptySnapshot) Sum() int64        { return 0 }
+func (*emptySnapshot) Values() []int64   { return []int64{} }
+func (*emptySnapshot) Variance() float64 { return 0.0 }
+func (*emptySnapshot) Value() int64      { return 0 }
+func (*emptySnapshot) Rate() float64     { return 0.0 }
+func (*emptySnapshot) Rate1() float64    { return 0.0 }
+func (*emptySnapshot) Rate5() float64    { return 0.0 }
+func (*emptySnapshot) Rate15() float64   { return 0.0 }
+func (*emptySnapshot) RateMean() float64 { return 0.0 }

@@ -30,8 +30,10 @@ func TestRoute53ChangeSort(t *testing.T) {
 		"2kfjogvxdqtxxugbh7gs7naaai.n": {ttl: 3333, values: []string{
 			`"enr:-HW4QO1ml1DdXLeZLsUxewnthhUy8eROqkDyoMTyavfks9JlYQIlMFEUoM78PovJDPQrAkrb3LRJ-""vtrymDguKCOIAWAgmlkgnY0iXNlY3AyNTZrMaEDffaGfJzgGhUif1JqFruZlYmA31HzathLSWxfbq_QoQ4"`,
 		}},
-		"fdxn3sn67na5dka4j2gok7bvqi.n": {ttl: treeNodeTTL, values: []string{`"enrtree-branch:"`}},
-		"n":                            {ttl: rootTTL, values: []string{`"enrtree-root:v1 e=2KFJOGVXDQTXXUGBH7GS7NAAAI l=FDXN3SN67NA5DKA4J2GOK7BVQI seq=0 sig=v_-J_q_9ICQg5ztExFvLQhDBGMb0lZPJLhe3ts9LAcgqhOhtT3YFJsl8BWNDSwGtamUdR-9xl88_w-X42SVpjwE"`}},
+		"fdxn3sn67na5dka4j2gok7bvqi.n": {ttl: treeNodeTTL,
+			values: []string{`"enrtree-branch:"`}},
+		"n": {ttl: rootTTL,
+			values: []string{`"enrtree-root:v1 e=2KFJOGVXDQTXXUGBH7GS7NAAAI l=FDXN3SN67NA5DKA4J2GOK7BVQI seq=0 sig=v_-J_q_9ICQg5ztExFvLQhDBGMb0lZPJLhe3ts9LAcgqhOhtT3YFJsl8BWNDSwGtamUdR-9xl88_w-X42SVpjwE"`}},
 	}
 
 	testTree1 := map[string]string{
@@ -137,7 +139,8 @@ func TestRoute53ChangeSort(t *testing.T) {
 	var client route53Client
 	changes := client.computeChanges("n", testTree1, testTree0)
 	if !reflect.DeepEqual(changes, wantChanges) {
-		t.Fatalf("wrong changes (got %d, want %d)", len(changes), len(wantChanges))
+		t.Fatalf("wrong changes (got %d, want %d)", len(changes),
+			len(wantChanges))
 	}
 
 	// Check splitting according to size.
@@ -148,7 +151,8 @@ func TestRoute53ChangeSort(t *testing.T) {
 	}
 	split := splitChanges(changes, 600, 4000)
 	if !reflect.DeepEqual(split, wantSplit) {
-		t.Fatalf("wrong split batches: got %d, want %d", len(split), len(wantSplit))
+		t.Fatalf("wrong split batches: got %d, want %d", len(split),
+			len(wantSplit))
 	}
 
 	// Check splitting according to count.
@@ -158,7 +162,8 @@ func TestRoute53ChangeSort(t *testing.T) {
 	}
 	split = splitChanges(changes, 10000, 6)
 	if !reflect.DeepEqual(split, wantSplit) {
-		t.Fatalf("wrong split batches: got %d, want %d", len(split), len(wantSplit))
+		t.Fatalf("wrong split batches: got %d, want %d", len(split),
+			len(wantSplit))
 	}
 }
 

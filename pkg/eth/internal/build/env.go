@@ -28,13 +28,19 @@ import (
 
 var (
 	// These flags override values in build env.
-	GitCommitFlag     = flag.String("git-commit", "", `Overrides git commit hash embedded into executables`)
-	GitBranchFlag     = flag.String("git-branch", "", `Overrides git branch being built`)
-	GitTagFlag        = flag.String("git-tag", "", `Overrides git tag being built`)
-	BuildnumFlag      = flag.String("buildnum", "", `Overrides CI build number`)
-	PullRequestFlag   = flag.Bool("pull-request", false, `Overrides pull request status of the build`)
-	CronJobFlag       = flag.Bool("cron-job", false, `Overrides cron job status of the build`)
-	UbuntuVersionFlag = flag.String("ubuntu", "", `Sets the ubuntu version being built for`)
+	GitCommitFlag = flag.String("git-commit", "",
+		`Overrides git commit hash embedded into executables`)
+	GitBranchFlag = flag.String("git-branch", "",
+		`Overrides git branch being built`)
+	GitTagFlag = flag.String("git-tag", "",
+		`Overrides git tag being built`)
+	BuildnumFlag    = flag.String("buildnum", "", `Overrides CI build number`)
+	PullRequestFlag = flag.Bool("pull-request", false,
+		`Overrides pull request status of the build`)
+	CronJobFlag = flag.Bool("cron-job", false,
+		`Overrides cron job status of the build`)
+	UbuntuVersionFlag = flag.String("ubuntu", "",
+		`Sets the ubuntu version being built for`)
 )
 
 // Environment contains metadata provided by the build environment.
@@ -51,7 +57,8 @@ type Environment struct {
 
 func (env Environment) String() string {
 	return fmt.Sprintf("%s env (commit:%s date:%s branch:%s tag:%s buildnum:%s pr:%t)",
-		env.Name, env.Commit, env.Date, env.Branch, env.Tag, env.Buildnum, env.IsPullRequest)
+		env.Name, env.Commit, env.Date, env.Branch, env.Tag, env.Buildnum,
+		env.IsPullRequest)
 }
 
 // Env returns metadata about the current CI environment, falling back to LocalEnv
@@ -99,7 +106,8 @@ func Env() Environment {
 
 // LocalEnv returns build environment metadata gathered from git.
 func LocalEnv() Environment {
-	env := applyEnvFlags(Environment{Name: "local", Repo: "ethereum/go-ethereum"})
+	env := applyEnvFlags(Environment{Name: "local",
+		Repo: "ethereum/go-ethereum"})
 
 	head := readGitFile("HEAD")
 	if fields := strings.Fields(head); len(fields) == 2 {

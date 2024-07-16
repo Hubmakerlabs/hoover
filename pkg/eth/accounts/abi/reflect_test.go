@@ -172,10 +172,12 @@ var reflectTests = []reflectTest{
 func TestReflectNameToStruct(t *testing.T) {
 	for _, test := range reflectTests {
 		t.Run(test.name, func(t *testing.T) {
-			m, err := mapArgNamesToStructFields(test.args, reflect.ValueOf(test.struc))
+			m, err := mapArgNamesToStructFields(test.args,
+				reflect.ValueOf(test.struc))
 			if len(test.err) > 0 {
 				if err == nil || err.Error() != test.err {
-					t.Fatalf("Invalid error: expected %v, got %v", test.err, err)
+					t.Fatalf("Invalid error: expected %v, got %v", test.err,
+						err)
 				}
 			} else {
 				if err != nil {
@@ -183,7 +185,8 @@ func TestReflectNameToStruct(t *testing.T) {
 				}
 				for fname := range test.want {
 					if m[fname] != test.want[fname] {
-						t.Fatalf("Incorrect value for field %s: expected %v, got %v", fname, test.want[fname], m[fname])
+						t.Fatalf("Incorrect value for field %s: expected %v, got %v",
+							fname, test.want[fname], m[fname])
 					}
 				}
 			}

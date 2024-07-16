@@ -41,7 +41,8 @@ func TestAttachWithHeaders(t *testing.T) {
 		t.Fatal(err)
 	}
 	port := ln.Addr().(*net.TCPAddr).Port
-	testReceiveHeaders(t, ln, "attach", "-H", "first: one", "-H", "second: two", fmt.Sprintf("http://localhost:%d", port))
+	testReceiveHeaders(t, ln, "attach", "-H", "first: one", "-H", "second: two",
+		fmt.Sprintf("http://localhost:%d", port))
 	// This way to do it fails due to flag ordering:
 	//
 	// testReceiveHeaders(t, ln, "-H", "first: one", "-H", "second: two", "attach", fmt.Sprintf("http://localhost:%d", port))
@@ -57,7 +58,9 @@ func TestRemoteDbWithHeaders(t *testing.T) {
 		t.Fatal(err)
 	}
 	port := ln.Addr().(*net.TCPAddr).Port
-	testReceiveHeaders(t, ln, "db", "metadata", "--remotedb", fmt.Sprintf("http://localhost:%d", port), "-H", "first: one", "-H", "second: two")
+	testReceiveHeaders(t, ln, "db", "metadata", "--remotedb",
+		fmt.Sprintf("http://localhost:%d", port), "-H", "first: one", "-H",
+		"second: two")
 }
 
 func testReceiveHeaders(t *testing.T, ln net.Listener, gethArgs ...string) {

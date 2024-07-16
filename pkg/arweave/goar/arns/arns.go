@@ -89,7 +89,8 @@ func (a *ArNS) QueryNameCa(domain string) (caAddress string, err error) {
 
 }
 
-func (a *ArNS) GetArNSTxID(caAddress string, domain string) (txId string, err error) {
+func (a *ArNS) GetArNSTxID(caAddress string, domain string) (txId string,
+	err error) {
 
 	baseURL := a.DreUrl + "/contract/"
 
@@ -105,7 +106,8 @@ func (a *ArNS) GetArNSTxID(caAddress string, domain string) (txId string, err er
 
 	// Check the response status code
 	if response.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("GetArNSTxID: unexpected response status: %s", response.Status)
+		return "", fmt.Errorf("GetArNSTxID: unexpected response status: %s",
+			response.Status)
 	}
 
 	// Read the response body

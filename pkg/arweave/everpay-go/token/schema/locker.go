@@ -19,7 +19,8 @@ type Lockers map[string]Locker // key: oracle chainType
 func (a Lockers) GetLocker(chainType string) (Locker, error) {
 	chainLocker, ok := a[chainType]
 	if !ok {
-		return Locker{}, fmt.Errorf("GetLocker not found the chainType HeightLocker; chainType:%s", chainType)
+		return Locker{}, fmt.Errorf("GetLocker not found the chainType HeightLocker; chainType:%s",
+			chainType)
 	}
 	return chainLocker, nil
 }

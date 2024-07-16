@@ -40,8 +40,9 @@ import (
 	"crypto/sha512"
 	"errors"
 	"fmt"
-	"github.com/minio/sha256-simd"
 	"hash"
+
+	"github.com/minio/sha256-simd"
 
 	ethcrypto "github.com/Hubmakerlabs/hoover/pkg/eth/crypto"
 )

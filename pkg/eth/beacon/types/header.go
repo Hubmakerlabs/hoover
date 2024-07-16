@@ -19,6 +19,7 @@ package types
 
 import (
 	"encoding/binary"
+
 	"github.com/minio/sha256-simd"
 
 	"github.com/Hubmakerlabs/hoover/pkg/eth/beacon/merkle"

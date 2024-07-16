@@ -17,7 +17,7 @@
 package snap
 
 import (
-	metrics "github.com/Hubmakerlabs/hoover/pkg/eth/metrics"
+	"github.com/Hubmakerlabs/hoover/pkg/eth/metrics"
 )
 
 var (

@@ -1,9 +1,8 @@
 package bn256
 
 import (
-	"testing"
-
 	"crypto/rand"
+	"testing"
 )
 
 func TestRandomG2Marshal(t *testing.T) {
@@ -44,7 +43,8 @@ func TestPairings(t *testing.T) {
 	if p0.String() != p0_2.String() {
 		t.Error("Pairing mismatch: e(a, b) * e(a, -b) != 1")
 	}
-	p0_3 := new(GT).ScalarMult(p1, bigFromBase10("21888242871839275222246405745257275088548364400416034343698204186575808495617"))
+	p0_3 := new(GT).ScalarMult(p1,
+		bigFromBase10("21888242871839275222246405745257275088548364400416034343698204186575808495617"))
 	if p0.String() != p0_3.String() {
 		t.Error("Pairing mismatch: e(a, b) has wrong order")
 	}

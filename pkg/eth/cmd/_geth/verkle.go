@@ -28,8 +28,7 @@ import (
 	"github.com/Hubmakerlabs/hoover/pkg/eth/core/rawdb"
 	"github.com/Hubmakerlabs/hoover/pkg/eth/internal/flags"
 	"github.com/Hubmakerlabs/hoover/pkg/eth/log"
-	"github.com/gballet/go-verkle"
-	cli "github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v2"
 )
 
 var (

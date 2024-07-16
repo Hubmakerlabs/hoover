@@ -28,12 +28,14 @@ import (
 func readFile(path, desc string, dest interface{}) error {
 	inFile, err := os.Open(path)
 	if err != nil {
-		return NewError(ErrorIO, fmt.Errorf("failed reading %s file: %v", desc, err))
+		return NewError(ErrorIO,
+			fmt.Errorf("failed reading %s file: %v", desc, err))
 	}
 	defer inFile.Close()
 	decoder := json.NewDecoder(inFile)
 	if err := decoder.Decode(dest); err != nil {
-		return NewError(ErrorJson, fmt.Errorf("failed unmarshaling %s file: %v", desc, err))
+		return NewError(ErrorJson,
+			fmt.Errorf("failed unmarshaling %s file: %v", desc, err))
 	}
 	return nil
 }

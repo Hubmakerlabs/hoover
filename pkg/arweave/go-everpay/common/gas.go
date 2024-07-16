@@ -12,7 +12,6 @@ import (
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/ethrpc"
 	tokSchema "github.com/Hubmakerlabs/hoover/pkg/arweave/go-everpay/token/schema"
 	"github.com/getsentry/sentry-go"
-
 	"github.com/tidwall/gjson"
 )
 

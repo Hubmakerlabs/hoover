@@ -1348,7 +1348,7 @@ func SetP2PConfig(ctx *cli.Context, cfg *p2p.Config) {
 	setBootstrapNodesV5(ctx, cfg)
 
 	lightClient := ctx.String(SyncModeFlag.Name) == "light"
-	lightServer := (ctx.Int(LightServeFlag.Name) != 0)
+	lightServer := ctx.Int(LightServeFlag.Name) != 0
 
 	lightPeers := ctx.Int(LightMaxPeersFlag.Name)
 	if lightClient && !ctx.IsSet(LightMaxPeersFlag.Name) {

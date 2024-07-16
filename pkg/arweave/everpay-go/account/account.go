@@ -5,9 +5,8 @@ import (
 	"strconv"
 
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/everpay-go/common"
-	"github.com/Hubmakerlabs/hoover/pkg/arweave/goether"
-
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/utils"
+	"github.com/Hubmakerlabs/hoover/pkg/arweave/goether"
 	"github.com/Hubmakerlabs/hoover/pkg/eth/common/hexutil"
 )
 

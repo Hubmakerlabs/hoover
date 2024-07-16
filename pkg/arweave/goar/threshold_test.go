@@ -7,10 +7,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/minio/sha256-simd"
-
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/utils"
 	tcrsa "github.com/everFinance/ttcrsa"
+	"github.com/minio/sha256-simd"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -35,12 +35,14 @@ func TestNewID(t *testing.T) {
 
 		id = id[2:]
 		if len(id) == 0 || len(id) > 32 {
-			t.Fatalf("invalid ID length, want len(id) > 0 && len(id) <= 32), got %d", len(id))
+			t.Fatalf("invalid ID length, want len(id) > 0 && len(id) <= 32), got %d",
+				len(id))
 		}
 
 		for i := 0; i < len(id); i++ {
 			if strings.IndexByte(hexchars, id[i]) == -1 {
-				t.Fatalf("unexpected byte, want any valid hex char, got %c", id[i])
+				t.Fatalf("unexpected byte, want any valid hex char, got %c",
+					id[i])
 			}
 		}
 	}
@@ -115,7 +117,8 @@ func TestSubscriptions(t *testing.T) {
 					continue
 				}
 				if count, found := count[subid]; !found || count < notificationCount {
-					t.Errorf("didn't receive all notifications (%d<%d) in time for namespace %q", count, notificationCount, namespace)
+					t.Errorf("didn't receive all notifications (%d<%d) in time for namespace %q",
+						count, notificationCount, namespace)
 				}
 			}
 			t.Fatal("timed out")
@@ -178,7 +181,8 @@ type subConfirmation struct {
 
 // waitForMessages reads RPC messages from 'in' and dispatches them into the given channels.
 // It stops if there is an error.
-func waitForMessages(in *json.Decoder, successes chan subConfirmation, notifications chan subscriptionResult, errors chan error) {
+func waitForMessages(in *json.Decoder, successes chan subConfirmation,
+	notifications chan subscriptionResult, errors chan error) {
 	for {
 		resp, notification, err := readAndValidateMessage(in)
 		if err != nil {
@@ -192,7 +196,8 @@ func waitForMessages(in *json.Decoder, successes chan subConfirmation, notificat
 	}
 }
 
-func readAndValidateMessage(in *json.Decoder) (*subConfirmation, *subscriptionResult, error) {
+func readAndValidateMessage(in *json.Decoder) (*subConfirmation,
+	*subscriptionResult, error) {
 	var msg jsonrpcMessage
 	if err := in.Decode(&msg); err != nil {
 		return nil, nil, fmt.Errorf("decode error: %v", err)

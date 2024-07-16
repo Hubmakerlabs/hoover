@@ -98,7 +98,8 @@ func (r *StandardRegistry) Get(name string) interface{} {
 // alternative to calling Get and Register on failure.
 // The interface can be the metric to register if not found in registry,
 // or a function returning the metric for lazy instantiation.
-func (r *StandardRegistry) GetOrRegister(name string, i interface{}) interface{} {
+func (r *StandardRegistry) GetOrRegister(name string,
+	i interface{}) interface{} {
 	// fast path
 	cached, ok := r.metrics.Load(name)
 	if ok {
@@ -212,7 +213,8 @@ func (r *StandardRegistry) Unregister(name string) {
 	r.metrics.LoadAndDelete(name)
 }
 
-func (r *StandardRegistry) loadOrRegister(name string, i interface{}) (interface{}, bool, bool) {
+func (r *StandardRegistry) loadOrRegister(name string,
+	i interface{}) (interface{}, bool, bool) {
 	switch i.(type) {
 	case Counter, CounterFloat64, Gauge, GaugeFloat64, GaugeInfo, Healthcheck, Histogram, Meter, Timer, ResettingTimer:
 	default:
@@ -298,7 +300,8 @@ func (r *PrefixedRegistry) Get(name string) interface{} {
 // Gets an existing metric or registers the given one.
 // The interface can be the metric to register if not found in registry,
 // or a function returning the metric for lazy instantiation.
-func (r *PrefixedRegistry) GetOrRegister(name string, metric interface{}) interface{} {
+func (r *PrefixedRegistry) GetOrRegister(name string,
+	metric interface{}) interface{} {
 	realName := r.prefix + name
 	return r.underlying.GetOrRegister(realName, metric)
 }

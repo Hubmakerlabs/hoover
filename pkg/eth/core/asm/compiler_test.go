@@ -73,7 +73,8 @@ label: ;; comment
 			continue
 		}
 		if output != test.output {
-			t.Errorf("incorrect output\ninput: %sgot:  %s\nwant: %s\n", test.input, output, test.output)
+			t.Errorf("incorrect output\ninput: %sgot:  %s\nwant: %s\n",
+				test.input, output, test.output)
 		}
 	}
 }

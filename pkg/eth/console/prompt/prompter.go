@@ -122,7 +122,8 @@ func (p *terminalPrompter) PromptInput(prompt string) (string, error) {
 // PromptPassword displays the given prompt to the user and requests some textual
 // data to be entered, but one which must not be echoed out into the terminal.
 // The method returns the input provided by the user.
-func (p *terminalPrompter) PromptPassword(prompt string) (passwd string, err error) {
+func (p *terminalPrompter) PromptPassword(prompt string) (passwd string,
+	err error) {
 	if p.supported {
 		p.rawMode.ApplyMode()
 		defer p.normalMode.ApplyMode()

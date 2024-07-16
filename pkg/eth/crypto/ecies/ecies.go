@@ -94,7 +94,8 @@ func ImportECDSA(prv *ecdsa.PrivateKey) *PrivateKey {
 
 // Generate an elliptic curve public / private keypair. If params is nil,
 // the recommended default parameters for the key will be chosen.
-func GenerateKey(rand io.Reader, curve elliptic.Curve, params *ECIESParams) (prv *PrivateKey, err error) {
+func GenerateKey(rand io.Reader, curve elliptic.Curve,
+	params *ECIESParams) (prv *PrivateKey, err error) {
 	pb, x, y, err := elliptic.GenerateKey(curve, rand)
 	if err != nil {
 		return
@@ -118,7 +119,8 @@ func MaxSharedKeyLength(pub *PublicKey) int {
 }
 
 // ECDH key agreement method used to establish secret keys for encryption.
-func (prv *PrivateKey) GenerateShared(pub *PublicKey, skLen, macLen int) (sk []byte, err error) {
+func (prv *PrivateKey) GenerateShared(pub *PublicKey,
+	skLen, macLen int) (sk []byte, err error) {
 	if prv.PublicKey.Curve != pub.Curve {
 		return nil, ErrInvalidCurve
 	}
@@ -191,7 +193,8 @@ func generateIV(params *ECIESParams, rand io.Reader) (iv []byte, err error) {
 }
 
 // symEncrypt carries out CTR encryption using the block cipher specified in the
-func symEncrypt(rand io.Reader, params *ECIESParams, key, m []byte) (ct []byte, err error) {
+func symEncrypt(rand io.Reader, params *ECIESParams, key, m []byte) (ct []byte,
+	err error) {
 	c, err := params.Cipher(key)
 	if err != nil {
 		return
@@ -229,7 +232,8 @@ func symDecrypt(params *ECIESParams, key, ct []byte) (m []byte, err error) {
 // s1 and s2 contain shared information that is not part of the resulting
 // ciphertext. s1 is fed into key derivation, s2 is fed into the MAC. If the
 // shared information parameters aren't being used, they should be nil.
-func Encrypt(rand io.Reader, pub *PublicKey, m, s1, s2 []byte) (ct []byte, err error) {
+func Encrypt(rand io.Reader, pub *PublicKey, m, s1, s2 []byte) (ct []byte,
+	err error) {
 	params, err := pubkeyParams(pub)
 	if err != nil {
 		return nil, err
@@ -277,7 +281,7 @@ func (prv *PrivateKey) Decrypt(c, s1, s2 []byte) (m []byte, err error) {
 
 	var (
 		rLen   int
-		hLen   int = hash.Size()
+		hLen   = hash.Size()
 		mStart int
 		mEnd   int
 	)

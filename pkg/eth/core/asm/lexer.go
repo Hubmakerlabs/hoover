@@ -169,7 +169,8 @@ func (l *lexer) emit(t tokenType) {
 	token := token{t, l.lineno, l.blob()}
 
 	if l.debug {
-		fmt.Fprintf(os.Stderr, "%04d: (%-20v) %s\n", token.lineno, token.typ, token.text)
+		fmt.Fprintf(os.Stderr, "%04d: (%-20v) %s\n", token.lineno, token.typ,
+			token.text)
 	}
 
 	l.tokens <- token

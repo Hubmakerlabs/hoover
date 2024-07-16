@@ -3,12 +3,11 @@ package sdk
 import (
 	"errors"
 
-	"github.com/minio/sha256-simd"
-
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/utils"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goether"
 	"github.com/Hubmakerlabs/hoover/pkg/eth/common/hexutil"
+	"github.com/minio/sha256-simd"
 )
 
 const (

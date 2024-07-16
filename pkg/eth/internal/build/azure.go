@@ -39,13 +39,16 @@ type AzureBlobstoreConfig struct {
 // need a multi API call approach implemented.
 //
 // See: https://msdn.microsoft.com/en-us/library/azure/dd179451.aspx#Anchor_3
-func AzureBlobstoreUpload(path string, name string, config AzureBlobstoreConfig) error {
+func AzureBlobstoreUpload(path string, name string,
+	config AzureBlobstoreConfig) error {
 	if *DryRunFlag {
-		fmt.Printf("would upload %q to %s/%s/%s\n", path, config.Account, config.Container, name)
+		fmt.Printf("would upload %q to %s/%s/%s\n", path, config.Account,
+			config.Container, name)
 		return nil
 	}
 	// Create an authenticated client against the Azure cloud
-	credential, err := azblob.NewSharedKeyCredential(config.Account, config.Token)
+	credential, err := azblob.NewSharedKeyCredential(config.Account,
+		config.Token)
 	if err != nil {
 		return err
 	}
@@ -61,14 +64,17 @@ func AzureBlobstoreUpload(path string, name string, config AzureBlobstoreConfig)
 	}
 	defer in.Close()
 
-	_, err = client.UploadFile(context.Background(), config.Container, name, in, nil)
+	_, err = client.UploadFile(context.Background(), config.Container, name, in,
+		nil)
 	return err
 }
 
 // AzureBlobstoreList lists all the files contained within an azure blobstore.
-func AzureBlobstoreList(config AzureBlobstoreConfig) ([]*container.BlobItem, error) {
+func AzureBlobstoreList(config AzureBlobstoreConfig) ([]*container.BlobItem,
+	error) {
 	// Create an authenticated client against the Azure cloud
-	credential, err := azblob.NewSharedKeyCredential(config.Account, config.Token)
+	credential, err := azblob.NewSharedKeyCredential(config.Account,
+		config.Token)
 	if err != nil {
 		return nil, err
 	}
@@ -92,15 +98,18 @@ func AzureBlobstoreList(config AzureBlobstoreConfig) ([]*container.BlobItem, err
 
 // AzureBlobstoreDelete iterates over a list of files to delete and removes them
 // from the blobstore.
-func AzureBlobstoreDelete(config AzureBlobstoreConfig, blobs []*container.BlobItem) error {
+func AzureBlobstoreDelete(config AzureBlobstoreConfig,
+	blobs []*container.BlobItem) error {
 	if *DryRunFlag {
 		for _, blob := range blobs {
-			fmt.Printf("would delete %s (%s) from %s/%s\n", *blob.Name, blob.Properties.LastModified, config.Account, config.Container)
+			fmt.Printf("would delete %s (%s) from %s/%s\n", *blob.Name,
+				blob.Properties.LastModified, config.Account, config.Container)
 		}
 		return nil
 	}
 	// Create an authenticated client against the Azure cloud
-	credential, err := azblob.NewSharedKeyCredential(config.Account, config.Token)
+	credential, err := azblob.NewSharedKeyCredential(config.Account,
+		config.Token)
 	if err != nil {
 		return err
 	}
@@ -111,10 +120,12 @@ func AzureBlobstoreDelete(config AzureBlobstoreConfig, blobs []*container.BlobIt
 	}
 	// Iterate over the blobs and delete them
 	for _, blob := range blobs {
-		if _, err := client.DeleteBlob(context.Background(), config.Container, *blob.Name, nil); err != nil {
+		if _, err := client.DeleteBlob(context.Background(), config.Container,
+			*blob.Name, nil); err != nil {
 			return err
 		}
-		fmt.Printf("deleted  %s (%s)\n", *blob.Name, blob.Properties.LastModified)
+		fmt.Printf("deleted  %s (%s)\n", *blob.Name,
+			blob.Properties.LastModified)
 	}
 	return nil
 }

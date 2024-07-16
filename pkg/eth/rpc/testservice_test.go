@@ -31,7 +31,8 @@ func newTestServer() *Server {
 	if err := server.RegisterName("test", new(testService)); err != nil {
 		panic(err)
 	}
-	if err := server.RegisterName("nftest", new(notificationTestService)); err != nil {
+	if err := server.RegisterName("nftest",
+		new(notificationTestService)); err != nil {
 		panic(err)
 	}
 	return server
@@ -86,7 +87,8 @@ func (s *testService) Echo(str string, i int, args *echoArgs) echoResult {
 	return echoResult{str, i, args}
 }
 
-func (s *testService) EchoWithCtx(ctx context.Context, str string, i int, args *echoArgs) echoResult {
+func (s *testService) EchoWithCtx(ctx context.Context, str string, i int,
+	args *echoArgs) echoResult {
 	return echoResult{str, i, args}
 }
 
@@ -136,7 +138,8 @@ func (s *testService) Panic() string {
 	panic("service panic")
 }
 
-func (s *testService) CallMeBack(ctx context.Context, method string, args []interface{}) (interface{}, error) {
+func (s *testService) CallMeBack(ctx context.Context, method string,
+	args []interface{}) (interface{}, error) {
 	c, ok := ClientFromContext(ctx)
 	if !ok {
 		return nil, errors.New("no client")
@@ -146,7 +149,8 @@ func (s *testService) CallMeBack(ctx context.Context, method string, args []inte
 	return result, err
 }
 
-func (s *testService) CallMeBackLater(ctx context.Context, method string, args []interface{}) error {
+func (s *testService) CallMeBackLater(ctx context.Context, method string,
+	args []interface{}) error {
 	c, ok := ClientFromContext(ctx)
 	if !ok {
 		return errors.New("no client")
@@ -179,7 +183,8 @@ func (s *notificationTestService) Unsubscribe(subid string) {
 	}
 }
 
-func (s *notificationTestService) SomeSubscription(ctx context.Context, n, val int) (*Subscription, error) {
+func (s *notificationTestService) SomeSubscription(ctx context.Context,
+	n, val int) (*Subscription, error) {
 	notifier, supported := NotifierFromContext(ctx)
 	if !supported {
 		return nil, ErrNotificationsUnsupported
@@ -207,7 +212,8 @@ func (s *notificationTestService) SomeSubscription(ctx context.Context, n, val i
 }
 
 // HangSubscription blocks on s.unblockHangSubscription before sending anything.
-func (s *notificationTestService) HangSubscription(ctx context.Context, val int) (*Subscription, error) {
+func (s *notificationTestService) HangSubscription(ctx context.Context,
+	val int) (*Subscription, error) {
 	notifier, supported := NotifierFromContext(ctx)
 	if !supported {
 		return nil, ErrNotificationsUnsupported

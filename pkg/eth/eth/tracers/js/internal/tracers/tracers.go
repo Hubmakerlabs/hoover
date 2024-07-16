@@ -31,21 +31,22 @@ var files embed.FS
 // returns a mapping of tracer name to source.
 func Load() (map[string]string, error) {
 	var assetTracers = make(map[string]string)
-	err := fs.WalkDir(files, ".", func(path string, d fs.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-		if d.IsDir() {
+	err := fs.WalkDir(files, ".",
+		func(path string, d fs.DirEntry, err error) error {
+			if err != nil {
+				return err
+			}
+			if d.IsDir() {
+				return nil
+			}
+			b, err := fs.ReadFile(files, path)
+			if err != nil {
+				return err
+			}
+			name := camel(strings.TrimSuffix(path, ".js"))
+			assetTracers[name] = string(b)
 			return nil
-		}
-		b, err := fs.ReadFile(files, path)
-		if err != nil {
-			return err
-		}
-		name := camel(strings.TrimSuffix(path, ".js"))
-		assetTracers[name] = string(b)
-		return nil
-	})
+		})
 	return assetTracers, err
 }
 

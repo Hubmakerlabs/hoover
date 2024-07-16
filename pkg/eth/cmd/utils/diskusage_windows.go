@@ -30,7 +30,8 @@ func getFreeDiskSpace(path string) (uint64, error) {
 	}
 
 	var freeBytesAvailableToCaller, totalNumberOfBytes, totalNumberOfFreeBytes uint64
-	if err := windows.GetDiskFreeSpaceEx(cwd, &freeBytesAvailableToCaller, &totalNumberOfBytes, &totalNumberOfFreeBytes); err != nil {
+	if err := windows.GetDiskFreeSpaceEx(cwd, &freeBytesAvailableToCaller,
+		&totalNumberOfBytes, &totalNumberOfFreeBytes); err != nil {
 		return 0, fmt.Errorf("failed to call GetDiskFreeSpaceEx: %v", err)
 	}
 

@@ -89,7 +89,8 @@ func TestUnmarshalBytes(t *testing.T) {
 			continue
 		}
 		if !bytes.Equal(test.want.([]byte), v) {
-			t.Errorf("input %s: value mismatch: got %x, want %x", test.input, &v, test.want)
+			t.Errorf("input %s: value mismatch: got %x, want %x", test.input,
+				&v, test.want)
 			continue
 		}
 	}
@@ -114,7 +115,8 @@ func TestMarshalBytes(t *testing.T) {
 			continue
 		}
 		if want := `"` + test.want + `"`; string(out) != want {
-			t.Errorf("%x: MarshalJSON output mismatch: got %q, want %q", in, out, want)
+			t.Errorf("%x: MarshalJSON output mismatch: got %q, want %q", in,
+				out, want)
 			continue
 		}
 		if out := Bytes(in).String(); out != test.want {
@@ -170,7 +172,8 @@ func TestUnmarshalBig(t *testing.T) {
 			continue
 		}
 		if test.want != nil && test.want.(*big.Int).Cmp((*big.Int)(&v)) != 0 {
-			t.Errorf("input %s: value mismatch: got %x, want %x", test.input, (*big.Int)(&v), test.want)
+			t.Errorf("input %s: value mismatch: got %x, want %x", test.input,
+				(*big.Int)(&v), test.want)
 			continue
 		}
 	}
@@ -195,7 +198,8 @@ func TestMarshalBig(t *testing.T) {
 			continue
 		}
 		if want := `"` + test.want + `"`; string(out) != want {
-			t.Errorf("%d: MarshalJSON output mismatch: got %q, want %q", in, out, want)
+			t.Errorf("%d: MarshalJSON output mismatch: got %q, want %q", in,
+				out, want)
 			continue
 		}
 		if out := (*Big)(in).String(); out != test.want {
@@ -213,7 +217,8 @@ var unmarshalUint64Tests = []unmarshalTest{
 	{input: `"0"`, wantErr: wrapTypeError(ErrMissingPrefix, uint64T)},
 	{input: `"0x"`, wantErr: wrapTypeError(ErrEmptyNumber, uint64T)},
 	{input: `"0x01"`, wantErr: wrapTypeError(ErrLeadingZero, uint64T)},
-	{input: `"0xfffffffffffffffff"`, wantErr: wrapTypeError(ErrUint64Range, uint64T)},
+	{input: `"0xfffffffffffffffff"`,
+		wantErr: wrapTypeError(ErrUint64Range, uint64T)},
 	{input: `"0xx"`, wantErr: wrapTypeError(ErrSyntax, uint64T)},
 	{input: `"0x1zz01"`, wantErr: wrapTypeError(ErrSyntax, uint64T)},
 
@@ -236,7 +241,8 @@ func TestUnmarshalUint64(t *testing.T) {
 			continue
 		}
 		if uint64(v) != test.want.(uint64) {
-			t.Errorf("input %s: value mismatch: got %d, want %d", test.input, v, test.want)
+			t.Errorf("input %s: value mismatch: got %d, want %d", test.input, v,
+				test.want)
 			continue
 		}
 	}
@@ -259,7 +265,8 @@ func TestMarshalUint64(t *testing.T) {
 			continue
 		}
 		if want := `"` + test.want + `"`; string(out) != want {
-			t.Errorf("%d: MarshalJSON output mismatch: got %q, want %q", in, out, want)
+			t.Errorf("%d: MarshalJSON output mismatch: got %q, want %q", in,
+				out, want)
 			continue
 		}
 		if out := (Uint64)(in).String(); out != test.want {
@@ -278,7 +285,8 @@ func TestMarshalUint(t *testing.T) {
 			continue
 		}
 		if want := `"` + test.want + `"`; string(out) != want {
-			t.Errorf("%d: MarshalJSON output mismatch: got %q, want %q", in, out, want)
+			t.Errorf("%d: MarshalJSON output mismatch: got %q, want %q", in,
+				out, want)
 			continue
 		}
 		if out := (Uint)(in).String(); out != test.want {
@@ -303,8 +311,10 @@ var unmarshalUintTests = []unmarshalTest{
 	{input: `"0"`, wantErr: wrapTypeError(ErrMissingPrefix, uintT)},
 	{input: `"0x"`, wantErr: wrapTypeError(ErrEmptyNumber, uintT)},
 	{input: `"0x01"`, wantErr: wrapTypeError(ErrLeadingZero, uintT)},
-	{input: `"0x100000000"`, want: uint(maxUint33bits), wantErr32bit: wrapTypeError(ErrUintRange, uintT)},
-	{input: `"0xfffffffffffffffff"`, wantErr: wrapTypeError(ErrUintRange, uintT)},
+	{input: `"0x100000000"`, want: uint(maxUint33bits),
+		wantErr32bit: wrapTypeError(ErrUintRange, uintT)},
+	{input: `"0xfffffffffffffffff"`,
+		wantErr: wrapTypeError(ErrUintRange, uintT)},
 	{input: `"0xx"`, wantErr: wrapTypeError(ErrSyntax, uintT)},
 	{input: `"0x1zz01"`, wantErr: wrapTypeError(ErrSyntax, uintT)},
 
@@ -317,7 +327,8 @@ var unmarshalUintTests = []unmarshalTest{
 	{input: `"0x1122aaff"`, want: uint(0x1122aaff)},
 	{input: `"0xbbb"`, want: uint(0xbbb)},
 	{input: `"0xffffffff"`, want: uint(0xffffffff)},
-	{input: `"0xffffffffffffffff"`, want: uint(maxUint64bits), wantErr32bit: wrapTypeError(ErrUintRange, uintT)},
+	{input: `"0xffffffffffffffff"`, want: uint(maxUint64bits),
+		wantErr32bit: wrapTypeError(ErrUintRange, uintT)},
 }
 
 func TestUnmarshalUint(t *testing.T) {
@@ -332,7 +343,8 @@ func TestUnmarshalUint(t *testing.T) {
 			continue
 		}
 		if uint(v) != test.want.(uint) {
-			t.Errorf("input %s: value mismatch: got %d, want %d", test.input, v, test.want)
+			t.Errorf("input %s: value mismatch: got %d, want %d", test.input, v,
+				test.want)
 			continue
 		}
 	}
@@ -346,8 +358,10 @@ func TestUnmarshalFixedUnprefixedText(t *testing.T) {
 	}{
 		{input: "0x2", wantErr: ErrOddLength},
 		{input: "2", wantErr: ErrOddLength},
-		{input: "4444", wantErr: errors.New("hex string has length 4, want 8 for x")},
-		{input: "4444", wantErr: errors.New("hex string has length 4, want 8 for x")},
+		{input: "4444",
+			wantErr: errors.New("hex string has length 4, want 8 for x")},
+		{input: "4444",
+			wantErr: errors.New("hex string has length 4, want 8 for x")},
 		// check that output is not modified for partially correct input
 		{input: "444444gg", wantErr: ErrSyntax, want: []byte{0, 0, 0, 0}},
 		{input: "0x444444gg", wantErr: ErrSyntax, want: []byte{0, 0, 0, 0}},
@@ -365,10 +379,12 @@ func TestUnmarshalFixedUnprefixedText(t *testing.T) {
 		case err != nil && test.wantErr == nil:
 			t.Errorf("%q: unexpected error %q", test.input, err)
 		case err != nil && err.Error() != test.wantErr.Error():
-			t.Errorf("%q: error mismatch: got %q, want %q", test.input, err, test.wantErr)
+			t.Errorf("%q: error mismatch: got %q, want %q", test.input, err,
+				test.wantErr)
 		}
 		if test.want != nil && !bytes.Equal(out, test.want) {
-			t.Errorf("%q: output mismatch: got %x, want %x", test.input, out, test.want)
+			t.Errorf("%q: output mismatch: got %x, want %x", test.input, out,
+				test.want)
 		}
 	}
 }

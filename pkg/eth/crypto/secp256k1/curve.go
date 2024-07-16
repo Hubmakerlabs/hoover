@@ -93,14 +93,14 @@ func (BitCurve *BitCurve) Params() *elliptic.CurveParams {
 // IsOnCurve returns true if the given (x,y) lies on the BitCurve.
 func (BitCurve *BitCurve) IsOnCurve(x, y *big.Int) bool {
 	// y² = x³ + b
-	y2 := new(big.Int).Mul(y, y) //y²
-	y2.Mod(y2, BitCurve.P)       //y²%P
+	y2 := new(big.Int).Mul(y, y) // y²
+	y2.Mod(y2, BitCurve.P)       // y²%P
 
-	x3 := new(big.Int).Mul(x, x) //x²
-	x3.Mul(x3, x)                //x³
+	x3 := new(big.Int).Mul(x, x) // x²
+	x3.Mul(x3, x)                // x³
 
-	x3.Add(x3, BitCurve.B) //x³+B
-	x3.Mod(x3, BitCurve.P) //(x³+B)%P
+	x3.Add(x3, BitCurve.B) // x³+B
+	x3.Mod(x3, BitCurve.P) // (x³+B)%P
 
 	return x3.Cmp(y2) == 0
 }
@@ -137,12 +137,14 @@ func (BitCurve *BitCurve) Add(x1, y1, x2, y2 *big.Int) (*big.Int, *big.Int) {
 	if x1.Cmp(x2) == 0 && y1.Cmp(y2) == 0 {
 		return BitCurve.affineFromJacobian(BitCurve.doubleJacobian(x1, y1, z))
 	}
-	return BitCurve.affineFromJacobian(BitCurve.addJacobian(x1, y1, z, x2, y2, z))
+	return BitCurve.affineFromJacobian(BitCurve.addJacobian(x1, y1, z, x2, y2,
+		z))
 }
 
 // addJacobian takes two points in Jacobian coordinates, (x1, y1, z1) and
 // (x2, y2, z2) and returns their sum, also in Jacobian form.
-func (BitCurve *BitCurve) addJacobian(x1, y1, z1, x2, y2, z2 *big.Int) (*big.Int, *big.Int, *big.Int) {
+func (BitCurve *BitCurve) addJacobian(x1, y1, z1, x2, y2, z2 *big.Int) (*big.Int,
+	*big.Int, *big.Int) {
 	// See http://hyperelliptic.org/EFD/g1p/auto-shortw-jacobian-0.html#addition-add-2007-bl
 	z1z1 := new(big.Int).Mul(z1, z1)
 	z1z1.Mod(z1z1, BitCurve.P)
@@ -213,33 +215,34 @@ func (BitCurve *BitCurve) Double(x1, y1 *big.Int) (*big.Int, *big.Int) {
 
 // doubleJacobian takes a point in Jacobian coordinates, (x, y, z), and
 // returns its double, also in Jacobian form.
-func (BitCurve *BitCurve) doubleJacobian(x, y, z *big.Int) (*big.Int, *big.Int, *big.Int) {
+func (BitCurve *BitCurve) doubleJacobian(x, y, z *big.Int) (*big.Int, *big.Int,
+	*big.Int) {
 	// See http://hyperelliptic.org/EFD/g1p/auto-shortw-jacobian-0.html#doubling-dbl-2009-l
 
-	a := new(big.Int).Mul(x, x) //X1²
-	b := new(big.Int).Mul(y, y) //Y1²
-	c := new(big.Int).Mul(b, b) //B²
+	a := new(big.Int).Mul(x, x) // X1²
+	b := new(big.Int).Mul(y, y) // Y1²
+	c := new(big.Int).Mul(b, b) // B²
 
-	d := new(big.Int).Add(x, b) //X1+B
-	d.Mul(d, d)                 //(X1+B)²
-	d.Sub(d, a)                 //(X1+B)²-A
-	d.Sub(d, c)                 //(X1+B)²-A-C
-	d.Mul(d, big.NewInt(2))     //2*((X1+B)²-A-C)
+	d := new(big.Int).Add(x, b) // X1+B
+	d.Mul(d, d)                 // (X1+B)²
+	d.Sub(d, a)                 // (X1+B)²-A
+	d.Sub(d, c)                 // (X1+B)²-A-C
+	d.Mul(d, big.NewInt(2))     // 2*((X1+B)²-A-C)
 
-	e := new(big.Int).Mul(big.NewInt(3), a) //3*A
-	f := new(big.Int).Mul(e, e)             //E²
+	e := new(big.Int).Mul(big.NewInt(3), a) // 3*A
+	f := new(big.Int).Mul(e, e)             // E²
 
-	x3 := new(big.Int).Mul(big.NewInt(2), d) //2*D
-	x3.Sub(f, x3)                            //F-2*D
+	x3 := new(big.Int).Mul(big.NewInt(2), d) // 2*D
+	x3.Sub(f, x3)                            // F-2*D
 	x3.Mod(x3, BitCurve.P)
 
-	y3 := new(big.Int).Sub(d, x3)                  //D-X3
-	y3.Mul(e, y3)                                  //E*(D-X3)
-	y3.Sub(y3, new(big.Int).Mul(big.NewInt(8), c)) //E*(D-X3)-8*C
+	y3 := new(big.Int).Sub(d, x3)                  // D-X3
+	y3.Mul(e, y3)                                  // E*(D-X3)
+	y3.Sub(y3, new(big.Int).Mul(big.NewInt(8), c)) // E*(D-X3)-8*C
 	y3.Mod(y3, BitCurve.P)
 
-	z3 := new(big.Int).Mul(y, z) //Y1*Z1
-	z3.Mul(big.NewInt(2), z3)    //3*Y1*Z1
+	z3 := new(big.Int).Mul(y, z) // Y1*Z1
+	z3.Mul(big.NewInt(2), z3)    // 3*Y1*Z1
 	z3.Mod(z3, BitCurve.P)
 
 	return x3, y3, z3
@@ -283,11 +286,16 @@ func init() {
 	// See SEC 2 section 2.7.1
 	// curve parameters taken from:
 	// http://www.secg.org/sec2-v2.pdf
-	theCurve.P, _ = new(big.Int).SetString("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F", 0)
-	theCurve.N, _ = new(big.Int).SetString("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141", 0)
-	theCurve.B, _ = new(big.Int).SetString("0x0000000000000000000000000000000000000000000000000000000000000007", 0)
-	theCurve.Gx, _ = new(big.Int).SetString("0x79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798", 0)
-	theCurve.Gy, _ = new(big.Int).SetString("0x483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8", 0)
+	theCurve.P, _ = new(big.Int).SetString("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F",
+		0)
+	theCurve.N, _ = new(big.Int).SetString("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141",
+		0)
+	theCurve.B, _ = new(big.Int).SetString("0x0000000000000000000000000000000000000000000000000000000000000007",
+		0)
+	theCurve.Gx, _ = new(big.Int).SetString("0x79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798",
+		0)
+	theCurve.Gy, _ = new(big.Int).SetString("0x483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8",
+		0)
 	theCurve.BitSize = 256
 }
 

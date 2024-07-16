@@ -32,15 +32,18 @@ func confirmStatusCode(t *testing.T, got, want int) {
 	}
 	if gotName := http.StatusText(got); len(gotName) > 0 {
 		if wantName := http.StatusText(want); len(wantName) > 0 {
-			t.Fatalf("response status code: got %d (%s), want %d (%s)", got, gotName, want, wantName)
+			t.Fatalf("response status code: got %d (%s), want %d (%s)", got,
+				gotName, want, wantName)
 		}
 	}
 	t.Fatalf("response status code: got %d, want %d", got, want)
 }
 
-func confirmRequestValidationCode(t *testing.T, method, contentType, body string, expectedStatusCode int) {
+func confirmRequestValidationCode(t *testing.T,
+	method, contentType, body string, expectedStatusCode int) {
 	t.Helper()
-	request := httptest.NewRequest(method, "http://url.com", strings.NewReader(body))
+	request := httptest.NewRequest(method, "http://url.com",
+		strings.NewReader(body))
 	if len(contentType) > 0 {
 		request.Header.Set("Content-Type", contentType)
 	}
@@ -56,28 +59,33 @@ func confirmRequestValidationCode(t *testing.T, method, contentType, body string
 }
 
 func TestHTTPErrorResponseWithDelete(t *testing.T) {
-	confirmRequestValidationCode(t, http.MethodDelete, contentType, "", http.StatusMethodNotAllowed)
+	confirmRequestValidationCode(t, http.MethodDelete, contentType, "",
+		http.StatusMethodNotAllowed)
 }
 
 func TestHTTPErrorResponseWithPut(t *testing.T) {
-	confirmRequestValidationCode(t, http.MethodPut, contentType, "", http.StatusMethodNotAllowed)
+	confirmRequestValidationCode(t, http.MethodPut, contentType, "",
+		http.StatusMethodNotAllowed)
 }
 
 func TestHTTPErrorResponseWithMaxContentLength(t *testing.T) {
 	body := make([]rune, maxRequestContentLength+1)
 	confirmRequestValidationCode(t,
-		http.MethodPost, contentType, string(body), http.StatusRequestEntityTooLarge)
+		http.MethodPost, contentType, string(body),
+		http.StatusRequestEntityTooLarge)
 }
 
 func TestHTTPErrorResponseWithEmptyContentType(t *testing.T) {
-	confirmRequestValidationCode(t, http.MethodPost, "", "", http.StatusUnsupportedMediaType)
+	confirmRequestValidationCode(t, http.MethodPost, "", "",
+		http.StatusUnsupportedMediaType)
 }
 
 func TestHTTPErrorResponseWithValidRequest(t *testing.T) {
 	confirmRequestValidationCode(t, http.MethodPost, contentType, "", 0)
 }
 
-func confirmHTTPRequestYieldsStatusCode(t *testing.T, method, contentType, body string, expectedStatusCode int) {
+func confirmHTTPRequestYieldsStatusCode(t *testing.T,
+	method, contentType, body string, expectedStatusCode int) {
 	t.Helper()
 	s := Server{}
 	ts := httptest.NewServer(&s)
@@ -130,7 +138,8 @@ func TestHTTPRespBodyUnlimited(t *testing.T) {
 // Tests that an HTTP error results in an HTTPError instance
 // being returned with the expected attributes.
 func TestHTTPErrorResponse(t *testing.T) {
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter,
+		r *http.Request) {
 		http.Error(w, "error has occurred!", http.StatusTeapot)
 	}))
 	defer ts.Close()
@@ -204,11 +213,13 @@ func TestHTTPPeerInfo(t *testing.T) {
 
 func TestNewContextWithHeaders(t *testing.T) {
 	expectedHeaders := 0
-	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter,
+		request *http.Request) {
 		for i := 0; i < expectedHeaders; i++ {
 			key, want := fmt.Sprintf("key-%d", i), fmt.Sprintf("val-%d", i)
 			if have := request.Header.Get(key); have != want {
-				t.Errorf("wrong request headers for %s, want: %s, have: %s", key, want, have)
+				t.Errorf("wrong request headers for %s, want: %s, have: %s",
+					key, want, have)
 			}
 		}
 		writer.WriteHeader(http.StatusOK)
@@ -227,7 +238,8 @@ func TestNewContextWithHeaders(t *testing.T) {
 		header.Set(k, v)
 		return header
 	}
-	ctx1 := NewContextWithHeaders(context.Background(), newHdr("key-0", "val-0"))
+	ctx1 := NewContextWithHeaders(context.Background(),
+		newHdr("key-0", "val-0"))
 	ctx2 := NewContextWithHeaders(ctx1, newHdr("key-1", "val-1"))
 	ctx3 := NewContextWithHeaders(ctx2, newHdr("key-2", "val-2"))
 

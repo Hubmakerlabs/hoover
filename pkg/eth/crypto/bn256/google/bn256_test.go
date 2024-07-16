@@ -142,7 +142,8 @@ func TestCurveImpl(t *testing.T) {
 
 	if s1.x.Cmp(s2.x) != 0 ||
 		s2.x.Cmp(s1.x) != 0 {
-		t.Errorf("DH points don't match: (%s, %s) (%s, %s)", s1.x, s1.y, s2.x, s2.y)
+		t.Errorf("DH points don't match: (%s, %s) (%s, %s)", s1.x, s1.y, s2.x,
+			s2.y)
 	}
 
 	pool.Put(x)

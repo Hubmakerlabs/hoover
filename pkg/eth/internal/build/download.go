@@ -20,13 +20,14 @@ import (
 	"bufio"
 	"encoding/hex"
 	"fmt"
-	"github.com/minio/sha256-simd"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/minio/sha256-simd"
 )
 
 // ChecksumDB keeps file checksums.

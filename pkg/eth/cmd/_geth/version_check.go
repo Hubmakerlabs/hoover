@@ -31,7 +31,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-var gethPubKeys []string = []string{
+var gethPubKeys = []string{
 	// @holiman, minisign public key FB1D084D39BAEC24
 	"RWQk7Lo5TQgd+wxBNZM+Zoy+7UhhMHaWKzqoes9tvSbFLJYZhNTbrIjx",
 	// minisign public key 138B1CA303E51687

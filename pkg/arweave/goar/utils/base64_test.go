@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
-
 	"github.com/stretchr/testify/assert"
 )
 

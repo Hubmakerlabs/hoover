@@ -90,7 +90,8 @@ func reflectIntType(unsigned bool, size int) reflect.Type {
 // mustArrayToByteSlice creates a new byte slice with the exact same size as value
 // and copies the bytes in value to the new slice.
 func mustArrayToByteSlice(value reflect.Value) reflect.Value {
-	slice := reflect.MakeSlice(reflect.TypeOf([]byte{}), value.Len(), value.Len())
+	slice := reflect.MakeSlice(reflect.TypeOf([]byte{}), value.Len(),
+		value.Len())
 	reflect.Copy(slice, value)
 	return slice
 }
@@ -115,7 +116,8 @@ func set(dst, src reflect.Value) error {
 	case dstType.Kind() == reflect.Struct:
 		return setStruct(dst, src)
 	default:
-		return fmt.Errorf("abi: cannot unmarshal %v in to %v", src.Type(), dst.Type())
+		return fmt.Errorf("abi: cannot unmarshal %v in to %v", src.Type(),
+			dst.Type())
 	}
 	return nil
 }
@@ -163,7 +165,8 @@ func setStruct(dst, src reflect.Value) error {
 		srcField := src.Field(i)
 		dstField := dst.Field(i)
 		if !dstField.IsValid() || !srcField.IsValid() {
-			return fmt.Errorf("Could not find src field: %v value: %v in destination", srcField.Type().Name(), srcField)
+			return fmt.Errorf("Could not find src field: %v value: %v in destination",
+				srcField.Type().Name(), srcField)
 		}
 		if err := set(dstField, srcField); err != nil {
 			return err
@@ -181,7 +184,8 @@ func setStruct(dst, src reflect.Value) error {
 // variable is expected to be mapped into, if it exists and has not been used, pair them.
 //
 // Note this function assumes the given value is a struct value.
-func mapArgNamesToStructFields(argNames []string, value reflect.Value) (map[string]string, error) {
+func mapArgNamesToStructFields(argNames []string,
+	value reflect.Value) (map[string]string, error) {
 	typ := value.Type()
 
 	abi2struct := make(map[string]string)
@@ -202,14 +206,16 @@ func mapArgNamesToStructFields(argNames []string, value reflect.Value) (map[stri
 		}
 		// check if tag is empty.
 		if tagName == "" {
-			return nil, fmt.Errorf("struct: abi tag in '%s' is empty", structFieldName)
+			return nil, fmt.Errorf("struct: abi tag in '%s' is empty",
+				structFieldName)
 		}
 		// check which argument field matches with the abi tag.
 		found := false
 		for _, arg := range argNames {
 			if arg == tagName {
 				if abi2struct[arg] != "" {
-					return nil, fmt.Errorf("struct: abi tag in '%s' already mapped", structFieldName)
+					return nil, fmt.Errorf("struct: abi tag in '%s' already mapped",
+						structFieldName)
 				}
 				// pair them
 				abi2struct[arg] = structFieldName
@@ -219,7 +225,8 @@ func mapArgNamesToStructFields(argNames []string, value reflect.Value) (map[stri
 		}
 		// check if this tag has been mapped.
 		if !found {
-			return nil, fmt.Errorf("struct: abi tag '%s' defined but not found in abi", tagName)
+			return nil, fmt.Errorf("struct: abi tag '%s' defined but not found in abi",
+				tagName)
 		}
 	}
 
@@ -239,14 +246,16 @@ func mapArgNamesToStructFields(argNames []string, value reflect.Value) (map[stri
 			if abi2struct[argName] != structFieldName &&
 				struct2abi[structFieldName] == "" &&
 				value.FieldByName(structFieldName).IsValid() {
-				return nil, fmt.Errorf("abi: multiple variables maps to the same abi field '%s'", argName)
+				return nil, fmt.Errorf("abi: multiple variables maps to the same abi field '%s'",
+					argName)
 			}
 			continue
 		}
 
 		// return an error if this struct field has already been paired.
 		if struct2abi[structFieldName] != "" {
-			return nil, fmt.Errorf("abi: multiple outputs mapping to the same struct field '%s'", structFieldName)
+			return nil, fmt.Errorf("abi: multiple outputs mapping to the same struct field '%s'",
+				structFieldName)
 		}
 
 		if value.FieldByName(structFieldName).IsValid() {

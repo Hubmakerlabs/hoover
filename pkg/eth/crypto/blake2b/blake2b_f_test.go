@@ -9,13 +9,14 @@ import (
 func TestF(t *testing.T) {
 	for i, test := range testVectorsF {
 		t.Run(fmt.Sprintf("test vector %v", i), func(t *testing.T) {
-			//toEthereumTestCase(test)
+			// toEthereumTestCase(test)
 
 			h := test.hIn
 			F(&h, test.m, test.c, test.f, test.rounds)
 
 			if !reflect.DeepEqual(test.hOut, h) {
-				t.Errorf("Unexpected result\nExpected: [%#x]\nActual:   [%#x]\n", test.hOut, h)
+				t.Errorf("Unexpected result\nExpected: [%#x]\nActual:   [%#x]\n",
+					test.hOut, h)
 			}
 		})
 	}

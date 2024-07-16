@@ -48,7 +48,8 @@ type nameError struct {
 
 func (err nameError) Error() string {
 	if ee, ok := err.err.(entryError); ok {
-		return fmt.Sprintf("invalid %s entry at %s: %v", ee.typ, err.name, ee.err)
+		return fmt.Sprintf("invalid %s entry at %s: %v", ee.typ, err.name,
+			ee.err)
 	}
 	return err.name + ": " + err.err.Error()
 }

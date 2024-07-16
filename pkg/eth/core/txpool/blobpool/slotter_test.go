@@ -50,11 +50,13 @@ func TestNewSlotter(t *testing.T) {
 		14*blobSize + txAvgSize, // 1-6 blobs + unexpectedly large tx infos >= 4 blobs + max tx metadata size
 	}
 	if len(shelves) != len(want) {
-		t.Errorf("shelves count mismatch: have %d, want %d", len(shelves), len(want))
+		t.Errorf("shelves count mismatch: have %d, want %d", len(shelves),
+			len(want))
 	}
 	for i := 0; i < len(shelves) && i < len(want); i++ {
 		if shelves[i] != want[i] {
-			t.Errorf("shelf %d mismatch: have %d, want %d", i, shelves[i], want[i])
+			t.Errorf("shelf %d mismatch: have %d, want %d", i, shelves[i],
+				want[i])
 		}
 	}
 }

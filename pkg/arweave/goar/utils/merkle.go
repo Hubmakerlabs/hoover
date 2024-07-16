@@ -8,9 +8,8 @@ import (
 	"math/big"
 	"os"
 
-	"github.com/minio/sha256-simd"
-
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
+	"github.com/minio/sha256-simd"
 	"github.com/shopspring/decimal"
 )
 

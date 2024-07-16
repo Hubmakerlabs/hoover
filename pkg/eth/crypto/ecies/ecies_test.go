@@ -35,9 +35,10 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"errors"
-	"github.com/minio/sha256-simd"
 	"math/big"
 	"testing"
+
+	"github.com/minio/sha256-simd"
 
 	"github.com/Hubmakerlabs/hoover/pkg/eth/crypto"
 )

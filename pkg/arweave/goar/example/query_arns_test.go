@@ -1,10 +1,11 @@
 package example
 
 import (
-	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/arns"
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+
+	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/arns"
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_QueryArNS(t *testing.T) {

@@ -364,7 +364,8 @@ func (g *G1) ClearCofactor(p *PointG1) {
 // (P_0, e_0), (P_1, e_1), ... (P_n, e_n) calculates r = e_0 * P_0 + e_1 * P_1 + ... + e_n * P_n
 // Length of points and scalars are expected to be equal, otherwise an error is returned.
 // Result is assigned to point at first argument.
-func (g *G1) MultiExp(r *PointG1, points []*PointG1, powers []*big.Int) (*PointG1, error) {
+func (g *G1) MultiExp(r *PointG1, points []*PointG1,
+	powers []*big.Int) (*PointG1, error) {
 	if len(points) != len(powers) {
 		return nil, errors.New("point and scalar vectors should be in same length")
 	}

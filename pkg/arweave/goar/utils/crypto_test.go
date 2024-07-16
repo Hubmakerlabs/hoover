@@ -3,9 +3,8 @@ package utils
 import (
 	"testing"
 
-	"github.com/minio/sha256-simd"
-
 	"github.com/Hubmakerlabs/hoover/pkg/eth/common/hexutil"
+	"github.com/minio/sha256-simd"
 	"github.com/stretchr/testify/assert"
 )
 

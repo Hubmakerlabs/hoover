@@ -25,6 +25,7 @@ import (
 	"crypto/sha512"
 	"errors"
 	"fmt"
+
 	"github.com/minio/sha256-simd"
 
 	"github.com/Hubmakerlabs/hoover/pkg/eth/crypto"

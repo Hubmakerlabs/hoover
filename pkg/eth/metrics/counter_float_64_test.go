@@ -93,7 +93,8 @@ func TestCounterFloat64Zero(t *testing.T) {
 func TestGetOrRegisterCounterFloat64(t *testing.T) {
 	r := NewRegistry()
 	NewRegisteredCounterFloat64("foo", r).Inc(47.0)
-	if c := GetOrRegisterCounterFloat64("foo", r).Snapshot(); c.Count() != 47.0 {
+	if c := GetOrRegisterCounterFloat64("foo",
+		r).Snapshot(); c.Count() != 47.0 {
 		t.Fatal(c)
 	}
 }

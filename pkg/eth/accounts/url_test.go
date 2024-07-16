@@ -58,7 +58,8 @@ func TestURLMarshalJSON(t *testing.T) {
 		t.Errorf("unexpcted error: %v", err)
 	}
 	if string(json) != "\"https://ethereum.org\"" {
-		t.Errorf("expected: %v, got: %v", "\"https://ethereum.org\"", string(json))
+		t.Errorf("expected: %v, got: %v", "\"https://ethereum.org\"",
+			string(json))
 	}
 }
 
@@ -91,7 +92,8 @@ func TestURLComparison(t *testing.T) {
 	for i, tt := range tests {
 		result := tt.urlA.Cmp(tt.urlB)
 		if result != tt.expect {
-			t.Errorf("test %d: cmp mismatch: expected: %d, got: %d", i, tt.expect, result)
+			t.Errorf("test %d: cmp mismatch: expected: %d, got: %d", i,
+				tt.expect, result)
 		}
 	}
 }

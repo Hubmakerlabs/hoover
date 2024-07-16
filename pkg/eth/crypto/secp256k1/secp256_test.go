@@ -79,7 +79,8 @@ func TestSignatureValidity(t *testing.T) {
 	}
 	recid := int(sig[64])
 	if recid > 4 || recid < 0 {
-		t.Errorf("sig recid mismatch: want: within 0 to 4 have: %d", int(sig[64]))
+		t.Errorf("sig recid mismatch: want: within 0 to 4 have: %d",
+			int(sig[64]))
 	}
 }
 
@@ -144,7 +145,8 @@ func TestRandomMessagesWithRandomKeys(t *testing.T) {
 	signAndRecoverWithRandomMessages(t, keys)
 }
 
-func signAndRecoverWithRandomMessages(t *testing.T, keys func() ([]byte, []byte)) {
+func signAndRecoverWithRandomMessages(t *testing.T,
+	keys func() ([]byte, []byte)) {
 	for i := 0; i < TestCount; i++ {
 		pubkey1, seckey := keys()
 		msg := csprngEntropy(32)
@@ -181,7 +183,8 @@ func TestRecoveryOfRandomSignature(t *testing.T) {
 		// recovery can sometimes work, but if so should always give wrong pubkey
 		pubkey2, _ := RecoverPubkey(msg, randSig())
 		if bytes.Equal(pubkey1, pubkey2) {
-			t.Fatalf("iteration: %d: pubkey mismatch: do NOT want %x: ", i, pubkey2)
+			t.Fatalf("iteration: %d: pubkey mismatch: do NOT want %x: ", i,
+				pubkey2)
 		}
 	}
 }
@@ -196,7 +199,8 @@ func TestRandomMessagesAgainstValidSig(t *testing.T) {
 		pubkey2, _ := RecoverPubkey(msg, sig)
 		// recovery can sometimes work, but if so should always give wrong pubkey
 		if bytes.Equal(pubkey1, pubkey2) {
-			t.Fatalf("iteration: %d: pubkey mismatch: do NOT want %x: ", i, pubkey2)
+			t.Fatalf("iteration: %d: pubkey mismatch: do NOT want %x: ", i,
+				pubkey2)
 		}
 	}
 }

@@ -8,14 +8,13 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Hubmakerlabs/hoover/pkg/arweave/go-everpay/common"
 	paySchema "github.com/Hubmakerlabs/hoover/pkg/arweave/go-everpay/pay/schema"
 	serverSchema "github.com/Hubmakerlabs/hoover/pkg/arweave/go-everpay/sdk/schema"
 	tokSchema "github.com/Hubmakerlabs/hoover/pkg/arweave/go-everpay/token/schema"
 	"github.com/google/uuid"
 	"github.com/tidwall/gjson"
 	"github.com/tidwall/sjson"
-
-	"github.com/Hubmakerlabs/hoover/pkg/arweave/go-everpay/common"
 )
 
 var log = common.NewLog("sdk")

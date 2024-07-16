@@ -2,20 +2,30 @@
 
 # log15 [![godoc reference](https://godoc.org/github.com/inconshreveable/log15?status.png)](https://godoc.org/github.com/inconshreveable/log15) [![Build Status](https://travis-ci.org/inconshreveable/log15.svg?branch=master)](https://travis-ci.org/inconshreveable/log15)
 
-Package log15 provides an opinionated, simple toolkit for best-practice logging in Go (golang) that is both human and machine readable. It is modeled after the Go standard library's [`io`](https://golang.org/pkg/io/) and [`net/http`](https://golang.org/pkg/net/http/) packages and is an alternative to the standard library's [`log`](https://golang.org/pkg/log/) package.
+Package log15 provides an opinionated, simple toolkit for best-practice logging
+in Go (golang) that is both human and machine readable. It is modeled after the
+Go standard library's [`io`](https://golang.org/pkg/io/)
+and [`net/http`](https://golang.org/pkg/net/http/) packages and is an
+alternative to the standard library's [`log`](https://golang.org/pkg/log/)
+package.
 
 ## Features
+
 - A simple, easy-to-understand API
 - Promotes structured logging by encouraging use of key/value pairs
 - Child loggers which inherit and add their own private context
 - Lazy evaluation of expensive operations
-- Simple Handler interface allowing for construction of flexible, custom logging configurations with a tiny API.
+- Simple Handler interface allowing for construction of flexible, custom logging
+  configurations with a tiny API.
 - Color terminal support
 - Built-in support for logging to files, streams, syslog, and the network
-- Support for forking records to multiple handlers, buffering records for output, failing over from failed handler writes, + more
+- Support for forking records to multiple handlers, buffering records for
+  output, failing over from failed handler writes, + more
 
 ## Versioning
-The API of the master branch of log15 should always be considered unstable. If you want to rely on a stable API,
+
+The API of the master branch of log15 should always be considered unstable. If
+you want to rely on a stable API,
 you must vendor the library.
 
 ## Importing
@@ -56,16 +66,22 @@ INFO[06-17|21:58:10] connection open                          module=app/server 
 ```
 
 ## Breaking API Changes
-The following commits broke API stability. This reference is intended to help you understand the consequences of updating to a newer version
+
+The following commits broke API stability. This reference is intended to help
+you understand the consequences of updating to a newer version
 of log15.
 
-- 57a084d014d4150152b19e4e531399a7145d1540 - Added a `Get()` method to the `Logger` interface to retrieve the current handler
-- 93404652ee366648fa622b64d1e2b67d75a3094a - `Record` field `Call` changed to `stack.Call` with switch to `github.com/go-stack/stack`
-- a5e7613673c73281f58e15a87d2cf0cf111e8152 - Restored `syslog.Priority` argument to the `SyslogXxx` handler constructors
+- 57a084d014d4150152b19e4e531399a7145d1540 - Added a `Get()` method to
+  the `Logger` interface to retrieve the current handler
+- 93404652ee366648fa622b64d1e2b67d75a3094a - `Record` field `Call` changed
+  to `stack.Call` with switch to `github.com/go-stack/stack`
+- a5e7613673c73281f58e15a87d2cf0cf111e8152 - Restored `syslog.Priority` argument
+  to the `SyslogXxx` handler constructors
 
 ## FAQ
 
 ### The varargs style is brittle and error prone! Can I have type safety please?
+
 Yes. Use `log.Ctx`:
 
 ```go
@@ -74,4 +90,5 @@ srvlog.Warn("abnormal conn rate", log.Ctx{"rate": curRate, "low": lowRate, "high
 ```
 
 ## License
+
 Apache

@@ -79,7 +79,9 @@
         "code": "0x",
         "address": "0x5ac5599fc9df172c89ee7ec55ad9104ccbfed40d"
       },
-      "traceAddress": [0],
+      "traceAddress": [
+        0
+      ],
       "subtraces": 0,
       "transactionPosition": 63,
       "transactionHash": "0x60e881fae3884657b5430925c5d0053535b45cce0b8188f2a6be1feee8bcc650",

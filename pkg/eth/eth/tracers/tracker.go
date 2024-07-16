@@ -98,7 +98,8 @@ func (t *stateTracker) wait(number uint64) error {
 
 	for {
 		if number < t.oldest {
-			return fmt.Errorf("invalid state number %d head %d", number, t.oldest)
+			return fmt.Errorf("invalid state number %d head %d", number,
+				t.oldest)
 		}
 		if number < t.oldest+uint64(t.limit) {
 			// number is now within limit, wait over

@@ -32,10 +32,11 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"github.com/minio/sha256-simd"
 	"io"
 	"os"
 	"path/filepath"
+
+	"github.com/minio/sha256-simd"
 
 	"github.com/Hubmakerlabs/hoover/pkg/eth/accounts"
 	"github.com/Hubmakerlabs/hoover/pkg/eth/common"

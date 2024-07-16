@@ -19,7 +19,6 @@ package p2p
 import (
 	"crypto/ecdsa"
 	"errors"
-	"github.com/minio/sha256-simd"
 	"io"
 	"math/rand"
 	"net"
@@ -28,6 +27,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/minio/sha256-simd"
 
 	"github.com/Hubmakerlabs/hoover/pkg/eth/crypto"
 	"github.com/Hubmakerlabs/hoover/pkg/eth/internal/testlog"

@@ -94,8 +94,14 @@ func testKZGWithBlob(t *testing.T, ckzg bool) {
 	}
 }
 
-func BenchmarkCKZGBlobToCommitment(b *testing.B)  { benchmarkBlobToCommitment(b, true) }
-func BenchmarkGoKZGBlobToCommitment(b *testing.B) { benchmarkBlobToCommitment(b, false) }
+func BenchmarkCKZGBlobToCommitment(b *testing.B) {
+	benchmarkBlobToCommitment(b,
+		true)
+}
+func BenchmarkGoKZGBlobToCommitment(b *testing.B) {
+	benchmarkBlobToCommitment(b,
+		false)
+}
 func benchmarkBlobToCommitment(b *testing.B, ckzg bool) {
 	if ckzg && !ckzgAvailable {
 		b.Skip("CKZG unavailable in this test build")
@@ -111,8 +117,11 @@ func benchmarkBlobToCommitment(b *testing.B, ckzg bool) {
 	}
 }
 
-func BenchmarkCKZGComputeProof(b *testing.B)  { benchmarkComputeProof(b, true) }
-func BenchmarkGoKZGComputeProof(b *testing.B) { benchmarkComputeProof(b, false) }
+func BenchmarkCKZGComputeProof(b *testing.B) { benchmarkComputeProof(b, true) }
+func BenchmarkGoKZGComputeProof(b *testing.B) {
+	benchmarkComputeProof(b,
+		false)
+}
 func benchmarkComputeProof(b *testing.B, ckzg bool) {
 	if ckzg && !ckzgAvailable {
 		b.Skip("CKZG unavailable in this test build")
@@ -153,8 +162,14 @@ func benchmarkVerifyProof(b *testing.B, ckzg bool) {
 	}
 }
 
-func BenchmarkCKZGComputeBlobProof(b *testing.B)  { benchmarkComputeBlobProof(b, true) }
-func BenchmarkGoKZGComputeBlobProof(b *testing.B) { benchmarkComputeBlobProof(b, false) }
+func BenchmarkCKZGComputeBlobProof(b *testing.B) {
+	benchmarkComputeBlobProof(b,
+		true)
+}
+func BenchmarkGoKZGComputeBlobProof(b *testing.B) {
+	benchmarkComputeBlobProof(b,
+		false)
+}
 func benchmarkComputeBlobProof(b *testing.B, ckzg bool) {
 	if ckzg && !ckzgAvailable {
 		b.Skip("CKZG unavailable in this test build")
@@ -173,8 +188,14 @@ func benchmarkComputeBlobProof(b *testing.B, ckzg bool) {
 	}
 }
 
-func BenchmarkCKZGVerifyBlobProof(b *testing.B)  { benchmarkVerifyBlobProof(b, true) }
-func BenchmarkGoKZGVerifyBlobProof(b *testing.B) { benchmarkVerifyBlobProof(b, false) }
+func BenchmarkCKZGVerifyBlobProof(b *testing.B) {
+	benchmarkVerifyBlobProof(b,
+		true)
+}
+func BenchmarkGoKZGVerifyBlobProof(b *testing.B) {
+	benchmarkVerifyBlobProof(b,
+		false)
+}
 func benchmarkVerifyBlobProof(b *testing.B, ckzg bool) {
 	if ckzg && !ckzgAvailable {
 		b.Skip("CKZG unavailable in this test build")

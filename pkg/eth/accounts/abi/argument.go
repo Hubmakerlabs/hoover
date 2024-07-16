@@ -88,7 +88,8 @@ func (arguments Arguments) Unpack(data []byte) ([]interface{}, error) {
 }
 
 // UnpackIntoMap performs the operation hexdata -> mapping of argument name to argument value.
-func (arguments Arguments) UnpackIntoMap(v map[string]interface{}, data []byte) error {
+func (arguments Arguments) UnpackIntoMap(v map[string]interface{},
+	data []byte) error {
 	// Make sure map is not nil
 	if v == nil {
 		return errors.New("abi: cannot unpack into a nil map")
@@ -128,7 +129,8 @@ func (arguments Arguments) Copy(v interface{}, values []interface{}) error {
 }
 
 // unpackAtomic unpacks ( hexdata -> go ) a single value
-func (arguments Arguments) copyAtomic(v interface{}, marshalledValues interface{}) error {
+func (arguments Arguments) copyAtomic(v interface{},
+	marshalledValues interface{}) error {
 	dst := reflect.ValueOf(v).Elem()
 	src := reflect.ValueOf(marshalledValues)
 
@@ -139,7 +141,8 @@ func (arguments Arguments) copyAtomic(v interface{}, marshalledValues interface{
 }
 
 // copyTuple copies a batch of values from marshalledValues to v.
-func (arguments Arguments) copyTuple(v interface{}, marshalledValues []interface{}) error {
+func (arguments Arguments) copyTuple(v interface{},
+	marshalledValues []interface{}) error {
 	value := reflect.ValueOf(v).Elem()
 	nonIndexedArgs := arguments.NonIndexed()
 
@@ -157,23 +160,28 @@ func (arguments Arguments) copyTuple(v interface{}, marshalledValues []interface
 		for i, arg := range nonIndexedArgs {
 			field := value.FieldByName(abi2struct[arg.Name])
 			if !field.IsValid() {
-				return fmt.Errorf("abi: field %s can't be found in the given value", arg.Name)
+				return fmt.Errorf("abi: field %s can't be found in the given value",
+					arg.Name)
 			}
-			if err := set(field, reflect.ValueOf(marshalledValues[i])); err != nil {
+			if err := set(field,
+				reflect.ValueOf(marshalledValues[i])); err != nil {
 				return err
 			}
 		}
 	case reflect.Slice, reflect.Array:
 		if value.Len() < len(marshalledValues) {
-			return fmt.Errorf("abi: insufficient number of arguments for unpack, want %d, got %d", len(arguments), value.Len())
+			return fmt.Errorf("abi: insufficient number of arguments for unpack, want %d, got %d",
+				len(arguments), value.Len())
 		}
 		for i := range nonIndexedArgs {
-			if err := set(value.Index(i), reflect.ValueOf(marshalledValues[i])); err != nil {
+			if err := set(value.Index(i),
+				reflect.ValueOf(marshalledValues[i])); err != nil {
 				return err
 			}
 		}
 	default:
-		return fmt.Errorf("abi:[2] cannot unmarshal tuple in to %v", value.Type())
+		return fmt.Errorf("abi:[2] cannot unmarshal tuple in to %v",
+			value.Type())
 	}
 	return nil
 }
@@ -223,7 +231,8 @@ func (arguments Arguments) Pack(args ...interface{}) ([]byte, error) {
 	// Make sure arguments match up and pack them
 	abiArgs := arguments
 	if len(args) != len(abiArgs) {
-		return nil, fmt.Errorf("argument count mismatch: got %d for %d", len(args), len(abiArgs))
+		return nil, fmt.Errorf("argument count mismatch: got %d for %d",
+			len(args), len(abiArgs))
 	}
 	// variable input is the output appended at the end of packed
 	// output. This is used for strings and bytes types input.

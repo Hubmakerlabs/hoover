@@ -8,9 +8,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/minio/sha256-simd"
-
 	tcrsa "github.com/everFinance/ttcrsa"
+	"github.com/minio/sha256-simd"
 )
 
 // CreateTcKeyPair

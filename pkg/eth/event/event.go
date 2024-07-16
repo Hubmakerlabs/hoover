@@ -67,7 +67,8 @@ func (mux *TypeMux) Subscribe(types ...interface{}) *TypeMuxSubscription {
 			rtyp := reflect.TypeOf(t)
 			oldsubs := mux.subm[rtyp]
 			if find(oldsubs, sub) != -1 {
-				panic(fmt.Sprintf("event: duplicate type %s in Subscribe", rtyp))
+				panic(fmt.Sprintf("event: duplicate type %s in Subscribe",
+					rtyp))
 			}
 			subs := make([]*TypeMuxSubscription, len(oldsubs)+1)
 			copy(subs, oldsubs)

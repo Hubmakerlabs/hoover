@@ -71,21 +71,25 @@ func TestMarshal(t *testing.T) {
 		for i := 0; i < 256; i++ {
 			h, err := New(size, nil)
 			if err != nil {
-				t.Fatalf("size=%d, len(input)=%d: error from New(%v, nil): %v", size, i, size, err)
+				t.Fatalf("size=%d, len(input)=%d: error from New(%v, nil): %v",
+					size, i, size, err)
 			}
 			h2, err := New(size, nil)
 			if err != nil {
-				t.Fatalf("size=%d, len(input)=%d: error from New(%v, nil): %v", size, i, size, err)
+				t.Fatalf("size=%d, len(input)=%d: error from New(%v, nil): %v",
+					size, i, size, err)
 			}
 
 			h.Write(input[:i/2])
 			halfstate, err := h.(encoding.BinaryMarshaler).MarshalBinary()
 			if err != nil {
-				t.Fatalf("size=%d, len(input)=%d: could not marshal: %v", size, i, err)
+				t.Fatalf("size=%d, len(input)=%d: could not marshal: %v", size,
+					i, err)
 			}
 			err = h2.(encoding.BinaryUnmarshaler).UnmarshalBinary(halfstate)
 			if err != nil {
-				t.Fatalf("size=%d, len(input)=%d: could not unmarshal: %v", size, i, err)
+				t.Fatalf("size=%d, len(input)=%d: could not unmarshal: %v",
+					size, i, err)
 			}
 
 			h.Write(input[i/2 : i])
@@ -94,17 +98,20 @@ func TestMarshal(t *testing.T) {
 			sum2 := h2.Sum(nil)
 
 			if !bytes.Equal(sum, sum2) {
-				t.Fatalf("size=%d, len(input)=%d: results do not match; sum = %v, sum2 = %v", size, i, sum, sum2)
+				t.Fatalf("size=%d, len(input)=%d: results do not match; sum = %v, sum2 = %v",
+					size, i, sum, sum2)
 			}
 
 			h3, err := New(size, nil)
 			if err != nil {
-				t.Fatalf("size=%d, len(input)=%d: error from New(%v, nil): %v", size, i, size, err)
+				t.Fatalf("size=%d, len(input)=%d: error from New(%v, nil): %v",
+					size, i, size, err)
 			}
 			h3.Write(input[:i])
 			sum3 := h3.Sum(nil)
 			if !bytes.Equal(sum, sum3) {
-				t.Fatalf("size=%d, len(input)=%d: sum = %v, want %v", size, i, sum, sum3)
+				t.Fatalf("size=%d, len(input)=%d: sum = %v, want %v", size, i,
+					sum, sum3)
 			}
 		}
 	}
@@ -128,7 +135,8 @@ func testHashes(t *testing.T) {
 		sum := h.Sum(nil)
 
 		if gotHex := fmt.Sprintf("%x", sum); gotHex != expectedHex {
-			t.Fatalf("#%d (single write): got %s, wanted %s", i, gotHex, expectedHex)
+			t.Fatalf("#%d (single write): got %s, wanted %s", i, gotHex,
+				expectedHex)
 		}
 
 		h.Reset()
@@ -138,7 +146,8 @@ func testHashes(t *testing.T) {
 
 		sum = h.Sum(sum[:0])
 		if gotHex := fmt.Sprintf("%x", sum); gotHex != expectedHex {
-			t.Fatalf("#%d (byte-by-byte): got %s, wanted %s", i, gotHex, expectedHex)
+			t.Fatalf("#%d (byte-by-byte): got %s, wanted %s", i, gotHex,
+				expectedHex)
 		}
 	}
 }
@@ -167,10 +176,12 @@ func testHashes2X(t *testing.T) {
 			t.Fatalf("#%d (single write): error from Read: %v", i, err)
 		}
 		if n, err := h.Read(sum); n != 0 || err != io.EOF {
-			t.Fatalf("#%d (single write): Read did not return (0, io.EOF) after exhaustion, got (%v, %v)", i, n, err)
+			t.Fatalf("#%d (single write): Read did not return (0, io.EOF) after exhaustion, got (%v, %v)",
+				i, n, err)
 		}
 		if gotHex := fmt.Sprintf("%x", sum); gotHex != expectedHex {
-			t.Fatalf("#%d (single write): got %s, wanted %s", i, gotHex, expectedHex)
+			t.Fatalf("#%d (single write): got %s, wanted %s", i, gotHex,
+				expectedHex)
 		}
 
 		h.Reset()
@@ -180,11 +191,13 @@ func testHashes2X(t *testing.T) {
 		for j := 0; j < len(sum); j++ {
 			h = h.Clone()
 			if _, err := h.Read(sum[j : j+1]); err != nil {
-				t.Fatalf("#%d (byte-by-byte) - Read %d: error from Read: %v", i, j, err)
+				t.Fatalf("#%d (byte-by-byte) - Read %d: error from Read: %v", i,
+					j, err)
 			}
 		}
 		if gotHex := fmt.Sprintf("%x", sum); gotHex != expectedHex {
-			t.Fatalf("#%d (byte-by-byte): got %s, wanted %s", i, gotHex, expectedHex)
+			t.Fatalf("#%d (byte-by-byte): got %s, wanted %s", i, gotHex,
+				expectedHex)
 		}
 	}
 
@@ -200,7 +213,8 @@ func testHashes2X(t *testing.T) {
 	if n, err := h.Read(result[:]); err != nil {
 		t.Fatalf("#unknown length: error from Read: %v", err)
 	} else if n != len(result) {
-		t.Fatalf("#unknown length: Read returned %d bytes, want %d", n, len(result))
+		t.Fatalf("#unknown length: Read returned %d bytes, want %d", n,
+			len(result))
 	}
 
 	const expected = "3dbba8516da76bf7330055c66ea36cf1005e92714262b24d9710f51d9e126406e1bcd6497059f9331f1091c3634b695428d475ed432f987040575520a1c29f5e"
@@ -325,23 +339,71 @@ func benchmarkWrite(b *testing.B, size int, sse4, avx, avx2 bool) {
 	}
 }
 
-func BenchmarkWrite128Generic(b *testing.B) { benchmarkWrite(b, 128, false, false, false) }
-func BenchmarkWrite1KGeneric(b *testing.B)  { benchmarkWrite(b, 1024, false, false, false) }
-func BenchmarkWrite128SSE4(b *testing.B)    { benchmarkWrite(b, 128, true, false, false) }
-func BenchmarkWrite1KSSE4(b *testing.B)     { benchmarkWrite(b, 1024, true, false, false) }
-func BenchmarkWrite128AVX(b *testing.B)     { benchmarkWrite(b, 128, false, true, false) }
-func BenchmarkWrite1KAVX(b *testing.B)      { benchmarkWrite(b, 1024, false, true, false) }
-func BenchmarkWrite128AVX2(b *testing.B)    { benchmarkWrite(b, 128, false, false, true) }
-func BenchmarkWrite1KAVX2(b *testing.B)     { benchmarkWrite(b, 1024, false, false, true) }
+func BenchmarkWrite128Generic(b *testing.B) {
+	benchmarkWrite(b, 128, false,
+		false, false)
+}
+func BenchmarkWrite1KGeneric(b *testing.B) {
+	benchmarkWrite(b, 1024, false,
+		false, false)
+}
+func BenchmarkWrite128SSE4(b *testing.B) {
+	benchmarkWrite(b, 128, true,
+		false, false)
+}
+func BenchmarkWrite1KSSE4(b *testing.B) {
+	benchmarkWrite(b, 1024, true,
+		false, false)
+}
+func BenchmarkWrite128AVX(b *testing.B) {
+	benchmarkWrite(b, 128, false,
+		true, false)
+}
+func BenchmarkWrite1KAVX(b *testing.B) {
+	benchmarkWrite(b, 1024, false,
+		true, false)
+}
+func BenchmarkWrite128AVX2(b *testing.B) {
+	benchmarkWrite(b, 128, false,
+		false, true)
+}
+func BenchmarkWrite1KAVX2(b *testing.B) {
+	benchmarkWrite(b, 1024, false,
+		false, true)
+}
 
-func BenchmarkSum128Generic(b *testing.B) { benchmarkSum(b, 128, false, false, false) }
-func BenchmarkSum1KGeneric(b *testing.B)  { benchmarkSum(b, 1024, false, false, false) }
-func BenchmarkSum128SSE4(b *testing.B)    { benchmarkSum(b, 128, true, false, false) }
-func BenchmarkSum1KSSE4(b *testing.B)     { benchmarkSum(b, 1024, true, false, false) }
-func BenchmarkSum128AVX(b *testing.B)     { benchmarkSum(b, 128, false, true, false) }
-func BenchmarkSum1KAVX(b *testing.B)      { benchmarkSum(b, 1024, false, true, false) }
-func BenchmarkSum128AVX2(b *testing.B)    { benchmarkSum(b, 128, false, false, true) }
-func BenchmarkSum1KAVX2(b *testing.B)     { benchmarkSum(b, 1024, false, false, true) }
+func BenchmarkSum128Generic(b *testing.B) {
+	benchmarkSum(b, 128, false, false,
+		false)
+}
+func BenchmarkSum1KGeneric(b *testing.B) {
+	benchmarkSum(b, 1024, false, false,
+		false)
+}
+func BenchmarkSum128SSE4(b *testing.B) {
+	benchmarkSum(b, 128, true, false,
+		false)
+}
+func BenchmarkSum1KSSE4(b *testing.B) {
+	benchmarkSum(b, 1024, true, false,
+		false)
+}
+func BenchmarkSum128AVX(b *testing.B) {
+	benchmarkSum(b, 128, false, true,
+		false)
+}
+func BenchmarkSum1KAVX(b *testing.B) {
+	benchmarkSum(b, 1024, false, true,
+		false)
+}
+func BenchmarkSum128AVX2(b *testing.B) {
+	benchmarkSum(b, 128, false, false,
+		true)
+}
+func BenchmarkSum1KAVX2(b *testing.B) {
+	benchmarkSum(b, 1024, false, false,
+		true)
+}
 
 // These values were taken from https://blake2.net/blake2b-test.txt.
 var hashes = []string{

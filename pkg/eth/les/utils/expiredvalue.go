@@ -83,7 +83,7 @@ func (e *ExpiredValue) Add(amount int64, logOffset Fixed64) int64 {
 		base /= math.Pow(2, float64(e.Exp-integer))
 	}
 	if integer > e.Exp {
-		e.Base >>= (integer - e.Exp)
+		e.Base >>= integer - e.Exp
 		e.Exp = integer
 	}
 	if base >= 0 || uint64(-base) <= e.Base {
@@ -106,10 +106,10 @@ func (e *ExpiredValue) Add(amount int64, logOffset Fixed64) int64 {
 // AddExp adds another ExpiredValue
 func (e *ExpiredValue) AddExp(a ExpiredValue) {
 	if e.Exp > a.Exp {
-		a.Base >>= (e.Exp - a.Exp)
+		a.Base >>= e.Exp - a.Exp
 	}
 	if e.Exp < a.Exp {
-		e.Base >>= (a.Exp - e.Exp)
+		e.Base >>= a.Exp - e.Exp
 		e.Exp = a.Exp
 	}
 	e.Base += a.Base
@@ -118,10 +118,10 @@ func (e *ExpiredValue) AddExp(a ExpiredValue) {
 // SubExp subtracts another ExpiredValue
 func (e *ExpiredValue) SubExp(a ExpiredValue) {
 	if e.Exp > a.Exp {
-		a.Base >>= (e.Exp - a.Exp)
+		a.Base >>= e.Exp - a.Exp
 	}
 	if e.Exp < a.Exp {
-		e.Base >>= (a.Exp - e.Exp)
+		e.Base >>= a.Exp - e.Exp
 		e.Exp = a.Exp
 	}
 	if e.Base > a.Base {

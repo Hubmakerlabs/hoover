@@ -56,7 +56,8 @@ func Fuzz(data []byte) int {
 	fmt.Printf("untrusted: %v\n", untrustedComment)
 	fmt.Printf("trusted: %v\n", trustedComment)
 
-	err = SignifySignFile(tmpFile.Name(), tmpFile.Name()+".sig", testSecKey, untrustedComment, trustedComment)
+	err = SignifySignFile(tmpFile.Name(), tmpFile.Name()+".sig", testSecKey,
+		untrustedComment, trustedComment)
 	if err != nil {
 		panic(err)
 	}
@@ -85,9 +86,11 @@ func Fuzz(data []byte) int {
 	pubKeyFile.WriteString(testPubKey)
 	pubKeyFile.WriteString("\n")
 
-	cmd := exec.Command(signify, "-V", "-p", pubKeyFile.Name(), "-x", tmpFile.Name()+".sig", "-m", tmpFile.Name())
+	cmd := exec.Command(signify, "-V", "-p", pubKeyFile.Name(), "-x",
+		tmpFile.Name()+".sig", "-m", tmpFile.Name())
 	if output, err := cmd.CombinedOutput(); err != nil {
-		panic(fmt.Sprintf("could not verify the file: %v, output: \n%s", err, output))
+		panic(fmt.Sprintf("could not verify the file: %v, output: \n%s", err,
+			output))
 	}
 
 	// Verify the signature using a golang library
@@ -134,9 +137,11 @@ func createKeyPair() (string, string) {
 	defer os.Remove(tmpKey.Name())
 	defer os.Remove(tmpKey.Name() + ".pub")
 	defer os.Remove(tmpKey.Name() + ".sec")
-	cmd := exec.Command("signify", "-G", "-n", "-p", tmpKey.Name()+".pub", "-s", tmpKey.Name()+".sec")
+	cmd := exec.Command("signify", "-G", "-n", "-p", tmpKey.Name()+".pub", "-s",
+		tmpKey.Name()+".sec")
 	if output, err := cmd.CombinedOutput(); err != nil {
-		panic(fmt.Sprintf("could not verify the file: %v, output: \n%s", err, output))
+		panic(fmt.Sprintf("could not verify the file: %v, output: \n%s", err,
+			output))
 	}
 	secKey, err := getKey(tmpKey.Name() + ".sec")
 	if err != nil {

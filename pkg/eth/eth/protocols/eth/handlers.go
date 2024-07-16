@@ -101,7 +101,7 @@ func serviceNonContiguousBlockHeaderQuery(chain *core.BlockChain,
 			} else {
 				query.Origin.Hash, query.Origin.Number = chain.GetAncestor(query.Origin.Hash,
 					query.Origin.Number, ancestor, &maxNonCanonical)
-				unknown = (query.Origin.Hash == common.Hash{})
+				unknown = query.Origin.Hash == common.Hash{}
 			}
 		case hashMode && !query.Reverse:
 			// Hash based traversal towards the leaf block

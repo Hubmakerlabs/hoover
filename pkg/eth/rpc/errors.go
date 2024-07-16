@@ -78,7 +78,8 @@ type methodNotFoundError struct{ method string }
 func (e *methodNotFoundError) ErrorCode() int { return -32601 }
 
 func (e *methodNotFoundError) Error() string {
-	return fmt.Sprintf("the method %s does not exist/is not available", e.method)
+	return fmt.Sprintf("the method %s does not exist/is not available",
+		e.method)
 }
 
 type notificationsUnsupportedError struct{}
@@ -114,7 +115,8 @@ type subscriptionNotFoundError struct{ namespace, subscription string }
 func (e *subscriptionNotFoundError) ErrorCode() int { return -32601 }
 
 func (e *subscriptionNotFoundError) Error() string {
-	return fmt.Sprintf("no %q subscription in %s namespace", e.subscription, e.namespace)
+	return fmt.Sprintf("no %q subscription in %s namespace", e.subscription,
+		e.namespace)
 }
 
 // Invalid JSON was received by the server.

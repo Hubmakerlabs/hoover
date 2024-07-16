@@ -48,7 +48,8 @@ func NewArchive(file *os.File) (Archive, string) {
 	case strings.HasSuffix(file.Name(), ".zip"):
 		return NewZipArchive(file), strings.TrimSuffix(file.Name(), ".zip")
 	case strings.HasSuffix(file.Name(), ".tar.gz"):
-		return NewTarballArchive(file), strings.TrimSuffix(file.Name(), ".tar.gz")
+		return NewTarballArchive(file), strings.TrimSuffix(file.Name(),
+			".tar.gz")
 	default:
 		return nil, ""
 	}
@@ -265,10 +266,12 @@ func extractZip(ar *os.File, dest string) error {
 }
 
 // extractFile extracts a single file from an archive.
-func extractFile(arpath string, armode os.FileMode, data io.Reader, dest string) error {
+func extractFile(arpath string, armode os.FileMode, data io.Reader,
+	dest string) error {
 	// Check that path is inside destination directory.
 	target := filepath.Join(dest, filepath.FromSlash(arpath))
-	if !strings.HasPrefix(target, filepath.Clean(dest)+string(os.PathSeparator)) {
+	if !strings.HasPrefix(target,
+		filepath.Clean(dest)+string(os.PathSeparator)) {
 		return fmt.Errorf("path %q escapes archive destination", target)
 	}
 

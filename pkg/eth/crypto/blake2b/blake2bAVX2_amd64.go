@@ -16,13 +16,16 @@ func init() {
 }
 
 //go:noescape
-func fAVX2(h *[8]uint64, m *[16]uint64, c0, c1 uint64, flag uint64, rounds uint64)
+func fAVX2(h *[8]uint64, m *[16]uint64, c0, c1 uint64, flag uint64,
+	rounds uint64)
 
 //go:noescape
-func fAVX(h *[8]uint64, m *[16]uint64, c0, c1 uint64, flag uint64, rounds uint64)
+func fAVX(h *[8]uint64, m *[16]uint64, c0, c1 uint64, flag uint64,
+	rounds uint64)
 
 //go:noescape
-func fSSE4(h *[8]uint64, m *[16]uint64, c0, c1 uint64, flag uint64, rounds uint64)
+func fSSE4(h *[8]uint64, m *[16]uint64, c0, c1 uint64, flag uint64,
+	rounds uint64)
 
 func f(h *[8]uint64, m *[16]uint64, c0, c1 uint64, flag uint64, rounds uint64) {
 	switch {

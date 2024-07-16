@@ -16,22 +16,28 @@ package main
 import (
 	"fmt"
 	"math/big"
-	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
+
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar"
+	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
 )
 
 func main() {
-	wallet, err := goar.NewWalletFromPath("./test-keyfile.json", "https://arweave.net")
+	wallet, err := goar.NewWalletFromPath("./test-keyfile.json",
+		"https://arweave.net")
 	if err != nil {
 		panic(err)
 	}
 
 	tx, err := wallet.SendAR(
-  //id, err := wallet.SendWinston( 
+		// id, err := wallet.SendWinston( 
 		big.NewFloat(1.0), // AR amount
-		{{target}}, // target address
-		[]types.Tag{},
-	)
+	{
+		{
+			target
+		}
+	},                     // target address
+	[]types.Tag{},
+)
 
 	fmt.Println(tx.ID, err)
 }
@@ -56,7 +62,8 @@ fmt.Println(id, err) // {{id}}, nil
 
 #### Send Data SpeedUp
 
-Arweave occasionally experiences congestion, and a low Reward can cause a transaction to fail; use speedUp to accelerate the transaction.
+Arweave occasionally experiences congestion, and a low Reward can cause a
+transaction to fail; use speedUp to accelerate the transaction.
 
 ```golang
 speedUp := int64(50) // means reward = reward * 150%
@@ -71,6 +78,7 @@ tx, err := wallet.SendDataSpeedUp(
 
 fmt.Println(tx.ID, err)
 ```
+
 ### Components
 
 #### Client
@@ -174,7 +182,7 @@ Package for Arweave develop toolkit.
 - [x] AssembleSigShares
 - [x] VerifySigShare
 
-[Threshold Signature Usage Guidelines](https://github.com/Hubmakerlabs/hoover/pkg/arweave/goar/wiki/GOAR--RSA-Threshold-Signature-Usage-Guidelines)    
+[Threshold Signature Usage Guidelines](https://github.com/Hubmakerlabs/hoover/pkg/arweave/goar/wiki/GOAR--RSA-Threshold-Signature-Usage-Guidelines)
 
 Create RSA Threshold Cryptography:
 
@@ -213,15 +221,27 @@ err := ts.VerifySigShare(signer01)
 ```
 make test
 ```
+
 ---
+
 ### About chunks
-1. First, we use Chunk transactions for all types of transactions in this library, so we only support transactions where format equals 2.
-2. Second, the library already encapsulates a common interface for sending transactions : e.g `SendAR; SendData`. The user only needs to call this interface to send the transaction and do not need to worry about the usage of chunks.
-3. The third，If the user needs to control the transaction such as breakpoint retransmission and breakpoint continuation operations. Here is how to do it.
+
+1. First, we use Chunk transactions for all types of transactions in this
+   library, so we only support transactions where format equals 2.
+2. Second, the library already encapsulates a common interface for sending
+   transactions : e.g `SendAR; SendData`. The user only needs to call this
+   interface to send the transaction and do not need to worry about the usage of
+   chunks.
+3. The third，If the user needs to control the transaction such as breakpoint
+   retransmission and breakpoint continuation operations. Here is how to do it.
 
 #### chunked uploading advanced options
+
 ##### upload all transaction data
-The method of submitting a data transaction is to use chunk uploading. This method will allow larger transaction sizes, resuming a transaction upload if it's interrupted and give progress updates while uploading.
+
+The method of submitting a data transaction is to use chunk uploading. This
+method will allow larger transaction sizes, resuming a transaction upload if
+it's interrupted and give progress updates while uploading.
 Simple example:
 
 ```golang
@@ -273,7 +293,10 @@ if err != nil {
 
 ##### Breakpoint continuingly
 
-You can resume an upload from a saved uploader object, that you have persisted in storage some using json.marshal(uploader) at any stage of the upload. To resume, parse it back into an object and pass it to getUploader() along with the transactions data:
+You can resume an upload from a saved uploader object, that you have persisted
+in storage some using json.marshal(uploader) at any stage of the upload. To
+resume, parse it back into an object and pass it to getUploader() along with the
+transactions data:
 
 ```golang
 uploaderBuf, err := ioutil.ReadFile("./jsonUploaderFile.json")
@@ -290,11 +313,16 @@ for !newUploader.IsComplete() {
 }
 ```
 
-When resuming the upload, you must provide the same data as the original upload. When you serialize the uploader object with json.marshal() to save it somewhere, it will not include the data.
+When resuming the upload, you must provide the same data as the original upload.
+When you serialize the uploader object with json.marshal() to save it somewhere,
+it will not include the data.
 
 ##### Breakpoint retransmission
 
-You can also resume an upload from just the transaction ID and data, once it has been mined into a block. This can be useful if you didn't save the uploader somewhere but the upload got interrupted. This will re-upload all of the data from the beginning, since we don't know which parts have been uploaded:
+You can also resume an upload from just the transaction ID and data, once it has
+been mined into a block. This can be useful if you didn't save the uploader
+somewhere but the upload got interrupted. This will re-upload all of the data
+from the beginning, since we don't know which parts have been uploaded:
 
 ```golang
 bigData, err := ioutil.ReadFile(filePath)
@@ -309,11 +337,18 @@ assert.NoError(t, uploader.Once())
 ##### NOTE: About all chunk transfer full example can be viewed in path `./example/chunks_tx_test.go`
 
 ---
+
 ### About Arweave Bundles
+
 1. `goar` implemented creating, editing, reading and verifying bundles tx
-2. This is the [ANS-104](https://github.com/joshbenaron/arweave-standards/blob/ans104/ans/ANS-104.md) standard protocol and refers to the [arbundles](https://github.com/Bundler-Network/arbundles) js-lib implement
+2. This is
+   the [ANS-104](https://github.com/joshbenaron/arweave-standards/blob/ans104/ans/ANS-104.md)
+   standard protocol and refers to
+   the [arbundles](https://github.com/Bundler-Network/arbundles) js-lib
+   implement
 
 #### Create Bundle Item
+
 ```go
 signer, err := goar.NewSignerFromPath("./testKey.json") // rsa signer
 // or 
@@ -331,8 +366,11 @@ item03
 ....
 
 ```
-#### assemble bundle and send to arweave network 
+
+#### assemble bundle and send to arweave network
+
 You can send items directly to the arweave network
+
 ```go
 
 items := []types.BundleItem{item01, item02, item03 ...}
@@ -346,7 +384,9 @@ tx, err := w.SendBundleTx(bd.BundleBinary, arTxtags)
 ```
 
 #### Send Item to [Arseeding](https://github.com/everFinance/arseeding) gateway
+
 Arseeding provides guaranteed data seeding and instant data accessibility
+
 ```go
 arseedUrl := "https://seed.everpay.io"
 currency := "USDC" // used for payment fee currency
@@ -354,13 +394,16 @@ resp, err := utils.SubmitItemToArSeed(item01,currency,arseedUrl)
 ```
 
 #### Send Item to Bundler gateway
+
 Bundler provides guaranteed data seeding and instant data accessibility
+
 ```go
 bundlrUrl := "https://node1.bundlr.network"
 resp, err := utils.SubmitItemToBundlr(item01, bundlrUrl)
 ```
 
 #### Verify Bundle Items
+
 ```go
 
 // verify
@@ -369,11 +412,14 @@ for _, item := range bundle.Items {
   assert.NoError(t, err)
 }
 ```
-check [bundle example](./example/bundle_test.go) 
+
+check [bundle example](./example/bundle_test.go)
 
 #### About Arseeding
-if you can `utils.SubmitItemToArseed(item,currency,arseedUrl)` 
-and you will get the following return response   
+
+if you can `utils.SubmitItemToArseed(item,currency,arseedUrl)`
+and you will get the following return response
+
 ```go
 {
     "ItemId": "5rEb7c6OjMQIYjl6P7AJIb4bB9CLMBSxhZ9N7BVbRCk",
@@ -385,16 +431,21 @@ and you will get the following return response
     "expectedBlock": 960751
 }
 ```
-After you transfer 0.000701 USDT to bundler using everpay, arseeding will upload the item to arweave.   
-For more usage, jump to [docs](https://github.com/everFinance/arseeding/blob/main/README.md)
+
+After you transfer 0.000701 USDT to bundler using everpay, arseeding will upload
+the item to arweave.   
+For more usage, jump
+to [docs](https://github.com/everFinance/arseeding/blob/main/README.md)
 
 #### About Bundlr
-if you call `utils.SubmitItemToBundlr(item,bundlrUrl)` 
+
+if you call `utils.SubmitItemToBundlr(item,bundlrUrl)`
 and return `panic: send to bundler request failed; http code: 402`        
 means that you have to pay ar to the bundler service address    
-must use item signature address to transfer funds   
+must use item signature address to transfer funds
 
 ##### how to get bundler service address?
+
 ```go
 curl --location --request GET 'https://node1.bundlr.network/info'
 
@@ -420,11 +471,14 @@ response:
     "gateway": "arweave.net"
 }
 ```
+
 This "addresses" are the bundler service receive address.    
 You need to transfer a certain amount of token to this address    
-and wait for 25 blocks to confirm the transaction before you can use the bundler service.    
+and wait for 25 blocks to confirm the transaction before you can use the bundler
+service.
 
-You can also use the following api to query the balance in the bundler service.   
+You can also use the following api to query the balance in the bundler service.
+
 ```
 curl --location --request GET 'https://node1.bundlr.network/account/balance?address=Ii5wAMlLNz13n26nYY45mcZErwZLjICmYd46GZvn4ck'
 

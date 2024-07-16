@@ -19,8 +19,9 @@ package types
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/minio/sha256-simd"
 	"math/bits"
+
+	"github.com/minio/sha256-simd"
 
 	"github.com/Hubmakerlabs/hoover/pkg/eth/beacon/params"
 	"github.com/Hubmakerlabs/hoover/pkg/eth/common"

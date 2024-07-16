@@ -18,11 +18,12 @@ package types
 
 import (
 	"fmt"
-	"github.com/minio/sha256-simd"
 	"os"
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/minio/sha256-simd"
 
 	"github.com/Hubmakerlabs/hoover/pkg/eth/beacon/merkle"
 	"github.com/Hubmakerlabs/hoover/pkg/eth/common"

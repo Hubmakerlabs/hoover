@@ -17,13 +17,12 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
+	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/utils"
 	"github.com/inconshreveable/log15"
 	"github.com/panjf2000/ants/v2"
 	"github.com/tidwall/gjson"
 	"gopkg.in/h2non/gentleman.v2"
-
-	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
-	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/utils"
 )
 
 var log = log15.New("module", "goar")

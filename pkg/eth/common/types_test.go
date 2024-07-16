@@ -70,9 +70,11 @@ func TestHashJsonValidation(t *testing.T) {
 		Size   int
 		Error  string
 	}{
-		{"", 62, "json: cannot unmarshal hex string without 0x prefix into Go value of type common.Hash"},
+		{"", 62,
+			"json: cannot unmarshal hex string without 0x prefix into Go value of type common.Hash"},
 		{"0x", 66, "hex string has length 66, want 64 for common.Hash"},
-		{"0x", 63, "json: cannot unmarshal hex string of odd length into Go value of type common.Hash"},
+		{"0x", 63,
+			"json: cannot unmarshal hex string of odd length into Go value of type common.Hash"},
 		{"0x", 0, "hex string has length 0, want 64 for common.Hash"},
 		{"0x", 64, ""},
 		{"0X", 64, ""},
@@ -83,11 +85,13 @@ func TestHashJsonValidation(t *testing.T) {
 		err := json.Unmarshal([]byte(input), &v)
 		if err == nil {
 			if test.Error != "" {
-				t.Errorf("%s: error mismatch: have nil, want %q", input, test.Error)
+				t.Errorf("%s: error mismatch: have nil, want %q", input,
+					test.Error)
 			}
 		} else {
 			if err.Error() != test.Error {
-				t.Errorf("%s: error mismatch: have %q, want %q", input, err, test.Error)
+				t.Errorf("%s: error mismatch: have %q, want %q", input, err,
+					test.Error)
 			}
 		}
 	}
@@ -118,7 +122,8 @@ func TestAddressUnmarshalJSON(t *testing.T) {
 				t.Errorf("test #%d: expected error, got none", i)
 			}
 			if got := new(big.Int).SetBytes(v.Bytes()); got.Cmp(test.Output) != 0 {
-				t.Errorf("test #%d: address mismatch: have %v, want %v", i, got, test.Output)
+				t.Errorf("test #%d: address mismatch: have %v, want %v", i, got,
+					test.Output)
 			}
 		}
 	}
@@ -130,20 +135,26 @@ func TestAddressHexChecksum(t *testing.T) {
 		Output string
 	}{
 		// Test cases from https://github.com/ethereum/EIPs/blob/master/EIPS/eip-55.md#specification
-		{"0x5aaeb6053f3e94c9b9a09f33669435e7ef1beaed", "0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed"},
-		{"0xfb6916095ca1df60bb79ce92ce3ea74c37c5d359", "0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359"},
-		{"0xdbf03b407c01e7cd3cbea99509d93f8dddc8c6fb", "0xdbF03B407c01E7cD3CBea99509d93f8DDDC8C6FB"},
-		{"0xd1220a0cf47c7b9be7a2e6ba89f429762e7b9adb", "0xD1220A0cf47c7B9Be7A2E6BA89F429762e7b9aDb"},
+		{"0x5aaeb6053f3e94c9b9a09f33669435e7ef1beaed",
+			"0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed"},
+		{"0xfb6916095ca1df60bb79ce92ce3ea74c37c5d359",
+			"0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359"},
+		{"0xdbf03b407c01e7cd3cbea99509d93f8dddc8c6fb",
+			"0xdbF03B407c01E7cD3CBea99509d93f8DDDC8C6FB"},
+		{"0xd1220a0cf47c7b9be7a2e6ba89f429762e7b9adb",
+			"0xD1220A0cf47c7B9Be7A2E6BA89F429762e7b9aDb"},
 		// Ensure that non-standard length input values are handled correctly
 		{"0xa", "0x000000000000000000000000000000000000000A"},
 		{"0x0a", "0x000000000000000000000000000000000000000A"},
 		{"0x00a", "0x000000000000000000000000000000000000000A"},
-		{"0x000000000000000000000000000000000000000a", "0x000000000000000000000000000000000000000A"},
+		{"0x000000000000000000000000000000000000000a",
+			"0x000000000000000000000000000000000000000A"},
 	}
 	for i, test := range tests {
 		output := HexToAddress(test.Input).Hex()
 		if output != test.Output {
-			t.Errorf("test #%d: failed to match when it should (%s != %s)", i, output, test.Output)
+			t.Errorf("test #%d: failed to match when it should (%s != %s)", i,
+				output, test.Output)
 		}
 	}
 }
@@ -199,7 +210,8 @@ func TestMixedcaseAccount_Address(t *testing.T) {
 
 	for _, r := range res {
 		if got := r.A.ValidChecksum(); got != r.Valid {
-			t.Errorf("Expected checksum %v, got checksum %v, input %v", r.Valid, got, r.A.String())
+			t.Errorf("Expected checksum %v, got checksum %v, input %v", r.Valid,
+				got, r.A.String())
 		}
 	}
 
@@ -212,7 +224,7 @@ func TestMixedcaseAccount_Address(t *testing.T) {
 		`["0x111111111111111111111222222222222333332344"]`, // Too long
 		`["1111111111111111111112222222222223333323"]`,     // Missing 0x
 		`["x1111111111111111111112222222222223333323"]`,    // Missing 0
-		`["0xG111111111111111111112222222222223333323"]`,   //Non-hex
+		`["0xG111111111111111111112222222222223333323"]`,   // Non-hex
 	} {
 		if err := json.Unmarshal([]byte(r), &r2); err == nil {
 			t.Errorf("Expected failure, input %v", r)
@@ -346,7 +358,8 @@ func TestAddress_Scan(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			a := &Address{}
 			if err := a.Scan(tt.args.src); (err != nil) != tt.wantErr {
-				t.Errorf("Address.Scan() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Address.Scan() error = %v, wantErr %v", err,
+					tt.wantErr)
 			}
 
 			if !tt.wantErr {
@@ -387,7 +400,8 @@ func TestAddress_Value(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := tt.a.Value()
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Address.Value() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Address.Value() error = %v, wantErr %v", err,
+					tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
@@ -470,7 +484,8 @@ func TestAddress_Format(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.out != tt.want {
-				t.Errorf("%s does not render as expected:\n got %s\nwant %s", tt.name, tt.out, tt.want)
+				t.Errorf("%s does not render as expected:\n got %s\nwant %s",
+					tt.name, tt.out, tt.want)
 			}
 		})
 	}
@@ -555,7 +570,8 @@ func TestHash_Format(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.out != tt.want {
-				t.Errorf("%s does not render as expected:\n got %s\nwant %s", tt.name, tt.out, tt.want)
+				t.Errorf("%s does not render as expected:\n got %s\nwant %s",
+					tt.name, tt.out, tt.want)
 			}
 		})
 	}

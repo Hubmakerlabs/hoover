@@ -9,26 +9,29 @@ layer.
 
 ## State transition tool (`t8n`)
 
-
 The `evm t8n` tool is a stateless state transition utility. It is a utility
 which can
 
 1. Take a prestate, including
-  - Accounts,
-  - Block context information,
-  - Previous blockshashes (*optional)
+
+- Accounts,
+- Block context information,
+- Previous blockshashes (*optional)
+
 2. Apply a set of transactions,
 3. Apply a mining-reward (*optional),
 4. And generate a post-state, including
-  - State root, transaction root, receipt root,
-  - Information about rejected transactions,
-  - Optionally: a full or partial post-state dump
+
+- State root, transaction root, receipt root,
+- Information about rejected transactions,
+- Optionally: a full or partial post-state dump
 
 ### Specification
 
 The idea is to specify the behaviour of this binary very _strict_, so that other
 node implementors can build replicas based on their own state-machines, and the
-state generators can swap between a \`geth\`-based implementation and a \`parityvm\`-based
+state generators can swap between a \`geth\`-based implementation and a \`
+parityvm\`-based
 implementation.
 
 #### Command line params
@@ -52,9 +55,11 @@ Command line params that need to be supported are
     --trace.nostack                (default: false)
     --trace.returndata             (default: false)
 ```
+
 #### Objects
 
-The transition tool uses JSON objects to read and write data related to the transition operation. The
+The transition tool uses JSON objects to read and write data related to the
+transition operation. The
 following object definitions are required.
 
 ##### `alloc`
@@ -193,23 +198,29 @@ There are a few (not many) errors that can occur, those are defined below.
 ##### EVM-based errors (`2` to `9`)
 
 - Other EVM error. Exit code `2`
-- Failed configuration: when a non-supported or invalid fork was specified. Exit code `3`.
-- Block history is not supplied, but needed for a `BLOCKHASH` operation. If `BLOCKHASH`
-  is invoked targeting a block which history has not been provided for, the program will
+- Failed configuration: when a non-supported or invalid fork was specified. Exit
+  code `3`.
+- Block history is not supplied, but needed for a `BLOCKHASH` operation.
+  If `BLOCKHASH`
+  is invoked targeting a block which history has not been provided for, the
+  program will
   exit with code `4`.
 
 ##### IO errors (`10`-`20`)
 
 - Invalid input json: the supplied data could not be marshalled.
   The program will exit with code `10`
-- IO problems: failure to load or save files, the program will exit with code `11`
+- IO problems: failure to load or save files, the program will exit with
+  code `11`
 
 ```
 # This should exit with 3
 ./evm t8n --input.alloc=./testdata/1/alloc.json --input.txs=./testdata/1/txs.json --input.env=./testdata/1/env.json --state.fork=Frontier+1346 2>/dev/null
 exitcode:3 OK
 ```
+
 #### Forks
+
 ### Basic usage
 
 The chain configuration to be used for a transition is specified via the
@@ -217,15 +228,19 @@ The chain configuration to be used for a transition is specified via the
 found in [`tests/init.go`](tests/init.go).
 
 #### Examples
+
 ##### Basic usage
 
 Invoking it with the provided example files
+
 ```
 ./evm t8n --input.alloc=./testdata/1/alloc.json --input.txs=./testdata/1/txs.json --input.env=./testdata/1/env.json --state.fork=Berlin
 ```
+
 Two resulting files:
 
 `alloc.json`:
+
 ```json
 {
  "0x8a8eafb1cf62bfbeb1741769dae1a9dd47996192": {
@@ -241,7 +256,9 @@ Two resulting files:
  }
 }
 ```
+
 `result.json`:
+
 ```json
 {
  "stateRoot": "0x84208a19bc2b46ada7445180c1db162be5b39b9abc8c0a54b05d32943eae4e13",
@@ -275,10 +292,13 @@ Two resulting files:
 ```
 
 We can make them spit out the data to e.g. `stdout` like this:
+
 ```
 ./evm t8n --input.alloc=./testdata/1/alloc.json --input.txs=./testdata/1/txs.json --input.env=./testdata/1/env.json --output.result=stdout --output.alloc=stdout --state.fork=Berlin
 ```
+
 Output:
+
 ```json
 {
   "alloc": {
@@ -328,29 +348,33 @@ Output:
 
 #### About Ommers
 
-Mining rewards and ommer rewards might need to be added. This is how those are applied:
+Mining rewards and ommer rewards might need to be added. This is how those are
+applied:
 
-- `block_reward` is the block mining reward for the miner (`0xaa`), of a block at height `N`.
+- `block_reward` is the block mining reward for the miner (`0xaa`), of a block
+  at height `N`.
 - For each ommer (mined by `0xbb`), with blocknumber `N-delta`
-   - (where `delta` is the difference between the current block and the ommer)
-   - The account `0xbb` (ommer miner) is awarded `(8-delta)/ 8 * block_reward`
-   - The account `0xaa` (block miner) is awarded `block_reward / 32`
+    - (where `delta` is the difference between the current block and the ommer)
+    - The account `0xbb` (ommer miner) is awarded `(8-delta)/ 8 * block_reward`
+    - The account `0xaa` (block miner) is awarded `block_reward / 32`
 
 To make `t8n` apply these, the following inputs are required:
 
 - `--state.reward`
-  - For ethash, it is `5000000000000000000` `wei`,
-  - If this is not defined, mining rewards are not applied,
-  - A value of `0` is valid, and causes accounts to be 'touched'.
+    - For ethash, it is `5000000000000000000` `wei`,
+    - If this is not defined, mining rewards are not applied,
+    - A value of `0` is valid, and causes accounts to be 'touched'.
 - For each ommer, the tool needs to be given an `address\` and a `delta`. This
   is done via the `ommers` field in `env`.
 
 Note: the tool does not verify that e.g. the normal uncle rules apply,
-and allows e.g two uncles at the same height, or the uncle-distance. This means that
+and allows e.g two uncles at the same height, or the uncle-distance. This means
+that
 the tool allows for negative uncle reward (distance > 8)
 
 Example:
 `./testdata/5/env.json`:
+
 ```json
 {
   "currentCoinbase": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
@@ -364,8 +388,10 @@ Example:
   ]
 }
 ```
+
 When applying this, using a reward of `0x08`
 Output:
+
 ```json
 {
   "alloc": {
@@ -381,19 +407,24 @@ Output:
   }
 }
 ```
+
 #### Future EIPS
 
-It is also possible to experiment with future eips that are not yet defined in a hard fork.
-Example, putting EIP-1344 into Frontier: 
+It is also possible to experiment with future eips that are not yet defined in a
+hard fork.
+Example, putting EIP-1344 into Frontier:
+
 ```
 ./evm t8n --state.fork=Frontier+1344 --input.pre=./testdata/1/pre.json --input.txs=./testdata/1/txs.json --input.env=/testdata/1/env.json
 ```
 
 #### Block history
 
-The `BLOCKHASH` opcode requires blockhashes to be provided by the caller, inside the `env`.
+The `BLOCKHASH` opcode requires blockhashes to be provided by the caller, inside
+the `env`.
 If a required blockhash is not provided, the exit code should be `4`:
-Example where blockhashes are provided: 
+Example where blockhashes are provided:
+
 ```
 ./evm t8n --input.alloc=./testdata/3/alloc.json --input.txs=./testdata/3/txs.json --input.env=./testdata/3/env.json  --trace --state.fork=Berlin
 
@@ -402,6 +433,7 @@ Example where blockhashes are provided:
 ```
 cat trace-0-0x72fadbef39cd251a437eea619cfeda752271a5faaaa2147df012e112159ffb81.jsonl | grep BLOCKHASH -C2
 ```
+
 ```
 {"pc":0,"op":96,"gas":"0x5f58ef8","gasCost":"0x3","memSize":0,"stack":[],"depth":1,"refund":0,"opName":"PUSH1"}
 {"pc":2,"op":64,"gas":"0x5f58ef5","gasCost":"0x14","memSize":0,"stack":["0x1"],"depth":1,"refund":0,"opName":"BLOCKHASH"}
@@ -410,33 +442,45 @@ cat trace-0-0x72fadbef39cd251a437eea619cfeda752271a5faaaa2147df012e112159ffb81.j
 ```
 
 In this example, the caller has not provided the required blockhash:
+
 ```
 ./evm t8n --input.alloc=./testdata/4/alloc.json --input.txs=./testdata/4/txs.json --input.env=./testdata/4/env.json --trace --state.fork=Berlin
 ERROR(4): getHash(3) invoked, blockhash for that block not provided
 ```
+
 Error code: 4
 
 #### Chaining
 
 Another thing that can be done, is to chain invocations:
+
 ```
 ./evm t8n --input.alloc=./testdata/1/alloc.json --input.txs=./testdata/1/txs.json --input.env=./testdata/1/env.json --state.fork=Berlin --output.alloc=stdout | ./evm t8n --input.alloc=stdin --input.env=./testdata/1/env.json --input.txs=./testdata/1/txs.json --state.fork=Berlin
 
 ```
-What happened here, is that we first applied two identical transactions, so the second one was rejected. 
-Then, taking the poststate alloc as the input for the next state, we tried again to include
+
+What happened here, is that we first applied two identical transactions, so the
+second one was rejected.
+Then, taking the poststate alloc as the input for the next state, we tried again
+to include
 the same two transactions: this time, both failed due to too low nonce.
 
-In order to meaningfully chain invocations, one would need to provide meaningful new `env`, otherwise the
+In order to meaningfully chain invocations, one would need to provide meaningful
+new `env`, otherwise the
 actual blocknumber (exposed to the EVM) would not increase.
 
 #### Transactions in RLP form
 
-It is possible to provide already-signed transactions as input to, using an `input.txs` which ends with the `rlp` suffix.
-The input format for RLP-form transactions is _identical_ to the _output_ format for block bodies. Therefore, it's fully possible
+It is possible to provide already-signed transactions as input to, using
+an `input.txs` which ends with the `rlp` suffix.
+The input format for RLP-form transactions is _identical_ to the _output_ format
+for block bodies. Therefore, it's fully possible
 to use the evm to go from `json` input to `rlp` input.
 
-The following command takes **json** the transactions in `./testdata/13/txs.json` and signs them. After execution, they are output to `signed_txs.rlp`.:
+The following command takes **json** the transactions
+in `./testdata/13/txs.json` and signs them. After execution, they are output
+to `signed_txs.rlp`.:
+
 ```
 ./evm t8n --state.fork=London --input.alloc=./testdata/13/alloc.json --input.txs=./testdata/13/txs.json --input.env=./testdata/13/env.json --output.result=alloc_jsontx.json --output.body=signed_txs.rlp
 INFO [12-27|09:25:11.102] Trie dumping started                     root=e4b924..6aef61
@@ -446,13 +490,16 @@ INFO [12-27|09:25:11.103] Wrote file                               file=alloc_js
 INFO [12-27|09:25:11.103] Wrote file                               file=signed_txs.rlp
 ```
 
-The `output.body` is the rlp-list of transactions, encoded in hex and placed in a string a'la `json` encoding rules:
+The `output.body` is the rlp-list of transactions, encoded in hex and placed in
+a string a'la `json` encoding rules:
+
 ```
 cat signed_txs.rlp
 "0xf8d2b86702f864010180820fa08284d09411111111111111111111111111111111111111118080c001a0b7dfab36232379bb3d1497a4f91c1966b1f932eae3ade107bf5d723b9cb474e0a06261c359a10f2132f126d250485b90cf20f30340801244a08ef6142ab33d1904b86702f864010280820fa08284d09411111111111111111111111111111111111111118080c080a0d4ec563b6568cd42d998fc4134b36933c6568d01533b5adf08769270243c6c7fa072bf7c21eac6bbeae5143371eef26d5e279637f3bd73482b55979d76d935b1e9"
 ```
 
-We can use `rlpdump` to check what the contents are: 
+We can use `rlpdump` to check what the contents are:
+
 ```
 rlpdump -hex $(cat signed_txs.rlp | jq -r )
 [
@@ -460,7 +507,10 @@ rlpdump -hex $(cat signed_txs.rlp | jq -r )
   02f864010280820fa08284d09411111111111111111111111111111111111111118080c080a0d4ec563b6568cd42d998fc4134b36933c6568d01533b5adf08769270243c6c7fa072bf7c21eac6bbeae5143371eef26d5e279637f3bd73482b55979d76d935b1e9,
 ]
 ```
-Now, we can now use those (or any other already signed transactions), as input, like so: 
+
+Now, we can now use those (or any other already signed transactions), as input,
+like so:
+
 ```
 ./evm t8n --state.fork=London --input.alloc=./testdata/13/alloc.json --input.txs=./signed_txs.rlp --input.env=./testdata/13/env.json --output.result=alloc_rlptx.json
 INFO [12-27|09:25:11.187] Trie dumping started                     root=e4b924..6aef61
@@ -468,8 +518,11 @@ INFO [12-27|09:25:11.187] Trie dumping complete                    accounts=3 el
 INFO [12-27|09:25:11.187] Wrote file                               file=alloc.json
 INFO [12-27|09:25:11.187] Wrote file                               file=alloc_rlptx.json
 ```
-You might have noticed that the results from these two invocations were stored in two separate files. 
+
+You might have noticed that the results from these two invocations were stored
+in two separate files.
 And we can now finally check that they match.
+
 ```
 cat alloc_jsontx.json | jq .stateRoot && cat alloc_rlptx.json | jq .stateRoot
 "0xe4b924a6adb5959fccf769d5b7bb2f6359e26d1e76a2443c5a91a36d826aef61"
@@ -478,7 +531,9 @@ cat alloc_jsontx.json | jq .stateRoot && cat alloc_rlptx.json | jq .stateRoot
 
 ## Transaction tool
 
-The transaction tool is used to perform static validity checks on transactions such as:
+The transaction tool is used to perform static validity checks on transactions
+such as:
+
 * intrinsic gas calculation
 * max values on integers
 * fee semantics, such as `maxFeePerGas < maxPriorityFeePerGas`
@@ -499,6 +554,7 @@ The transaction tool is used to perform static validity checks on transactions s
   }
 ]
 ```
+
 ```
 ./evm t9n --state.fork London --input.txs testdata/15/signed_txs.rlp
 [
@@ -514,6 +570,7 @@ The transaction tool is used to perform static validity checks on transactions s
   }
 ]
 ```
+
 ## Block builder tool (b11r)
 
 The `evm b11r` tool is used to assemble and seal full block rlps.
@@ -566,6 +623,7 @@ type Header struct {
         BaseFee     *big.Int          `json:"baseFeePerGas"`
 }
 ```
+
 #### `ommers`
 
 The `ommers` object is a list of RLP-encoded ommer blocks in hex

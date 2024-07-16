@@ -1,10 +1,10 @@
 package utils
 
 import (
-	"github.com/Hubmakerlabs/hoover/pkg/arweave/go-everpay/token/schema"
 	"math/big"
 	"testing"
 
+	"github.com/Hubmakerlabs/hoover/pkg/arweave/go-everpay/token/schema"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -6,6 +6,7 @@ package base58
 
 import (
 	"errors"
+
 	"github.com/minio/sha256-simd"
 )
 

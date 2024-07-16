@@ -56,11 +56,14 @@ type solcOutputV8 struct {
 //
 // Returns an error if the JSON is malformed or missing data, or if the JSON
 // embedded within the JSON is malformed.
-func ParseCombinedJSON(combinedJSON []byte, source string, languageVersion string, compilerVersion string, compilerOptions string) (map[string]*Contract, error) {
+func ParseCombinedJSON(combinedJSON []byte, source string,
+	languageVersion string, compilerVersion string,
+	compilerOptions string) (map[string]*Contract, error) {
 	var output solcOutput
 	if err := json.Unmarshal(combinedJSON, &output); err != nil {
 		// Try to parse the output with the new solidity v.0.8.0 rules
-		return parseCombinedJSONV8(combinedJSON, source, languageVersion, compilerVersion, compilerOptions)
+		return parseCombinedJSONV8(combinedJSON, source, languageVersion,
+			compilerVersion, compilerOptions)
 	}
 	// Compilation succeeded, assemble and return the contracts.
 	contracts := make(map[string]*Contract)
@@ -68,13 +71,16 @@ func ParseCombinedJSON(combinedJSON []byte, source string, languageVersion strin
 		// Parse the individual compilation results.
 		var abi, userdoc, devdoc interface{}
 		if err := json.Unmarshal([]byte(info.Abi), &abi); err != nil {
-			return nil, fmt.Errorf("solc: error reading abi definition (%v)", err)
+			return nil, fmt.Errorf("solc: error reading abi definition (%v)",
+				err)
 		}
 		if err := json.Unmarshal([]byte(info.Userdoc), &userdoc); err != nil {
-			return nil, fmt.Errorf("solc: error reading userdoc definition (%v)", err)
+			return nil, fmt.Errorf("solc: error reading userdoc definition (%v)",
+				err)
 		}
 		if err := json.Unmarshal([]byte(info.Devdoc), &devdoc); err != nil {
-			return nil, fmt.Errorf("solc: error reading devdoc definition (%v)", err)
+			return nil, fmt.Errorf("solc: error reading devdoc definition (%v)",
+				err)
 		}
 
 		contracts[name] = &Contract{
@@ -101,7 +107,9 @@ func ParseCombinedJSON(combinedJSON []byte, source string, languageVersion strin
 
 // parseCombinedJSONV8 parses the direct output of solc --combined-output
 // and parses it using the rules from solidity v.0.8.0 and later.
-func parseCombinedJSONV8(combinedJSON []byte, source string, languageVersion string, compilerVersion string, compilerOptions string) (map[string]*Contract, error) {
+func parseCombinedJSONV8(combinedJSON []byte, source string,
+	languageVersion string, compilerVersion string,
+	compilerOptions string) (map[string]*Contract, error) {
 	var output solcOutputV8
 	if err := json.Unmarshal(combinedJSON, &output); err != nil {
 		return nil, err

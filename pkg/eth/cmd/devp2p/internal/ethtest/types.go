@@ -216,13 +216,13 @@ func (c *Conn) Read() Message {
 			return ethMsg
 		}
 		msg = new(NewPooledTransactionHashes66)
-	case (GetPooledTransactions{}.Code()):
+	case GetPooledTransactions{}.Code():
 		ethMsg := new(eth.GetPooledTransactionsPacket)
 		if err := rlp.DecodeBytes(rawData, ethMsg); err != nil {
 			return errorf("could not rlp decode message: %v", err)
 		}
 		return (*GetPooledTransactions)(ethMsg)
-	case (PooledTransactions{}.Code()):
+	case PooledTransactions{}.Code():
 		ethMsg := new(eth.PooledTransactionsPacket)
 		if err := rlp.DecodeBytes(rawData, ethMsg); err != nil {
 			return errorf("could not rlp decode message: %v", err)

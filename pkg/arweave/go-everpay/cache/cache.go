@@ -6,18 +6,17 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/Hubmakerlabs/hoover/pkg/arweave/go-everpay/cache/schema"
-	paySchema "github.com/Hubmakerlabs/hoover/pkg/arweave/go-everpay/pay/schema"
-	tokSchema "github.com/Hubmakerlabs/hoover/pkg/arweave/go-everpay/token/schema"
-	"github.com/Hubmakerlabs/hoover/pkg/eth/crypto"
-
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/ethrpc"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/go-everpay/account"
+	"github.com/Hubmakerlabs/hoover/pkg/arweave/go-everpay/cache/schema"
 	comm "github.com/Hubmakerlabs/hoover/pkg/arweave/go-everpay/common"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/go-everpay/pay"
+	paySchema "github.com/Hubmakerlabs/hoover/pkg/arweave/go-everpay/pay/schema"
+	tokSchema "github.com/Hubmakerlabs/hoover/pkg/arweave/go-everpay/token/schema"
 	arTypes "github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/utils"
 	"github.com/Hubmakerlabs/hoover/pkg/eth/common"
+	"github.com/Hubmakerlabs/hoover/pkg/eth/crypto"
 )
 
 var log = comm.NewLog("cache")
@@ -136,8 +135,8 @@ func (c *Cache) addTxsByAcc(tx *schema.TxResponse) {
 
 	// need add to cache address
 	needAddMap := map[string]struct{}{
-		from: struct{}{},
-		to:   struct{}{},
+		from: {},
+		to:   {},
 	}
 
 	switch tx.Action {

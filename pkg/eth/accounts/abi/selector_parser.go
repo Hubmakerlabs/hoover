@@ -39,7 +39,8 @@ func isIdentifierSymbol(c byte) bool {
 	return c == '$' || c == '_'
 }
 
-func parseToken(unescapedSelector string, isIdent bool) (string, string, error) {
+func parseToken(unescapedSelector string, isIdent bool) (string, string,
+	error) {
 	if len(unescapedSelector) == 0 {
 		return "", "", errors.New("empty token")
 	}
@@ -76,7 +77,8 @@ func parseElementaryType(unescapedSelector string) (string, string, error) {
 			rest = rest[1:]
 		}
 		if len(rest) == 0 || rest[0] != ']' {
-			return "", "", fmt.Errorf("failed to parse array: expected ']', got %c", unescapedSelector[0])
+			return "", "", fmt.Errorf("failed to parse array: expected ']', got %c",
+				unescapedSelector[0])
 		}
 		parsedType = parsedType + string(rest[0])
 		rest = rest[1:]
@@ -84,7 +86,8 @@ func parseElementaryType(unescapedSelector string) (string, string, error) {
 	return parsedType, rest, nil
 }
 
-func parseCompositeType(unescapedSelector string) ([]interface{}, string, error) {
+func parseCompositeType(unescapedSelector string) ([]interface{}, string,
+	error) {
 	if len(unescapedSelector) == 0 || unescapedSelector[0] != '(' {
 		return nil, "", fmt.Errorf("expected '(', got %c", unescapedSelector[0])
 	}
@@ -126,7 +129,8 @@ func assembleArgs(args []interface{}) ([]ArgumentMarshaling, error) {
 		// generate dummy name to avoid unmarshal issues
 		name := fmt.Sprintf("name%d", i)
 		if s, ok := arg.(string); ok {
-			arguments = append(arguments, ArgumentMarshaling{name, s, s, nil, false})
+			arguments = append(arguments,
+				ArgumentMarshaling{name, s, s, nil, false})
 		} else if components, ok := arg.([]interface{}); ok {
 			subArgs, err := assembleArgs(components)
 			if err != nil {
@@ -137,9 +141,11 @@ func assembleArgs(args []interface{}) ([]ArgumentMarshaling, error) {
 				subArgs = subArgs[:len(subArgs)-1]
 				tupleType = "tuple[]"
 			}
-			arguments = append(arguments, ArgumentMarshaling{name, tupleType, tupleType, subArgs, false})
+			arguments = append(arguments,
+				ArgumentMarshaling{name, tupleType, tupleType, subArgs, false})
 		} else {
-			return nil, fmt.Errorf("failed to assemble args: unexpected type %T", arg)
+			return nil, fmt.Errorf("failed to assemble args: unexpected type %T",
+				arg)
 		}
 	}
 	return arguments, nil
@@ -152,7 +158,8 @@ func assembleArgs(args []interface{}) ([]ArgumentMarshaling, error) {
 func ParseSelector(unescapedSelector string) (SelectorMarshaling, error) {
 	name, rest, err := parseIdentifier(unescapedSelector)
 	if err != nil {
-		return SelectorMarshaling{}, fmt.Errorf("failed to parse selector '%s': %v", unescapedSelector, err)
+		return SelectorMarshaling{}, fmt.Errorf("failed to parse selector '%s': %v",
+			unescapedSelector, err)
 	}
 	args := []interface{}{}
 	if len(rest) >= 2 && rest[0] == '(' && rest[1] == ')' {
@@ -160,17 +167,20 @@ func ParseSelector(unescapedSelector string) (SelectorMarshaling, error) {
 	} else {
 		args, rest, err = parseCompositeType(rest)
 		if err != nil {
-			return SelectorMarshaling{}, fmt.Errorf("failed to parse selector '%s': %v", unescapedSelector, err)
+			return SelectorMarshaling{}, fmt.Errorf("failed to parse selector '%s': %v",
+				unescapedSelector, err)
 		}
 	}
 	if len(rest) > 0 {
-		return SelectorMarshaling{}, fmt.Errorf("failed to parse selector '%s': unexpected string '%s'", unescapedSelector, rest)
+		return SelectorMarshaling{}, fmt.Errorf("failed to parse selector '%s': unexpected string '%s'",
+			unescapedSelector, rest)
 	}
 
 	// Reassemble the fake ABI and construct the JSON
 	fakeArgs, err := assembleArgs(args)
 	if err != nil {
-		return SelectorMarshaling{}, fmt.Errorf("failed to parse selector: %v", err)
+		return SelectorMarshaling{}, fmt.Errorf("failed to parse selector: %v",
+			err)
 	}
 
 	return SelectorMarshaling{name, "function", fakeArgs}, nil

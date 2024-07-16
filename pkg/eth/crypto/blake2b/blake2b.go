@@ -45,8 +45,10 @@ var (
 )
 
 var iv = [8]uint64{
-	0x6a09e667f3bcc908, 0xbb67ae8584caa73b, 0x3c6ef372fe94f82b, 0xa54ff53a5f1d36f1,
-	0x510e527fade682d1, 0x9b05688c2b3e6c1f, 0x1f83d9abfb41bd6b, 0x5be0cd19137e2179,
+	0x6a09e667f3bcc908, 0xbb67ae8584caa73b, 0x3c6ef372fe94f82b,
+	0xa54ff53a5f1d36f1,
+	0x510e527fade682d1, 0x9b05688c2b3e6c1f, 0x1f83d9abfb41bd6b,
+	0x5be0cd19137e2179,
 }
 
 // Sum512 returns the BLAKE2b-512 checksum of the data.
@@ -94,7 +96,10 @@ func New256(key []byte) (hash.Hash, error) { return newDigest(Size256, key) }
 // - 16 if BLAKE2b is used as a MAC function (The key is at least 16 bytes long).
 // When the key is nil, the returned hash.Hash implements BinaryMarshaler
 // and BinaryUnmarshaler for state (de)serialization as documented by hash.Hash.
-func New(size int, key []byte) (hash.Hash, error) { return newDigest(size, key) }
+func New(size int, key []byte) (hash.Hash, error) {
+	return newDigest(size,
+		key)
+}
 
 // F is a compression function for BLAKE2b. It takes as an argument the state
 // vector `h`, message block vector `m`, offset counter `t`, final block indicator

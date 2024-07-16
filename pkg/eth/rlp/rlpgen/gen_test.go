@@ -31,8 +31,9 @@ import (
 
 // Package RLP is loaded only once and reused for all tests.
 var (
-	testFset       = token.NewFileSet()
-	testImporter   = importer.ForCompiler(testFset, "source", nil).(types.ImporterFrom)
+	testFset     = token.NewFileSet()
+	testImporter = importer.ForCompiler(testFset, "source",
+		nil).(types.ImporterFrom)
 	testPackageRLP *types.Package
 )
 
@@ -47,7 +48,8 @@ func init() {
 	}
 }
 
-var tests = []string{"uints", "nil", "rawvalue", "optional", "bigint", "uint256"}
+var tests = []string{"uints", "nil", "rawvalue", "optional", "bigint",
+	"uint256"}
 
 func TestOutput(t *testing.T) {
 	for _, test := range tests {
@@ -75,13 +77,15 @@ func TestOutput(t *testing.T) {
 				t.Fatal("error loading expected test output:", err)
 			}
 			if !bytes.Equal(output, wantOutput) {
-				t.Fatalf("output mismatch, want: %v got %v", string(wantOutput), string(output))
+				t.Fatalf("output mismatch, want: %v got %v", string(wantOutput),
+					string(output))
 			}
 		})
 	}
 }
 
-func loadTestSource(file string, typeName string) (*buildContext, *types.Named, error) {
+func loadTestSource(file string, typeName string) (*buildContext, *types.Named,
+	error) {
 	// Load the test input.
 	content, err := os.ReadFile(file)
 	if err != nil {

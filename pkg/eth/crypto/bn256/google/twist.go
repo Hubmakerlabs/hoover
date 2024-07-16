@@ -205,7 +205,8 @@ func (c *twistPoint) Double(a *twistPoint, pool *bnPool) {
 	f.Put(pool)
 }
 
-func (c *twistPoint) Mul(a *twistPoint, scalar *big.Int, pool *bnPool) *twistPoint {
+func (c *twistPoint) Mul(a *twistPoint, scalar *big.Int,
+	pool *bnPool) *twistPoint {
 	sum := newTwistPoint(pool)
 	sum.SetInfinity()
 	t := newTwistPoint(pool)

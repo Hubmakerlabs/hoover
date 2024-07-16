@@ -56,7 +56,8 @@ loop:
 			if err := SendItems(rw1, 1); err == nil {
 				t.Error("EncodeMsg returned nil error")
 			} else if err != ErrPipeClosed {
-				t.Errorf("EncodeMsg returned wrong error: got %v, want %v", err, ErrPipeClosed)
+				t.Errorf("EncodeMsg returned wrong error: got %v, want %v", err,
+					ErrPipeClosed)
 			}
 			close(done)
 		}()

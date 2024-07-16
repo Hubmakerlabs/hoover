@@ -25,13 +25,14 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
-	"github.com/minio/sha256-simd"
 	"math/big"
 	"regexp"
 	"sort"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/minio/sha256-simd"
 
 	"github.com/Hubmakerlabs/hoover/pkg/eth"
 	"github.com/Hubmakerlabs/hoover/pkg/eth/accounts"

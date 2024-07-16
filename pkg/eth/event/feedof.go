@@ -40,7 +40,8 @@ func (f *FeedOf[T]) init() {
 	f.removeSub = make(chan chan<- T)
 	f.sendLock = make(chan struct{}, 1)
 	f.sendLock <- struct{}{}
-	f.sendCases = caseList{{Chan: reflect.ValueOf(f.removeSub), Dir: reflect.SelectRecv}}
+	f.sendCases = caseList{{Chan: reflect.ValueOf(f.removeSub),
+		Dir: reflect.SelectRecv}}
 }
 
 // Subscribe adds a channel to the feed. Future sends will be delivered on the channel

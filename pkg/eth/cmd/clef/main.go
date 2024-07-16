@@ -24,7 +24,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/minio/sha256-simd"
 	"io"
 	"math/big"
 	"net"
@@ -34,6 +33,8 @@ import (
 	"runtime"
 	"strings"
 	"time"
+
+	"github.com/minio/sha256-simd"
 
 	"github.com/Hubmakerlabs/hoover/pkg/eth/accounts"
 	"github.com/Hubmakerlabs/hoover/pkg/eth/accounts/keystore"

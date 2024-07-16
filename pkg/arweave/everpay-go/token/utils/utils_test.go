@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/everpay-go/token/schema"
-
 	"github.com/stretchr/testify/assert"
 )
 

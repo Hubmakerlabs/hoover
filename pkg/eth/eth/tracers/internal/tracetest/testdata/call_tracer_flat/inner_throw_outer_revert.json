@@ -88,7 +88,9 @@
       "error": "invalid opcode: INVALID",
       "result": {},
       "subtraces": 0,
-      "traceAddress": [0],
+      "traceAddress": [
+        0
+      ],
       "type": "call"
     }
   ]

@@ -65,7 +65,8 @@ func PGPKeyID(pgpkey string) (string, error) {
 		return "", err
 	}
 	if len(keys) != 1 {
-		return "", fmt.Errorf("key count mismatch: have %d, want %d", len(keys), 1)
+		return "", fmt.Errorf("key count mismatch: have %d, want %d", len(keys),
+			1)
 	}
 	return keys[0].PrimaryKey.KeyIdString(), nil
 }

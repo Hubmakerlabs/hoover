@@ -32,18 +32,23 @@ func TestHexCompact(t *testing.T) {
 		// odd length, no terminator
 		{hex: []byte{1, 2, 3, 4, 5}, compact: []byte{0x11, 0x23, 0x45}},
 		// even length, no terminator
-		{hex: []byte{0, 1, 2, 3, 4, 5}, compact: []byte{0x00, 0x01, 0x23, 0x45}},
+		{hex: []byte{0, 1, 2, 3, 4, 5},
+			compact: []byte{0x00, 0x01, 0x23, 0x45}},
 		// odd length, terminator
-		{hex: []byte{15, 1, 12, 11, 8, 16 /*term*/}, compact: []byte{0x3f, 0x1c, 0xb8}},
+		{hex: []byte{15, 1, 12, 11, 8, 16 /*term*/},
+			compact: []byte{0x3f, 0x1c, 0xb8}},
 		// even length, terminator
-		{hex: []byte{0, 15, 1, 12, 11, 8, 16 /*term*/}, compact: []byte{0x20, 0x0f, 0x1c, 0xb8}},
+		{hex: []byte{0, 15, 1, 12, 11, 8, 16 /*term*/},
+			compact: []byte{0x20, 0x0f, 0x1c, 0xb8}},
 	}
 	for _, test := range tests {
 		if c := hexToCompact(test.hex); !bytes.Equal(c, test.compact) {
-			t.Errorf("hexToCompact(%x) -> %x, want %x", test.hex, c, test.compact)
+			t.Errorf("hexToCompact(%x) -> %x, want %x", test.hex, c,
+				test.compact)
 		}
 		if h := compactToHex(test.compact); !bytes.Equal(h, test.hex) {
-			t.Errorf("compactToHex(%x) -> %x, want %x", test.compact, h, test.hex)
+			t.Errorf("compactToHex(%x) -> %x, want %x", test.compact, h,
+				test.hex)
 		}
 	}
 }
@@ -70,10 +75,12 @@ func TestHexKeybytes(t *testing.T) {
 	}
 	for _, test := range tests {
 		if h := keybytesToHex(test.key); !bytes.Equal(h, test.hexOut) {
-			t.Errorf("keybytesToHex(%x) -> %x, want %x", test.key, h, test.hexOut)
+			t.Errorf("keybytesToHex(%x) -> %x, want %x", test.key, h,
+				test.hexOut)
 		}
 		if k := hexToKeybytes(test.hexIn); !bytes.Equal(k, test.key) {
-			t.Errorf("hexToKeybytes(%x) -> %x, want %x", test.hexIn, k, test.key)
+			t.Errorf("hexToKeybytes(%x) -> %x, want %x", test.hexIn, k,
+				test.key)
 		}
 	}
 }
@@ -88,7 +95,8 @@ func TestHexToCompactInPlace(t *testing.T) {
 		exp := hexToCompact(hexBytes)
 		got := hexToCompactInPlace(hexBytes)
 		if !bytes.Equal(exp, got) {
-			t.Fatalf("test %d: encoding err\ninp %v\ngot %x\nexp %x\n", i, key, got, exp)
+			t.Fatalf("test %d: encoding err\ninp %v\ngot %x\nexp %x\n", i, key,
+				got, exp)
 		}
 	}
 }

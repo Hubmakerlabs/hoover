@@ -48,7 +48,8 @@ t.Time(func() {})
 t.Update(47)
 ```
 
-**NOTE:** Be sure to unregister short-lived meters and timers otherwise they will
+**NOTE:** Be sure to unregister short-lived meters and timers otherwise they
+will
 leak memory:
 
 ```go
@@ -71,7 +72,8 @@ w, _ := syslog.Dial("unixgram", "/dev/log", syslog.LOG_INFO, "metrics")
 go metrics.Syslog(metrics.DefaultRegistry, 60e9, w)
 ```
 
-Periodically emit every metric to Graphite using the [Graphite client](https://github.com/cyberdelia/go-metrics-graphite):
+Periodically emit every metric to Graphite using
+the [Graphite client](https://github.com/cyberdelia/go-metrics-graphite):
 
 ```go
 
@@ -86,7 +88,8 @@ Periodically emit every metric into InfluxDB:
 **NOTE:** this has been pulled out of the library due to constant fluctuations
 in the InfluxDB API. In fact, all client libraries are on their way out. see
 issues [#121](https://github.com/rcrowley/go-metrics/issues/121) and
-[#124](https://github.com/rcrowley/go-metrics/issues/124) for progress and details.
+[#124](https://github.com/rcrowley/go-metrics/issues/124) for progress and
+details.
 
 ```go
 import "github.com/vrischmann/go-metrics-influxdb"
@@ -100,7 +103,8 @@ go influxdb.InfluxDB(metrics.DefaultRegistry,
 )
 ```
 
-Periodically upload every metric to Librato using the [Librato client](https://github.com/mihasya/go-metrics-librato):
+Periodically upload every metric to Librato using
+the [Librato client](https://github.com/mihasya/go-metrics-librato):
 
 **Note**: the client included with this repository under the `librato` package
 has been deprecated and moved to the repository linked above.
@@ -128,10 +132,11 @@ go stathat.Stathat(metrics.DefaultRegistry, 10e9, "example@example.com")
 
 Maintain all metrics along with expvars at `/debug/metrics`:
 
-This uses the same mechanism as [the official expvar](https://golang.org/pkg/expvar/)
-but exposed under `/debug/metrics`, which shows a json representation of all your usual expvars
+This uses the same mechanism
+as [the official expvar](https://golang.org/pkg/expvar/)
+but exposed under `/debug/metrics`, which shows a json representation of all
+your usual expvars
 as well as all your go-metrics.
-
 
 ```go
 import "github.com/rcrowley/go-metrics/exp"

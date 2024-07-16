@@ -8,12 +8,15 @@ TL;DR: Given a version number MAJOR.MINOR.PATCH, increment the:
 * MINOR version when you add functionality in a backwards-compatible manner, and
 * PATCH version when you make backwards-compatible bug fixes.
 
-Additional labels for pre-release and build metadata are available as extensions to the MAJOR.MINOR.PATCH format.
+Additional labels for pre-release and build metadata are available as extensions
+to the MAJOR.MINOR.PATCH format.
 
 ### 6.1.0
 
-The API-method `account_signGnosisSafeTx` was added. This method takes two parameters, 
-`[address, safeTx]`. The latter, `safeTx`, can be copy-pasted from the gnosis relay. For example: 
+The API-method `account_signGnosisSafeTx` was added. This method takes two
+parameters,
+`[address, safeTx]`. The latter, `safeTx`, can be copy-pasted from the gnosis
+relay. For example:
 
 ```
 {
@@ -64,10 +67,12 @@ The API-method `account_signGnosisSafeTx` was added. This method takes two param
 }
 ```
 
-Not all fields are required, though. This method is really just a UX helper, which massages the 
-input to conform to the `EIP-712` [specification](https://docs.gnosis.io/safe/docs/contracts_tx_execution/#transaction-hash) 
-for the Gnosis Safe, and making the output be directly importable to by a relay service. 
-
+Not all fields are required, though. This method is really just a UX helper,
+which massages the
+input to conform to
+the `EIP-712` [specification](https://docs.gnosis.io/safe/docs/contracts_tx_execution/#transaction-hash)
+for the Gnosis Safe, and making the output be directly importable to by a relay
+service.
 
 ### 6.0.0
 
@@ -77,12 +82,16 @@ for the Gnosis Safe, and making the output be directly importable to by a relay 
 #### 5.0.0
 
 * The external `account_EcRecover`-method was reimplemented.
-* The external method `account_sign(address, data)` was replaced with `account_signData(contentType, address, data)`.
-The addition of `contentType` makes it possible to use the method for different types of objects, such as:
-  * signing data with an intended validator (not yet implemented)
-  * signing clique headers,
-  * signing plain personal messages,
-* The external method `account_signTypedData` implements [EIP-712](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-712.md) and makes it possible to sign typed data.
+* The external method `account_sign(address, data)` was replaced
+  with `account_signData(contentType, address, data)`.
+  The addition of `contentType` makes it possible to use the method for
+  different types of objects, such as:
+    * signing data with an intended validator (not yet implemented)
+    * signing clique headers,
+    * signing plain personal messages,
+* The external method `account_signTypedData`
+  implements [EIP-712](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-712.md)
+  and makes it possible to sign typed data.
 
 #### 4.0.0
 
@@ -91,13 +100,16 @@ The addition of `contentType` makes it possible to use the method for different 
 
 #### 3.0.0
 
-* The external `account_List`-method was changed to not expose `url`, which contained info about the local filesystem. It now returns only a list of addresses.
+* The external `account_List`-method was changed to not expose `url`, which
+  contained info about the local filesystem. It now returns only a list of
+  addresses.
 
 #### 2.0.0
 
-* Commit `73abaf04b1372fa4c43201fb1b8019fe6b0a6f8d`, move `from` into `transaction` object in `signTransaction`. This
-makes the `accounts_signTransaction` identical to the old `eth_signTransaction`.
-
+* Commit `73abaf04b1372fa4c43201fb1b8019fe6b0a6f8d`, move `from`
+  into `transaction` object in `signTransaction`. This
+  makes the `accounts_signTransaction` identical to the
+  old `eth_signTransaction`.
 
 #### 1.0.0
 

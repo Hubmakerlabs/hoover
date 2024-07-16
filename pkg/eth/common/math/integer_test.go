@@ -60,7 +60,8 @@ func TestOverflow(t *testing.T) {
 		}
 
 		if test.overflow != overflows {
-			t.Errorf("%d failed. Expected test to be %v, got %v", i, test.overflow, overflows)
+			t.Errorf("%d failed. Expected test to be %v, got %v", i,
+				test.overflow, overflows)
 		}
 	}
 }
@@ -91,11 +92,13 @@ func TestHexOrDecimal64(t *testing.T) {
 		var num HexOrDecimal64
 		err := num.UnmarshalText([]byte(test.input))
 		if (err == nil) != test.ok {
-			t.Errorf("ParseUint64(%q) -> (err == nil) = %t, want %t", test.input, err == nil, test.ok)
+			t.Errorf("ParseUint64(%q) -> (err == nil) = %t, want %t",
+				test.input, err == nil, test.ok)
 			continue
 		}
 		if err == nil && uint64(num) != test.num {
-			t.Errorf("ParseUint64(%q) -> %d, want %d", test.input, num, test.num)
+			t.Errorf("ParseUint64(%q) -> %d, want %d", test.input, num,
+				test.num)
 		}
 	}
 }

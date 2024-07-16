@@ -34,7 +34,8 @@ func ExampleDecode_structTagTail() {
 	err := Decode(bytes.NewReader([]byte{0xC4, 0x01, 0x02, 0x03, 0x04}), &val)
 	fmt.Printf("with 4 elements: err=%v val=%v\n", err, val)
 
-	err = Decode(bytes.NewReader([]byte{0xC6, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06}), &val)
+	err = Decode(bytes.NewReader([]byte{0xC6, 0x01, 0x02, 0x03, 0x04, 0x05,
+		0x06}), &val)
 	fmt.Printf("with 6 elements: err=%v val=%v\n", err, val)
 
 	// Note that at least two list elements must be present to

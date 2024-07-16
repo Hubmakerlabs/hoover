@@ -28,17 +28,20 @@ import (
 // DefaultRootDerivationPath is the root path to which custom derivation endpoints
 // are appended. As such, the first account will be at m/44'/60'/0'/0, the second
 // at m/44'/60'/0'/1, etc.
-var DefaultRootDerivationPath = DerivationPath{0x80000000 + 44, 0x80000000 + 60, 0x80000000 + 0, 0}
+var DefaultRootDerivationPath = DerivationPath{0x80000000 + 44, 0x80000000 + 60,
+	0x80000000 + 0, 0}
 
 // DefaultBaseDerivationPath is the base path from which custom derivation endpoints
 // are incremented. As such, the first account will be at m/44'/60'/0'/0/0, the second
 // at m/44'/60'/0'/0/1, etc.
-var DefaultBaseDerivationPath = DerivationPath{0x80000000 + 44, 0x80000000 + 60, 0x80000000 + 0, 0, 0}
+var DefaultBaseDerivationPath = DerivationPath{0x80000000 + 44, 0x80000000 + 60,
+	0x80000000 + 0, 0, 0}
 
 // LegacyLedgerBaseDerivationPath is the legacy base path from which custom derivation
 // endpoints are incremented. As such, the first account will be at m/44'/60'/0'/0, the
 // second at m/44'/60'/0'/1, etc.
-var LegacyLedgerBaseDerivationPath = DerivationPath{0x80000000 + 44, 0x80000000 + 60, 0x80000000 + 0, 0}
+var LegacyLedgerBaseDerivationPath = DerivationPath{0x80000000 + 44,
+	0x80000000 + 60, 0x80000000 + 0, 0}
 
 // DerivationPath represents the computer friendly version of a hierarchical
 // deterministic wallet account derivation path.
@@ -105,9 +108,11 @@ func ParseDerivationPath(path string) (DerivationPath, error) {
 		max := math.MaxUint32 - value
 		if bigval.Sign() < 0 || bigval.Cmp(big.NewInt(int64(max))) > 0 {
 			if value == 0 {
-				return nil, fmt.Errorf("component %v out of allowed range [0, %d]", bigval, max)
+				return nil, fmt.Errorf("component %v out of allowed range [0, %d]",
+					bigval, max)
 			}
-			return nil, fmt.Errorf("component %v out of allowed hardened range [0, %d]", bigval, max)
+			return nil, fmt.Errorf("component %v out of allowed hardened range [0, %d]",
+				bigval, max)
 		}
 		value += uint32(bigval.Uint64())
 

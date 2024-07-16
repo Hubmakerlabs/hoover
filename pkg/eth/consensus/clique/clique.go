@@ -30,7 +30,7 @@ import (
 	"github.com/Hubmakerlabs/hoover/pkg/eth/accounts"
 	"github.com/Hubmakerlabs/hoover/pkg/eth/common"
 	"github.com/Hubmakerlabs/hoover/pkg/eth/common/hexutil"
-	lru "github.com/Hubmakerlabs/hoover/pkg/eth/common/lru"
+	"github.com/Hubmakerlabs/hoover/pkg/eth/common/lru"
 	"github.com/Hubmakerlabs/hoover/pkg/eth/consensus"
 	"github.com/Hubmakerlabs/hoover/pkg/eth/consensus/misc"
 	"github.com/Hubmakerlabs/hoover/pkg/eth/consensus/misc/eip1559"

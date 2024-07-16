@@ -83,7 +83,8 @@ func ComputeProof(blob Blob, point Point) (Proof, Claim, error) {
 
 // VerifyProof verifies the KZG proof that the polynomial represented by the blob
 // evaluated at the given point is the claimed value.
-func VerifyProof(commitment Commitment, point Point, claim Claim, proof Proof) error {
+func VerifyProof(commitment Commitment, point Point, claim Claim,
+	proof Proof) error {
 	if useCKZG.Load() {
 		return ckzgVerifyProof(commitment, point, claim, proof)
 	}

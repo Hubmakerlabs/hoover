@@ -49,7 +49,8 @@ func TestSimulatedAfter(t *testing.T) {
 	case stamp := <-ch:
 		want := AbsTime(0).Add(offset).Add(timeout)
 		if stamp != want {
-			t.Errorf("Wrong time sent on timer channel: got %v, want %v", stamp, want)
+			t.Errorf("Wrong time sent on timer channel: got %v, want %v", stamp,
+				want)
 		}
 	default:
 		t.Fatal("Timer didn't fire")
@@ -126,7 +127,8 @@ func TestSimulatedTimerReset(t *testing.T) {
 	select {
 	case ftime := <-timer.C():
 		if ftime != AbsTime(timeout) {
-			t.Fatalf("wrong time %v sent on timer channel, want %v", ftime, AbsTime(timeout))
+			t.Fatalf("wrong time %v sent on timer channel, want %v", ftime,
+				AbsTime(timeout))
 		}
 	default:
 		t.Fatal("timer didn't fire")
@@ -137,7 +139,8 @@ func TestSimulatedTimerReset(t *testing.T) {
 	select {
 	case ftime := <-timer.C():
 		if ftime != AbsTime(3*timeout) {
-			t.Fatalf("wrong time %v sent on timer channel, want %v", ftime, AbsTime(3*timeout))
+			t.Fatalf("wrong time %v sent on timer channel, want %v", ftime,
+				AbsTime(3*timeout))
 		}
 	default:
 		t.Fatal("timer didn't fire again")

@@ -21,7 +21,8 @@ import "testing"
 func TestIsPrimitive(t *testing.T) {
 	// Expected positives
 	for i, tc := range []string{
-		"int24", "int24[]", "uint88", "uint88[]", "uint", "uint[]", "int256", "int256[]",
+		"int24", "int24[]", "uint88", "uint88[]", "uint", "uint[]", "int256",
+		"int256[]",
 		"uint96", "uint96[]", "int96", "int96[]", "bytes17[]", "bytes17",
 	} {
 		if !isPrimitiveTypeValid(tc) {
@@ -31,10 +32,12 @@ func TestIsPrimitive(t *testing.T) {
 	// Expected negatives
 	for i, tc := range []string{
 		"int257", "int257[]", "uint88 ", "uint88 []", "uint257", "uint-1[]",
-		"uint0", "uint0[]", "int95", "int95[]", "uint1", "uint1[]", "bytes33[]", "bytess",
+		"uint0", "uint0[]", "int95", "int95[]", "uint1", "uint1[]", "bytes33[]",
+		"bytess",
 	} {
 		if isPrimitiveTypeValid(tc) {
-			t.Errorf("test %d: expected '%v' to not be a valid primitive", i, tc)
+			t.Errorf("test %d: expected '%v' to not be a valid primitive", i,
+				tc)
 		}
 	}
 }

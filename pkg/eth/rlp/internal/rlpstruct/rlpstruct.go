@@ -96,7 +96,8 @@ func (e TagError) Error() string {
 	if e.StructType != "" {
 		field = e.StructType + "." + e.Field
 	}
-	return fmt.Sprintf("rlp: invalid struct tag %q for %s (%s)", e.Tag, field, e.Err)
+	return fmt.Sprintf("rlp: invalid struct tag %q for %s (%s)", e.Tag, field,
+		e.Err)
 }
 
 // ProcessFields filters the given struct fields, returning only fields
@@ -136,7 +137,8 @@ func ProcessFields(allFields []Field) ([]Field, []Tags, error) {
 			anyOptional = true
 		} else {
 			if anyOptional {
-				msg := fmt.Sprintf("must be optional because preceding field %q is optional", firstOptionalName)
+				msg := fmt.Sprintf("must be optional because preceding field %q is optional",
+					firstOptionalName)
 				return nil, nil, TagError{Field: name, Err: msg}
 			}
 		}
@@ -157,7 +159,8 @@ func parseTag(field Field, lastPublic int) (Tags, error) {
 		case "nil", "nilString", "nilList":
 			ts.NilOK = true
 			if field.Type.Kind != reflect.Ptr {
-				return ts, TagError{Field: name, Tag: t, Err: "field is not a pointer"}
+				return ts, TagError{Field: name, Tag: t,
+					Err: "field is not a pointer"}
 			}
 			switch t {
 			case "nil":
@@ -170,18 +173,22 @@ func parseTag(field Field, lastPublic int) (Tags, error) {
 		case "optional":
 			ts.Optional = true
 			if ts.Tail {
-				return ts, TagError{Field: name, Tag: t, Err: `also has "tail" tag`}
+				return ts, TagError{Field: name, Tag: t,
+					Err: `also has "tail" tag`}
 			}
 		case "tail":
 			ts.Tail = true
 			if field.Index != lastPublic {
-				return ts, TagError{Field: name, Tag: t, Err: "must be on last field"}
+				return ts, TagError{Field: name, Tag: t,
+					Err: "must be on last field"}
 			}
 			if ts.Optional {
-				return ts, TagError{Field: name, Tag: t, Err: `also has "optional" tag`}
+				return ts, TagError{Field: name, Tag: t,
+					Err: `also has "optional" tag`}
 			}
 			if field.Type.Kind != reflect.Slice {
-				return ts, TagError{Field: name, Tag: t, Err: "field type is not slice"}
+				return ts, TagError{Field: name, Tag: t,
+					Err: "field type is not slice"}
 			}
 		default:
 			return ts, TagError{Field: name, Tag: t, Err: "unknown tag"}

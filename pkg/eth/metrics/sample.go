@@ -196,7 +196,8 @@ type sampleSnapshot struct {
 
 // newSampleSnapshotPrecalculated creates a read-only sampleSnapShot, using
 // precalculated sums to avoid iterating the values
-func newSampleSnapshotPrecalculated(count int64, values []int64, min, max, sum int64) *sampleSnapshot {
+func newSampleSnapshotPrecalculated(count int64, values []int64,
+	min, max, sum int64) *sampleSnapshot {
 	if len(values) == 0 {
 		return &sampleSnapshot{
 			count:  count,

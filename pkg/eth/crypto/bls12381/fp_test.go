@@ -69,19 +69,22 @@ func TestFpAdditionCrossAgainstBigInt(t *testing.T) {
 		big_c := new(big.Int)
 		add(c, a, b)
 		out_1 := toBytes(c)
-		out_2 := padBytes(big_c.Add(big_a, big_b).Mod(big_c, modulus.big()).Bytes(), 48)
+		out_2 := padBytes(big_c.Add(big_a, big_b).Mod(big_c,
+			modulus.big()).Bytes(), 48)
 		if !bytes.Equal(out_1, out_2) {
 			t.Fatal("cross test against big.Int is not satisfied A")
 		}
 		double(c, a)
 		out_1 = toBytes(c)
-		out_2 = padBytes(big_c.Add(big_a, big_a).Mod(big_c, modulus.big()).Bytes(), 48)
+		out_2 = padBytes(big_c.Add(big_a, big_a).Mod(big_c,
+			modulus.big()).Bytes(), 48)
 		if !bytes.Equal(out_1, out_2) {
 			t.Fatal("cross test against big.Int is not satisfied B")
 		}
 		sub(c, a, b)
 		out_1 = toBytes(c)
-		out_2 = padBytes(big_c.Sub(big_a, big_b).Mod(big_c, modulus.big()).Bytes(), 48)
+		out_2 = padBytes(big_c.Sub(big_a, big_b).Mod(big_c,
+			modulus.big()).Bytes(), 48)
 		if !bytes.Equal(out_1, out_2) {
 			t.Fatal("cross test against big.Int is not satisfied C")
 		}
@@ -101,7 +104,8 @@ func TestFpAdditionCrossAgainstBigIntAssigned(t *testing.T) {
 		big_a, big_b := toBig(a), toBig(b)
 		addAssign(a, b)
 		out_1 := toBytes(a)
-		out_2 := padBytes(big_a.Add(big_a, big_b).Mod(big_a, modulus.big()).Bytes(), 48)
+		out_2 := padBytes(big_a.Add(big_a, big_b).Mod(big_a,
+			modulus.big()).Bytes(), 48)
 		if !bytes.Equal(out_1, out_2) {
 			t.Fatal("cross test against big.Int is not satisfied A")
 		}
@@ -109,7 +113,8 @@ func TestFpAdditionCrossAgainstBigIntAssigned(t *testing.T) {
 		big_a = toBig(a)
 		doubleAssign(a)
 		out_1 = toBytes(a)
-		out_2 = padBytes(big_a.Add(big_a, big_a).Mod(big_a, modulus.big()).Bytes(), 48)
+		out_2 = padBytes(big_a.Add(big_a, big_a).Mod(big_a,
+			modulus.big()).Bytes(), 48)
 		if !bytes.Equal(out_1, out_2) {
 			t.Fatal("cross test against big.Int is not satisfied B")
 		}
@@ -118,7 +123,8 @@ func TestFpAdditionCrossAgainstBigIntAssigned(t *testing.T) {
 		big_a, big_b = toBig(a), toBig(b)
 		subAssign(a, b)
 		out_1 = toBytes(a)
-		out_2 = padBytes(big_a.Sub(big_a, big_b).Mod(big_a, modulus.big()).Bytes(), 48)
+		out_2 = padBytes(big_a.Sub(big_a, big_b).Mod(big_a,
+			modulus.big()).Bytes(), 48)
 		if !bytes.Equal(out_1, out_2) {
 			t.Fatal("cross test against big.Int is not satisfied A")
 		}
@@ -308,7 +314,8 @@ func TestFpMultiplicationCrossAgainstBigInt(t *testing.T) {
 		big_c := new(big.Int)
 		mul(c, a, b)
 		out_1 := toBytes(c)
-		out_2 := padBytes(big_c.Mul(big_a, big_b).Mod(big_c, modulus.big()).Bytes(), 48)
+		out_2 := padBytes(big_c.Mul(big_a, big_b).Mod(big_c,
+			modulus.big()).Bytes(), 48)
 		if !bytes.Equal(out_1, out_2) {
 			t.Fatal("cross test against big.Int is not satisfied")
 		}

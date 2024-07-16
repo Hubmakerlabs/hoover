@@ -47,7 +47,8 @@ type upnp struct {
 
 type upnpClient interface {
 	GetExternalIPAddress() (string, error)
-	AddPortMapping(string, uint16, string, uint16, string, bool, string, uint32) error
+	AddPortMapping(string, uint16, string, uint16, string, bool, string,
+		uint32) error
 	DeletePortMapping(string, uint16, string) error
 	GetNATRSIPStatus() (sip bool, nat bool, err error)
 }
@@ -79,7 +80,8 @@ func (n *upnp) ExternalIP() (addr net.IP, err error) {
 	return ip, nil
 }
 
-func (n *upnp) AddMapping(protocol string, extport, intport int, desc string, lifetime time.Duration) (uint16, error) {
+func (n *upnp) AddMapping(protocol string, extport, intport int, desc string,
+	lifetime time.Duration) (uint16, error) {
 	ip, err := n.internalAddress()
 	if err != nil {
 		return 0, nil // TODO: Shouldn't we return the error?
@@ -89,14 +91,16 @@ func (n *upnp) AddMapping(protocol string, extport, intport int, desc string, li
 	n.DeleteMapping(protocol, extport, intport)
 
 	err = n.withRateLimit(func() error {
-		return n.client.AddPortMapping("", uint16(extport), protocol, uint16(intport), ip.String(), true, desc, lifetimeS)
+		return n.client.AddPortMapping("", uint16(extport), protocol,
+			uint16(intport), ip.String(), true, desc, lifetimeS)
 	})
 	if err == nil {
 		return uint16(extport), nil
 	}
 
 	return uint16(extport), n.withRateLimit(func() error {
-		p, err := n.addAnyPortMapping(protocol, extport, intport, ip, desc, lifetimeS)
+		p, err := n.addAnyPortMapping(protocol, extport, intport, ip, desc,
+			lifetimeS)
 		if err == nil {
 			extport = int(p)
 		}
@@ -104,14 +108,17 @@ func (n *upnp) AddMapping(protocol string, extport, intport int, desc string, li
 	})
 }
 
-func (n *upnp) addAnyPortMapping(protocol string, extport, intport int, ip net.IP, desc string, lifetimeS uint32) (uint16, error) {
+func (n *upnp) addAnyPortMapping(protocol string, extport, intport int,
+	ip net.IP, desc string, lifetimeS uint32) (uint16, error) {
 	if client, ok := n.client.(*internetgateway2.WANIPConnection2); ok {
-		return client.AddAnyPortMapping("", uint16(extport), protocol, uint16(intport), ip.String(), true, desc, lifetimeS)
+		return client.AddAnyPortMapping("", uint16(extport), protocol,
+			uint16(intport), ip.String(), true, desc, lifetimeS)
 	}
 	// It will retry with a random port number if the client does
 	// not support AddAnyPortMapping.
 	extport = n.randomPort()
-	err := n.client.AddPortMapping("", uint16(extport), protocol, uint16(intport), ip.String(), true, desc, lifetimeS)
+	err := n.client.AddPortMapping("", uint16(extport), protocol,
+		uint16(intport), ip.String(), true, desc, lifetimeS)
 	if err != nil {
 		return 0, err
 	}
@@ -145,12 +152,14 @@ func (n *upnp) internalAddress() (net.IP, error) {
 			}
 		}
 	}
-	return nil, fmt.Errorf("could not find local address in same net as %v", devaddr)
+	return nil, fmt.Errorf("could not find local address in same net as %v",
+		devaddr)
 }
 
 func (n *upnp) DeleteMapping(protocol string, extport, intport int) error {
 	return n.withRateLimit(func() error {
-		return n.client.DeletePortMapping("", uint16(extport), strings.ToUpper(protocol))
+		return n.client.DeletePortMapping("", uint16(extport),
+			strings.ToUpper(protocol))
 	})
 }
 
@@ -176,27 +185,34 @@ func (n *upnp) withRateLimit(fn func() error) error {
 func discoverUPnP() Interface {
 	found := make(chan *upnp, 2)
 	// IGDv1
-	go discover(found, internetgateway1.URN_WANConnectionDevice_1, func(sc goupnp.ServiceClient) *upnp {
-		switch sc.Service.ServiceType {
-		case internetgateway1.URN_WANIPConnection_1:
-			return &upnp{service: "IGDv1-IP1", client: &internetgateway1.WANIPConnection1{ServiceClient: sc}}
-		case internetgateway1.URN_WANPPPConnection_1:
-			return &upnp{service: "IGDv1-PPP1", client: &internetgateway1.WANPPPConnection1{ServiceClient: sc}}
-		}
-		return nil
-	})
+	go discover(found, internetgateway1.URN_WANConnectionDevice_1,
+		func(sc goupnp.ServiceClient) *upnp {
+			switch sc.Service.ServiceType {
+			case internetgateway1.URN_WANIPConnection_1:
+				return &upnp{service: "IGDv1-IP1",
+					client: &internetgateway1.WANIPConnection1{ServiceClient: sc}}
+			case internetgateway1.URN_WANPPPConnection_1:
+				return &upnp{service: "IGDv1-PPP1",
+					client: &internetgateway1.WANPPPConnection1{ServiceClient: sc}}
+			}
+			return nil
+		})
 	// IGDv2
-	go discover(found, internetgateway2.URN_WANConnectionDevice_2, func(sc goupnp.ServiceClient) *upnp {
-		switch sc.Service.ServiceType {
-		case internetgateway2.URN_WANIPConnection_1:
-			return &upnp{service: "IGDv2-IP1", client: &internetgateway2.WANIPConnection1{ServiceClient: sc}}
-		case internetgateway2.URN_WANIPConnection_2:
-			return &upnp{service: "IGDv2-IP2", client: &internetgateway2.WANIPConnection2{ServiceClient: sc}}
-		case internetgateway2.URN_WANPPPConnection_1:
-			return &upnp{service: "IGDv2-PPP1", client: &internetgateway2.WANPPPConnection1{ServiceClient: sc}}
-		}
-		return nil
-	})
+	go discover(found, internetgateway2.URN_WANConnectionDevice_2,
+		func(sc goupnp.ServiceClient) *upnp {
+			switch sc.Service.ServiceType {
+			case internetgateway2.URN_WANIPConnection_1:
+				return &upnp{service: "IGDv2-IP1",
+					client: &internetgateway2.WANIPConnection1{ServiceClient: sc}}
+			case internetgateway2.URN_WANIPConnection_2:
+				return &upnp{service: "IGDv2-IP2",
+					client: &internetgateway2.WANIPConnection2{ServiceClient: sc}}
+			case internetgateway2.URN_WANPPPConnection_1:
+				return &upnp{service: "IGDv2-PPP1",
+					client: &internetgateway2.WANPPPConnection1{ServiceClient: sc}}
+			}
+			return nil
+		})
 	for i := 0; i < cap(found); i++ {
 		if c := <-found; c != nil {
 			return c
@@ -208,7 +224,8 @@ func discoverUPnP() Interface {
 // finds devices matching the given target and calls matcher for all
 // advertised services of each device. The first non-nil service found
 // is sent into out. If no service matched, nil is sent.
-func discover(out chan<- *upnp, target string, matcher func(goupnp.ServiceClient) *upnp) {
+func discover(out chan<- *upnp, target string,
+	matcher func(goupnp.ServiceClient) *upnp) {
 	devs, err := goupnp.DiscoverDevices(target)
 	if err != nil {
 		out <- nil

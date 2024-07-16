@@ -112,11 +112,13 @@ func TestExpDecaySample(t *testing.T) {
 		if have, want := int(snap.Count()), tc.updates; have != want {
 			t.Errorf("have %d want %d", have, want)
 		}
-		if have, want := snap.Size(), min(tc.updates, tc.reservoirSize); have != want {
+		if have, want := snap.Size(), min(tc.updates,
+			tc.reservoirSize); have != want {
 			t.Errorf("have %d want %d", have, want)
 		}
 		values := snap.(*sampleSnapshot).values
-		if have, want := len(values), min(tc.updates, tc.reservoirSize); have != want {
+		if have, want := len(values), min(tc.updates,
+			tc.reservoirSize); have != want {
 			t.Errorf("have %d want %d", have, want)
 		}
 		for _, v := range values {
@@ -165,7 +167,8 @@ func TestExpDecaySampleRescale(t *testing.T) {
 
 func TestExpDecaySampleSnapshot(t *testing.T) {
 	now := time.Now()
-	s := NewExpDecaySample(100, 0.99).(*ExpDecaySample).SetRand(rand.New(rand.NewSource(1)))
+	s := NewExpDecaySample(100,
+		0.99).(*ExpDecaySample).SetRand(rand.New(rand.NewSource(1)))
 	for i := 1; i <= 10000; i++ {
 		s.(*ExpDecaySample).update(now.Add(time.Duration(i)), int64(i))
 	}
@@ -176,7 +179,8 @@ func TestExpDecaySampleSnapshot(t *testing.T) {
 
 func TestExpDecaySampleStatistics(t *testing.T) {
 	now := time.Now()
-	s := NewExpDecaySample(100, 0.99).(*ExpDecaySample).SetRand(rand.New(rand.NewSource(1)))
+	s := NewExpDecaySample(100,
+		0.99).(*ExpDecaySample).SetRand(rand.New(rand.NewSource(1)))
 	for i := 1; i <= 10000; i++ {
 		s.(*ExpDecaySample).update(now.Add(time.Duration(i)), int64(i))
 	}

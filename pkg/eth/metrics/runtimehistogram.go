@@ -7,7 +7,8 @@ import (
 	"sync/atomic"
 )
 
-func getOrRegisterRuntimeHistogram(name string, scale float64, r Registry) *runtimeHistogram {
+func getOrRegisterRuntimeHistogram(name string, scale float64,
+	r Registry) *runtimeHistogram {
 	if r == nil {
 		r = DefaultRegistry
 	}
@@ -27,7 +28,8 @@ func newRuntimeHistogram(scale float64) *runtimeHistogram {
 	return h
 }
 
-func RuntimeHistogramFromData(scale float64, hist *metrics.Float64Histogram) *runtimeHistogram {
+func RuntimeHistogramFromData(scale float64,
+	hist *metrics.Float64Histogram) *runtimeHistogram {
 	h := &runtimeHistogram{scaleFactor: scale}
 	h.update(hist)
 	return h

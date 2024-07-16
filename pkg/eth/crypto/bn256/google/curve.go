@@ -225,7 +225,8 @@ func (c *curvePoint) Double(a *curvePoint, pool *bnPool) {
 	pool.Put(f)
 }
 
-func (c *curvePoint) Mul(a *curvePoint, scalar *big.Int, pool *bnPool) *curvePoint {
+func (c *curvePoint) Mul(a *curvePoint, scalar *big.Int,
+	pool *bnPool) *curvePoint {
 	sum := newCurvePoint(pool)
 	sum.SetInfinity()
 	t := newCurvePoint(pool)

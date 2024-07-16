@@ -80,7 +80,8 @@ func (c *LibratoClient) PostMetrics(batch Batch) (err error) {
 		return
 	}
 
-	if req, err = http.NewRequest(http.MethodPost, MetricsPostUrl, bytes.NewBuffer(js)); err != nil {
+	if req, err = http.NewRequest(http.MethodPost, MetricsPostUrl,
+		bytes.NewBuffer(js)); err != nil {
 		return
 	}
 
@@ -96,9 +97,11 @@ func (c *LibratoClient) PostMetrics(batch Batch) (err error) {
 	if resp.StatusCode != http.StatusOK {
 		var body []byte
 		if body, err = io.ReadAll(resp.Body); err != nil {
-			body = []byte(fmt.Sprintf("(could not fetch response body for error: %s)", err))
+			body = []byte(fmt.Sprintf("(could not fetch response body for error: %s)",
+				err))
 		}
-		err = fmt.Errorf("unable to post to Librato: %d %s %s", resp.StatusCode, resp.Status, string(body))
+		err = fmt.Errorf("unable to post to Librato: %d %s %s", resp.StatusCode,
+			resp.Status, string(body))
 	}
 	return
 }

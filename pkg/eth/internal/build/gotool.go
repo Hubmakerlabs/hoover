@@ -64,13 +64,15 @@ func (g *GoToolchain) goTool(command string, args ...string) *exec.Cmd {
 	if g.Root == "" {
 		g.Root = runtime.GOROOT()
 	}
-	tool := exec.Command(filepath.Join(g.Root, "bin", "go"), command) // nolint: gosec
+	tool := exec.Command(filepath.Join(g.Root, "bin", "go"),
+		command) // nolint: gosec
 	tool.Args = append(tool.Args, args...)
 	tool.Env = append(tool.Env, "GOROOT="+g.Root)
 
 	// Forward environment variables to the tool, but skip compiler target settings.
 	// TODO: what about GOARM?
-	skip := map[string]struct{}{"GOROOT": {}, "GOARCH": {}, "GOOS": {}, "GOBIN": {}, "CC": {}}
+	skip := map[string]struct{}{"GOROOT": {}, "GOARCH": {}, "GOOS": {},
+		"GOBIN": {}, "CC": {}}
 	for _, e := range os.Environ() {
 		if i := strings.IndexByte(e, '='); i >= 0 {
 			if _, ok := skip[e[:i]]; ok {
@@ -93,7 +95,8 @@ func DownloadGo(csdb *ChecksumDB) string {
 	// requested version exactly, there is no need to download anything.
 	activeGo := strings.TrimPrefix(runtime.Version(), "go")
 	if activeGo == version {
-		log.Printf("-dlgo version matches active Go version %s, skipping download.", activeGo)
+		log.Printf("-dlgo version matches active Go version %s, skipping download.",
+			activeGo)
 		return runtime.GOROOT()
 	}
 
@@ -120,7 +123,8 @@ func DownloadGo(csdb *ChecksumDB) string {
 		log.Fatal(err)
 	}
 
-	godir := filepath.Join(ucache, fmt.Sprintf("geth-go-%s-%s-%s", version, os, arch))
+	godir := filepath.Join(ucache,
+		fmt.Sprintf("geth-go-%s-%s-%s", version, os, arch))
 	if err := ExtractArchive(dst, godir); err != nil {
 		log.Fatal(err)
 	}

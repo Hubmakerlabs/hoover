@@ -87,7 +87,8 @@ func TestCompleteKeywords(t *testing.T) {
 	for _, test := range tests {
 		cs := re.CompleteKeywords(test.input)
 		if !reflect.DeepEqual(cs, test.want) {
-			t.Errorf("wrong completions for %q\ngot  %v\nwant %v", test.input, cs, test.want)
+			t.Errorf("wrong completions for %q\ngot  %v\nwant %v", test.input,
+				cs, test.want)
 		}
 	}
 }

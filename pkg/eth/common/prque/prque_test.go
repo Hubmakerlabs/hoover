@@ -28,7 +28,8 @@ func TestPrque(t *testing.T) {
 		for i := 0; i < size; i++ {
 			queue.Push(data[i], prio[i])
 			if queue.Size() != i+1 {
-				t.Errorf("queue size mismatch: have %v, want %v.", queue.Size(), i+1)
+				t.Errorf("queue size mismatch: have %v, want %v.", queue.Size(),
+					i+1)
 			}
 		}
 		// Create a map the values to the priorities for easier verification
@@ -46,7 +47,8 @@ func TestPrque(t *testing.T) {
 			}
 			prevPrio = prio
 			if val != dict[prio] {
-				t.Errorf("push/pop mismatch: have %v, want %v.", val, dict[prio])
+				t.Errorf("push/pop mismatch: have %v, want %v.", val,
+					dict[prio])
 			}
 			delete(dict, prio)
 		}
@@ -68,7 +70,8 @@ func TestReset(t *testing.T) {
 		for i := 0; i < size; i++ {
 			queue.Push(data[i], prio[i])
 			if queue.Size() != i+1 {
-				t.Errorf("queue size mismatch: have %v, want %v.", queue.Size(), i+1)
+				t.Errorf("queue size mismatch: have %v, want %v.", queue.Size(),
+					i+1)
 			}
 		}
 		// Create a map the values to the priorities for easier verification
@@ -85,7 +88,8 @@ func TestReset(t *testing.T) {
 			}
 			prevPrio = prio
 			if val != dict[prio] {
-				t.Errorf("push/pop mismatch: have %v, want %v.", val, dict[prio])
+				t.Errorf("push/pop mismatch: have %v, want %v.", val,
+					dict[prio])
 			}
 			delete(dict, prio)
 		}

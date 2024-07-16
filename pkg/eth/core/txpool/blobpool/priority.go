@@ -31,7 +31,8 @@ var log2_1_125 = math.Log2(1.125)
 //
 // This method takes about 8ns on a very recent laptop CPU, recalculating about
 // 125 million transaction priority values per second.
-func evictionPriority(basefeeJumps float64, txBasefeeJumps, blobfeeJumps, txBlobfeeJumps float64) int {
+func evictionPriority(basefeeJumps float64,
+	txBasefeeJumps, blobfeeJumps, txBlobfeeJumps float64) int {
 	var (
 		basefeePriority = evictionPriority1D(basefeeJumps, txBasefeeJumps)
 		blobfeePriority = evictionPriority1D(blobfeeJumps, txBlobfeeJumps)

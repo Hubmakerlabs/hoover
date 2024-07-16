@@ -66,7 +66,8 @@ func getCompletions(vm *goja.Runtime, line string) (results []string) {
 			if len(parts) == 1 {
 				results = append(results, k)
 			} else {
-				results = append(results, strings.Join(parts[:len(parts)-1], ".")+"."+k)
+				results = append(results,
+					strings.Join(parts[:len(parts)-1], ".")+"."+k)
 			}
 		}
 	})

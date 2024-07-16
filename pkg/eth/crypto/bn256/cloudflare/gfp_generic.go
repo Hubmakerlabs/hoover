@@ -107,7 +107,8 @@ func mul(a, b [4]uint64) [8]uint64 {
 		}
 	}
 
-	return [8]uint64{buff[0], buff[4], buff[8], buff[12], buff[16], buff[20], buff[24], buff[28]}
+	return [8]uint64{buff[0], buff[4], buff[8], buff[12], buff[16], buff[20],
+		buff[24], buff[28]}
 }
 
 func halfMul(a, b [4]uint64) [4]uint64 {

@@ -96,49 +96,49 @@ func Test_Arq(t *testing.T) {
 	t.Log(ids)
 }
 
-func Test_SendFormatTx(t *testing.T) {
-	// arNode := "https://arweave.net"
-	// wallet, err := goar.NewWalletFromPath("./testKey.json", arNode)
-	// assert.NoError(t, err)
-	//
-	// owner := utils.Base64Encode(wallet.PubKey.N.Bytes())
-	//
-	// target := "cSYOy8-p1QFenktkDBFyRM3cwZSTrQ_J4EsELLho_UE"
-	// reward, err := wallet.Client.GetTransactionPrice(nil, &target)
-	// assert.NoError(t, err)
-	//
-	// anchor, err := wallet.Client.GetTransactionAnchor()
-	// assert.NoError(t, err)
-	//
-	// amount := big.NewInt(140000) // transfer amount
-	// tags := []types.Tag{{Name: "Content-Type", Value: "application/json"}, {Name: "tcrsa", Value: "sandyTest"}}
-	// tx := &types.Transaction{
-	// 	Format:    1,
-	// 	ID:        "",
-	// 	LastTx:    anchor,
-	// 	Owner:     owner,
-	// 	Tags:      types.TagsEncode(tags),
-	// 	Target:    target,
-	// 	Quantity:  amount.String(),
-	// 	Data:      "",
-	// 	DataSize:  "0",
-	// 	DataRoot:  "",
-	// 	Reward:    fmt.Sprintf("%d", reward),
-	// 	Signature: "",
-	// 	Chunks:    nil,
-	// }
-	// signData, err := types.GetSignatureData(tx)
-	//
-	// sig, err := utils.sign(signData, wallet.PrvKey)
-	// assert.NoError(t, err)
-	// tx.AddSignature(sig)
-	//
-	// status, code, err := wallet.Client.SubmitTransaction(tx)
-	// assert.NoError(t, err)
-	// t.Log(status, code)
-	// t.Log("from: ",wallet.Address)
-	// t.Log("txHash: ", tx.ID)
-}
+// func Test_SendFormatTx(t *testing.T) {
+// arNode := "https://arweave.net"
+// wallet, err := goar.NewWalletFromPath("./testKey.json", arNode)
+// assert.NoError(t, err)
+//
+// owner := utils.Base64Encode(wallet.PubKey.N.Bytes())
+//
+// target := "cSYOy8-p1QFenktkDBFyRM3cwZSTrQ_J4EsELLho_UE"
+// reward, err := wallet.Client.GetTransactionPrice(nil, &target)
+// assert.NoError(t, err)
+//
+// anchor, err := wallet.Client.GetTransactionAnchor()
+// assert.NoError(t, err)
+//
+// amount := big.NewInt(140000) // transfer amount
+// tags := []types.Tag{{Name: "Content-Type", Value: "application/json"}, {Name: "tcrsa", Value: "sandyTest"}}
+// tx := &types.Transaction{
+// 	Format:    1,
+// 	ID:        "",
+// 	LastTx:    anchor,
+// 	Owner:     owner,
+// 	Tags:      types.TagsEncode(tags),
+// 	Target:    target,
+// 	Quantity:  amount.String(),
+// 	Data:      "",
+// 	DataSize:  "0",
+// 	DataRoot:  "",
+// 	Reward:    fmt.Sprintf("%d", reward),
+// 	Signature: "",
+// 	Chunks:    nil,
+// }
+// signData, err := types.GetSignatureData(tx)
+//
+// sig, err := utils.sign(signData, wallet.PrvKey)
+// assert.NoError(t, err)
+// tx.AddSignature(sig)
+//
+// status, code, err := wallet.Client.SubmitTransaction(tx)
+// assert.NoError(t, err)
+// t.Log(status, code)
+// t.Log("from: ",wallet.Address)
+// t.Log("txHash: ", tx.ID)
+// }
 
 // func Test_SendMsg(t *testing.T) {
 // 	signer02, err := goar.NewSignerFromPath("./testKey.json")

@@ -226,7 +226,8 @@ func (ctx ppctx) fields(obj *goja.Object) []string {
 	return append(vals, methods...)
 }
 
-func iterOwnAndConstructorKeys(vm *goja.Runtime, obj *goja.Object, f func(string)) {
+func iterOwnAndConstructorKeys(vm *goja.Runtime, obj *goja.Object,
+	f func(string)) {
 	seen := make(map[string]bool)
 	iterOwnKeys(vm, obj, func(prop string) {
 		seen[prop] = true
@@ -249,7 +250,8 @@ func iterOwnKeys(vm *goja.Runtime, obj *goja.Object, f func(string)) {
 	}
 	rv, err := getOwnPropertyNames(goja.Null(), obj)
 	if err != nil {
-		panic(vm.ToValue(fmt.Sprintf("Error getting object properties: %v", err)))
+		panic(vm.ToValue(fmt.Sprintf("Error getting object properties: %v",
+			err)))
 	}
 	gv := rv.Export()
 	switch gv := gv.(type) {
@@ -262,7 +264,8 @@ func iterOwnKeys(vm *goja.Runtime, obj *goja.Object, f func(string)) {
 			f(v)
 		}
 	default:
-		panic(fmt.Errorf("Object.getOwnPropertyNames returned unexpected type %T", gv))
+		panic(fmt.Errorf("Object.getOwnPropertyNames returned unexpected type %T",
+			gv))
 	}
 }
 

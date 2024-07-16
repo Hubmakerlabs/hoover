@@ -1004,7 +1004,7 @@ func TestOpMCopy(t *testing.T) {
 		stack.push(len)
 		stack.push(src)
 		stack.push(dst)
-		wantErr := (tc.wantGas == 0)
+		wantErr := tc.wantGas == 0
 		// Calc mem expansion
 		var memorySize uint64
 		if memSize, overflow := memoryMcopy(stack); overflow {

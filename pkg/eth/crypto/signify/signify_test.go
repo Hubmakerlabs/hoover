@@ -48,7 +48,8 @@ func TestSignify(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = SignFile(tmpFile.Name(), tmpFile.Name()+".sig", testSecKey, "clé", "croissants")
+	err = SignFile(tmpFile.Name(), tmpFile.Name()+".sig", testSecKey, "clé",
+		"croissants")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -90,9 +91,11 @@ func TestSignifyTrustedCommentTooManyLines(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = SignFile(tmpFile.Name(), tmpFile.Name()+".sig", testSecKey, "", "crois\nsants")
+	err = SignFile(tmpFile.Name(), tmpFile.Name()+".sig", testSecKey, "",
+		"crois\nsants")
 	if err == nil || err.Error() == "" {
-		t.Fatalf("should have errored on a multi-line trusted comment, got %v", err)
+		t.Fatalf("should have errored on a multi-line trusted comment, got %v",
+			err)
 	}
 	defer os.Remove(tmpFile.Name() + ".sig")
 }
@@ -113,7 +116,8 @@ func TestSignifyTrustedCommentTooManyLinesLF(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = SignFile(tmpFile.Name(), tmpFile.Name()+".sig", testSecKey, "crois\rsants", "")
+	err = SignFile(tmpFile.Name(), tmpFile.Name()+".sig", testSecKey,
+		"crois\rsants", "")
 	if err != nil {
 		t.Fatal(err)
 	}

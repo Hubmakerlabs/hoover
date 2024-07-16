@@ -61,7 +61,8 @@ func TestTimerFunc(t *testing.T) {
 		floor    = actualTime - drift
 	)
 	if measured > ceil || measured < floor {
-		t.Errorf("tm.Max(): %v > %v || %v > %v\n", measured, ceil, measured, floor)
+		t.Errorf("tm.Max(): %v > %v || %v > %v\n", measured, ceil, measured,
+			floor)
 	}
 }
 

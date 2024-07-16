@@ -20,8 +20,9 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
-	"github.com/minio/sha256-simd"
 	"math/big"
+
+	"github.com/minio/sha256-simd"
 
 	"github.com/Hubmakerlabs/hoover/pkg/eth/common"
 	"github.com/Hubmakerlabs/hoover/pkg/eth/common/math"

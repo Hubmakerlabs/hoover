@@ -45,8 +45,9 @@ package main
 
 import (
 	"fmt"
-	"metrics"
 	"time"
+
+	"metrics"
 )
 
 func main() {

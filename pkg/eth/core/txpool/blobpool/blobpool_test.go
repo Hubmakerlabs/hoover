@@ -20,7 +20,6 @@ import (
 	"bytes"
 	"crypto/ecdsa"
 	"errors"
-	"github.com/minio/sha256-simd"
 	"math"
 	"math/big"
 	"os"
@@ -28,6 +27,8 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/minio/sha256-simd"
 
 	"github.com/Hubmakerlabs/hoover/pkg/eth/common"
 	"github.com/Hubmakerlabs/hoover/pkg/eth/consensus/misc/eip1559"

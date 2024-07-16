@@ -60,7 +60,8 @@ func TestMuxErrorAfterStop(t *testing.T) {
 		t.Errorf("subscription channel was not closed")
 	}
 	if err := mux.Post(testEvent(0)); err != ErrMuxClosed {
-		t.Errorf("Post error mismatch, got: %s, expected: %s", err, ErrMuxClosed)
+		t.Errorf("Post error mismatch, got: %s, expected: %s", err,
+			ErrMuxClosed)
 	}
 }
 
@@ -135,7 +136,8 @@ func TestMuxConcurrent(t *testing.T) {
 	}
 	for i, count := range counts {
 		if count != 1 {
-			t.Errorf("receiver %d called %d times, expected only 1 call", i, count)
+			t.Errorf("receiver %d called %d times, expected only 1 call", i,
+				count)
 		}
 	}
 }

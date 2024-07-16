@@ -28,15 +28,18 @@ func TestParseEthstatsURL(t *testing.T) {
 	}{
 		{
 			url:  `"debug meowsbits":mypass@ws://mordor.dash.fault.dev:3000`,
-			node: "debug meowsbits", pass: "mypass", host: "ws://mordor.dash.fault.dev:3000",
+			node: "debug meowsbits", pass: "mypass",
+			host: "ws://mordor.dash.fault.dev:3000",
 		},
 		{
 			url:  `"debug @meowsbits":mypass@ws://mordor.dash.fault.dev:3000`,
-			node: "debug @meowsbits", pass: "mypass", host: "ws://mordor.dash.fault.dev:3000",
+			node: "debug @meowsbits", pass: "mypass",
+			host: "ws://mordor.dash.fault.dev:3000",
 		},
 		{
 			url:  `"debug: @meowsbits":mypass@ws://mordor.dash.fault.dev:3000`,
-			node: "debug: @meowsbits", pass: "mypass", host: "ws://mordor.dash.fault.dev:3000",
+			node: "debug: @meowsbits", pass: "mypass",
+			host: "ws://mordor.dash.fault.dev:3000",
 		},
 		{
 			url:  `name:@ws://mordor.dash.fault.dev:3000`,
@@ -70,13 +73,16 @@ func TestParseEthstatsURL(t *testing.T) {
 		}
 
 		if node != c.node {
-			t.Errorf("case=%d mismatch node value, got: %v ,want: %v", i, node, c.node)
+			t.Errorf("case=%d mismatch node value, got: %v ,want: %v", i, node,
+				c.node)
 		}
 		if pass != c.pass {
-			t.Errorf("case=%d mismatch pass value, got: %v ,want: %v", i, pass, c.pass)
+			t.Errorf("case=%d mismatch pass value, got: %v ,want: %v", i, pass,
+				c.pass)
 		}
 		if host != c.host {
-			t.Errorf("case=%d mismatch host value, got: %v ,want: %v", i, host, c.host)
+			t.Errorf("case=%d mismatch host value, got: %v ,want: %v", i, host,
+				c.host)
 		}
 	}
 }

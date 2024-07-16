@@ -102,7 +102,8 @@ func TestRuntimeHistogramStats(t *testing.T) {
 			}
 			ps := []float64{.5, .8, .9, .99, .995}
 			if v := s.Percentiles(ps); !reflect.DeepEqual(v, test.Percentiles) {
-				t.Errorf("Percentiles(%v) = %v, want %v", ps, v, test.Percentiles)
+				t.Errorf("Percentiles(%v) = %v, want %v", ps, v,
+					test.Percentiles)
 			}
 		})
 	}
@@ -145,7 +146,8 @@ func BenchmarkRuntimeHistogramSnapshotRead(b *testing.B) {
 		}
 		return &res
 	}
-	latency := RuntimeHistogramFromData(float64(time.Second), dserialize(sLatency))
+	latency := RuntimeHistogramFromData(float64(time.Second),
+		dserialize(sLatency))
 	b.ResetTimer()
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -157,6 +159,7 @@ func BenchmarkRuntimeHistogramSnapshotRead(b *testing.B) {
 		_ = snap.Min()
 		_ = snap.StdDev()
 		_ = snap.Variance()
-		_ = snap.Percentiles([]float64{0.25, 0.5, 0.75, 0.95, 0.99, 0.999, 0.9999})
+		_ = snap.Percentiles([]float64{0.25, 0.5, 0.75, 0.95, 0.99, 0.999,
+			0.9999})
 	}
 }

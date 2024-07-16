@@ -27,10 +27,22 @@ import (
 // Tests that the scheduler can deduplicate and forward retrieval requests to
 // underlying fetchers and serve responses back, irrelevant of the concurrency
 // of the requesting clients or serving data fetchers.
-func TestSchedulerSingleClientSingleFetcher(t *testing.T) { testScheduler(t, 1, 1, 5000) }
-func TestSchedulerSingleClientMultiFetcher(t *testing.T)  { testScheduler(t, 1, 10, 5000) }
-func TestSchedulerMultiClientSingleFetcher(t *testing.T)  { testScheduler(t, 10, 1, 5000) }
-func TestSchedulerMultiClientMultiFetcher(t *testing.T)   { testScheduler(t, 10, 10, 5000) }
+func TestSchedulerSingleClientSingleFetcher(t *testing.T) {
+	testScheduler(t, 1,
+		1, 5000)
+}
+func TestSchedulerSingleClientMultiFetcher(t *testing.T) {
+	testScheduler(t, 1,
+		10, 5000)
+}
+func TestSchedulerMultiClientSingleFetcher(t *testing.T) {
+	testScheduler(t, 10,
+		1, 5000)
+}
+func TestSchedulerMultiClientMultiFetcher(t *testing.T) {
+	testScheduler(t, 10,
+		10, 5000)
+}
 
 func testScheduler(t *testing.T, clients int, fetchers int, requests int) {
 	t.Parallel()
@@ -89,8 +101,10 @@ func testScheduler(t *testing.T, clients int, fetchers int, requests int) {
 			b := new(big.Int)
 			for j := 0; j < requests; j++ {
 				bits := <-out
-				if want := b.SetUint64(uint64(j)).Bytes(); !bytes.Equal(bits, want) {
-					t.Errorf("vector %d: delivered content mismatch: have %x, want %x", j, bits, want)
+				if want := b.SetUint64(uint64(j)).Bytes(); !bytes.Equal(bits,
+					want) {
+					t.Errorf("vector %d: delivered content mismatch: have %x, want %x",
+						j, bits, want)
 				}
 			}
 		}()

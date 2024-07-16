@@ -30,12 +30,17 @@ func TestPriorityCalculation(t *testing.T) {
 		txfee   uint64
 		result  int
 	}{
-		{basefee: 7, txfee: 10, result: 2},                          // 3.02 jumps, 4 ceil, 2 log2
-		{basefee: 17_200_000_000, txfee: 17_200_000_000, result: 0}, // 0 jumps, special case 0 log2
-		{basefee: 9_853_941_692, txfee: 11_085_092_510, result: 0},  // 0.99 jumps, 1 ceil, 0 log2
-		{basefee: 11_544_106_391, txfee: 10_356_781_100, result: 0}, // -0.92 jumps, -1 floor, 0 log2
-		{basefee: 17_200_000_000, txfee: 7, result: -7},             // -183.57 jumps, -184 floor, -7 log2
-		{basefee: 7, txfee: 17_200_000_000, result: 7},              // 183.57 jumps, 184 ceil, 7 log2
+		{basefee: 7, txfee: 10, result: 2}, // 3.02 jumps, 4 ceil, 2 log2
+		{basefee: 17_200_000_000, txfee: 17_200_000_000,
+			result: 0}, // 0 jumps, special case 0 log2
+		{basefee: 9_853_941_692, txfee: 11_085_092_510,
+			result: 0}, // 0.99 jumps, 1 ceil, 0 log2
+		{basefee: 11_544_106_391, txfee: 10_356_781_100,
+			result: 0}, // -0.92 jumps, -1 floor, 0 log2
+		{basefee: 17_200_000_000, txfee: 7,
+			result: -7}, // -183.57 jumps, -184 floor, -7 log2
+		{basefee: 7, txfee: 17_200_000_000,
+			result: 7}, // 183.57 jumps, 184 ceil, 7 log2
 	}
 	for i, tt := range tests {
 		var (
@@ -43,7 +48,8 @@ func TestPriorityCalculation(t *testing.T) {
 			feeJumps  = dynamicFeeJumps(uint256.NewInt(tt.txfee))
 		)
 		if prio := evictionPriority1D(baseJumps, feeJumps); prio != tt.result {
-			t.Errorf("test %d priority mismatch: have %d, want %d", i, prio, tt.result)
+			t.Errorf("test %d priority mismatch: have %d, want %d", i, prio,
+				tt.result)
 		}
 	}
 }
@@ -82,6 +88,7 @@ func BenchmarkPriorityCalculation(b *testing.B) {
 	b.ResetTimer()
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		evictionPriority(basefeeJumps, txBasefeeJumps[i], blobfeeJumps, txBlobfeeJumps[i])
+		evictionPriority(basefeeJumps, txBasefeeJumps[i], blobfeeJumps,
+			txBlobfeeJumps[i])
 	}
 }

@@ -35,7 +35,7 @@ import (
 	"github.com/Hubmakerlabs/hoover/pkg/eth/log"
 	"github.com/Hubmakerlabs/hoover/pkg/eth/rlp"
 	"github.com/Hubmakerlabs/hoover/pkg/eth/trie"
-	cli "github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v2"
 )
 
 var (

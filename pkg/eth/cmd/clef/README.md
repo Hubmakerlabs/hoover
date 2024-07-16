@@ -1,16 +1,29 @@
 # Clef
 
-Clef can be used to sign transactions and data and is meant as a(n eventual) replacement for Geth's account management. This allows DApps to not depend on Geth's account management. When a DApp wants to sign data (or a transaction), it can send the content to Clef, which will then provide the user with context and asks for permission to sign the content. If the users grants the signing request, Clef will send the signature back to the DApp.
+Clef can be used to sign transactions and data and is meant as a(n eventual)
+replacement for Geth's account management. This allows DApps to not depend on
+Geth's account management. When a DApp wants to sign data (or a transaction), it
+can send the content to Clef, which will then provide the user with context and
+asks for permission to sign the content. If the users grants the signing
+request, Clef will send the signature back to the DApp.
 
-This setup allows a DApp to connect to a remote Ethereum node and send transactions that are locally signed. This can help in situations when a DApp is connected to an untrusted remote Ethereum node, because a local one is not available, not synchronised with the chain, or is a node that has no built-in (or limited) account management.
+This setup allows a DApp to connect to a remote Ethereum node and send
+transactions that are locally signed. This can help in situations when a DApp is
+connected to an untrusted remote Ethereum node, because a local one is not
+available, not synchronised with the chain, or is a node that has no built-in (
+or limited) account management.
 
-Clef can run as a daemon on the same machine, off a usb-stick like [USB armory](https://inversepath.com/usbarmory), or even a separate VM in a [QubesOS](https://www.qubes-os.org/) type setup.
+Clef can run as a daemon on the same machine, off a usb-stick
+like [USB armory](https://inversepath.com/usbarmory), or even a separate VM in
+a [QubesOS](https://www.qubes-os.org/) type setup.
 
 Check out the
 
 * [CLI tutorial](tutorial.md) for some concrete examples on how Clef works.
-* [Setup docs](docs/setup.md) for information on how to configure Clef on QubesOS or USB Armory.
-* [Data types](datatypes.md) for details on the communication messages between Clef and an external UI.
+* [Setup docs](docs/setup.md) for information on how to configure Clef on
+  QubesOS or USB Armory.
+* [Data types](datatypes.md) for details on the communication messages between
+  Clef and an external UI.
 
 ## Command line flags
 
@@ -61,51 +74,76 @@ $ clef -keystore /my/keystore -chainid 4
 
 The security model of Clef is as follows:
 
-* One critical component (the Clef binary / daemon) is responsible for handling cryptographic operations: signing, private keys, encryption/decryption of keystore files.
+* One critical component (the Clef binary / daemon) is responsible for handling
+  cryptographic operations: signing, private keys, encryption/decryption of
+  keystore files.
 * Clef has a well-defined 'external' API.
 * The 'external' API is considered UNTRUSTED.
-* Clef also communicates with whatever process that invoked the binary, via stdin/stdout.
-  * This channel is considered 'trusted'. Over this channel, approvals and passwords are communicated.
+* Clef also communicates with whatever process that invoked the binary, via
+  stdin/stdout.
+    * This channel is considered 'trusted'. Over this channel, approvals and
+      passwords are communicated.
 
 The general flow for signing a transaction using e.g. Geth is as follows:
 ![image](sign_flow.png)
 
-In this case, `geth` would be started with `--signer http://localhost:8550` and would relay requests to `eth.sendTransaction`.
+In this case, `geth` would be started with `--signer http://localhost:8550` and
+would relay requests to `eth.sendTransaction`.
 
 ## TODOs
 
 Some snags and todos
 
-* [ ] Clef should take a startup param "--no-change", for UIs that do not contain the capability to perform changes to things, only approve/deny. Such a UI should be able to start the signer in a more secure mode by telling it that it only wants approve/deny capabilities.
-* [x] It would be nice if Clef could collect new 4byte-id:s/method selectors, and have a secondary database for those (`4byte_custom.json`). Users could then (optionally) submit their collections for inclusion upstream.
-* [ ] It should be possible to configure Clef to check if an account is indeed known to it, before passing on to the UI. The reason it currently does not, is that it would make it possible to enumerate accounts if it immediately returned "unknown account" (side channel attack).
-* [x] It should be possible to configure Clef to auto-allow listing (certain) accounts, instead of asking every time.
-* [x] Done Upon startup, Clef should spit out some info to the caller (particularly important when executed in `stdio-ui`-mode), invoking methods with the following info:
-  * [x] Version info about the signer
-  * [x] Address of API (HTTP/IPC)
-  * [ ] List of known accounts
-* [ ] Have a default timeout on signing operations, so that if the user has not answered within e.g. 60 seconds, the request is rejected.
+* [ ] Clef should take a startup param "--no-change", for UIs that do not
+  contain the capability to perform changes to things, only approve/deny. Such a
+  UI should be able to start the signer in a more secure mode by telling it that
+  it only wants approve/deny capabilities.
+* [x] It would be nice if Clef could collect new 4byte-id:s/method selectors,
+  and have a secondary database for those (`4byte_custom.json`). Users could
+  then (optionally) submit their collections for inclusion upstream.
+* [ ] It should be possible to configure Clef to check if an account is indeed
+  known to it, before passing on to the UI. The reason it currently does not, is
+  that it would make it possible to enumerate accounts if it immediately
+  returned "unknown account" (side channel attack).
+* [x] It should be possible to configure Clef to auto-allow listing (certain)
+  accounts, instead of asking every time.
+* [x] Done Upon startup, Clef should spit out some info to the caller (
+  particularly important when executed in `stdio-ui`-mode), invoking methods
+  with the following info:
+    * [x] Version info about the signer
+    * [x] Address of API (HTTP/IPC)
+    * [ ] List of known accounts
+* [ ] Have a default timeout on signing operations, so that if the user has not
+  answered within e.g. 60 seconds, the request is rejected.
 * [ ] `account_signRawTransaction`
 * [ ] `account_bulkSignTransactions([] transactions)` should
-   * only exist if enabled via config/flag
-   * only allow non-data-sending transactions
-   * all txs must use the same `from`-account
-   * let the user confirm, showing
-      * the total amount
-      * the number of unique recipients
+    * only exist if enabled via config/flag
+    * only allow non-data-sending transactions
+    * all txs must use the same `from`-account
+    * let the user confirm, showing
+        * the total amount
+        * the number of unique recipients
 
 * Geth todos
-    - The signer should pass the `Origin` header as call-info to the UI. As of right now, the way that info about the request is put together is a bit of a hack into the HTTP server. This could probably be greatly improved.
+    - The signer should pass the `Origin` header as call-info to the UI. As of
+      right now, the way that info about the request is put together is a bit of
+      a hack into the HTTP server. This could probably be greatly improved.
     - Relay: Geth should be started in `geth --signer localhost:8550`.
-    - Currently, the Geth APIs use `common.Address` in the arguments to transaction submission (e.g `to` field). This type is 20 `bytes`, and is incapable of carrying checksum information. The signer uses `common.MixedcaseAddress`, which retains the original input.
-    - The Geth API should switch to use the same type, and relay `to`-account verbatim to the external API.
+    - Currently, the Geth APIs use `common.Address` in the arguments to
+      transaction submission (e.g `to` field). This type is 20 `bytes`, and is
+      incapable of carrying checksum information. The signer
+      uses `common.MixedcaseAddress`, which retains the original input.
+    - The Geth API should switch to use the same type, and relay `to`-account
+      verbatim to the external API.
 * [x] Storage
     * [x] An encrypted key-value storage should be implemented.
     * See [rules.md](rules.md) for more info about this.
 * Another potential thing to introduce is pairing.
-  * To prevent spurious requests which users just accept, implement a way to "pair" the caller with the signer (external API).
-  * Thus Geth/cpp would cryptographically handshake and afterwards the caller would be allowed to make signing requests.
-  * This feature would make the addition of rules less dangerous.
+    * To prevent spurious requests which users just accept, implement a way to "
+      pair" the caller with the signer (external API).
+    * Thus Geth/cpp would cryptographically handshake and afterwards the caller
+      would be allowed to make signing requests.
+    * This feature would make the addition of rules less dangerous.
 
 * Wallets / accounts. Add API methods for wallets.
 
@@ -113,23 +151,32 @@ Some snags and todos
 
 ### External API
 
-Clef listens to HTTP requests on `http.addr`:`http.port` (or to IPC on `ipcpath`), with the same JSON-RPC standard as Geth. The messages are expected to be [JSON-RPC 2.0 standard](https://www.jsonrpc.org/specification).
+Clef listens to HTTP requests on `http.addr`:`http.port` (or to IPC
+on `ipcpath`), with the same JSON-RPC standard as Geth. The messages are
+expected to be [JSON-RPC 2.0 standard](https://www.jsonrpc.org/specification).
 
-Some of these calls can require user interaction. Clients must be aware that responses may be delayed significantly or may never be received if a user decides to ignore the confirmation request.
+Some of these calls can require user interaction. Clients must be aware that
+responses may be delayed significantly or may never be received if a user
+decides to ignore the confirmation request.
 
-The External API is **untrusted**: it does not accept credentials, nor does it expect that requests have any authority.
+The External API is **untrusted**: it does not accept credentials, nor does it
+expect that requests have any authority.
 
 ### Internal UI API
 
-Clef has one native console-based UI, for operation without any standalone tools. However, there is also an API to communicate with an external UI. To enable that UI, the signer needs to be executed with the `--stdio-ui` option, which allocates `stdin` / `stdout` for the UI API.
+Clef has one native console-based UI, for operation without any standalone
+tools. However, there is also an API to communicate with an external UI. To
+enable that UI, the signer needs to be executed with the `--stdio-ui` option,
+which allocates `stdin` / `stdout` for the UI API.
 
-An example (insecure) proof-of-concept of has been implemented in `pythonsigner.py`.
+An example (insecure) proof-of-concept of has been implemented
+in `pythonsigner.py`.
 
 The model is as follows:
 
 * The user starts the UI app (`pythonsigner.py`).
 * The UI app starts `clef` with `--stdio-ui`, and listens to the
-process output for confirmation-requests.
+  process output for confirmation-requests.
 * `clef` opens the external HTTP API.
 * When the `signer` receives requests, it sends a JSON-RPC request via `stdout`.
 * The UI app prompts the user accordingly, and responds to `clef`.
@@ -137,9 +184,11 @@ process output for confirmation-requests.
 
 ## External API
 
-See the [external API changelog](extapi_changelog.md) for information about changes to this API.
+See the [external API changelog](extapi_changelog.md) for information about
+changes to this API.
 
 ### Encoding
+
 - number: positive integers that are hex encoded
 - data: hex encoded data
 - string: ASCII string
@@ -150,17 +199,22 @@ All hex encoded values must be prefixed with `0x`.
 
 #### Create new password protected account
 
-The signer will generate a new private key, encrypt it according to [web3 keystore spec](https://github.com/ethereum/wiki/wiki/Web3-Secret-Storage-Definition) and store it in the keystore directory.  
-The client is responsible for creating a backup of the keystore. If the keystore is lost there is no method of retrieving lost accounts.
+The signer will generate a new private key, encrypt it according
+to [web3 keystore spec](https://github.com/ethereum/wiki/wiki/Web3-Secret-Storage-Definition)
+and store it in the keystore directory.  
+The client is responsible for creating a backup of the keystore. If the keystore
+is lost there is no method of retrieving lost accounts.
 
 #### Arguments
 
 None
 
 #### Result
-  - address [string]: account address that is derived from the generated key
+
+- address [string]: account address that is derived from the generated key
 
 #### Sample call
+
 ```json
 {
   "id": 0,
@@ -169,7 +223,9 @@ None
   "params": []
 }
 ```
+
 Response
+
 ```json
 {
   "id": 0,
@@ -181,17 +237,21 @@ Response
 ### account_list
 
 #### List available accounts
-   List all accounts that this signer currently manages
+
+List all accounts that this signer currently manages
 
 #### Arguments
 
 None
 
 #### Result
-  - array with account records:
-     - account.address [string]: account address that is derived from the generated key
+
+- array with account records:
+    - account.address [string]: account address that is derived from the
+      generated key
 
 #### Sample call
+
 ```json
 {
   "id": 1,
@@ -199,7 +259,9 @@ None
   "method": "account_list"
 }
 ```
+
 Response
+
 ```json
 {
   "id": 1,
@@ -214,26 +276,35 @@ Response
 ### account_signTransaction
 
 #### Sign transactions
-   Signs a transaction and responds with the signed transaction in RLP-encoded and JSON forms.
+
+Signs a transaction and responds with the signed transaction in RLP-encoded and
+JSON forms.
 
 #### Arguments
-  1. transaction object:
-     - `from` [address]: account to send the transaction from
-     - `to` [address]: receiver account. If omitted or `0x`, will cause contract creation.
-     - `gas` [number]: maximum amount of gas to burn
-     - `gasPrice` [number]: gas price
-     - `value` [number:optional]: amount of Wei to send with the transaction
-     - `data` [data:optional]:  input data
-     - `nonce` [number]: account nonce
-  1. method signature [string:optional]
-     - The method signature, if present, is to aid decoding the calldata. Should consist of `methodname(paramtype,...)`, e.g. `transfer(uint256,address)`. The signer may use this data to parse the supplied calldata, and show the user. The data, however, is considered totally untrusted, and reliability is not expected.
 
+1. transaction object:
+    - `from` [address]: account to send the transaction from
+    - `to` [address]: receiver account. If omitted or `0x`, will cause contract
+      creation.
+    - `gas` [number]: maximum amount of gas to burn
+    - `gasPrice` [number]: gas price
+    - `value` [number:optional]: amount of Wei to send with the transaction
+    - `data` [data:optional]:  input data
+    - `nonce` [number]: account nonce
+1. method signature [string:optional]
+    - The method signature, if present, is to aid decoding the calldata. Should
+      consist of `methodname(paramtype,...)`, e.g. `transfer(uint256,address)`.
+      The signer may use this data to parse the supplied calldata, and show the
+      user. The data, however, is considered totally untrusted, and reliability
+      is not expected.
 
 #### Result
-  - raw [data]: signed transaction in RLP encoded form
-  - tx [json]: signed transaction in JSON form
+
+- raw [data]: signed transaction in RLP encoded form
+- tx [json]: signed transaction in JSON form
 
 #### Sample call
+
 ```json
 {
   "id": 2,
@@ -252,6 +323,7 @@ Response
   ]
 }
 ```
+
 Response
 
 ```json
@@ -275,8 +347,8 @@ Response
   }
 }
 ```
-#### Sample call with ABI-data
 
+#### Sample call with ABI-data
 
 ```json
 {
@@ -297,6 +369,7 @@ Response
   ]
 }
 ```
+
 Response
 
 ```json
@@ -322,6 +395,7 @@ Response
 ```
 
 Bash example:
+
 ```bash
 > curl -H "Content-Type: application/json" -X POST --data '{"jsonrpc":"2.0","method":"account_signTransaction","params":[{"from":"0x694267f14675d7e1b9494fd8d72fefe1755710fa","gas":"0x333","gasPrice":"0x1","nonce":"0x0","to":"0x07a565b7ed7d7a678680a4c162885bedbb695fe0", "value":"0x0", "data":"0x4401a6e40000000000000000000000000000000000000000000000000000000000000012"},"safeSend(address)"],"id":67}' http://localhost:8550/
 
@@ -331,20 +405,25 @@ Bash example:
 ### account_signData
 
 #### Sign data
-   Signs a chunk of data and returns the calculated signature.
+
+Signs a chunk of data and returns the calculated signature.
 
 #### Arguments
-  - content type [string]: type of signed data
-     - `text/validator`: hex data with custom validator defined in a contract
-     - `application/clique`: [clique](https://github.com/ethereum/EIPs/issues/225) headers
-     - `text/plain`: simple hex data validated by `account_ecRecover`
-  - account [address]: account to sign with
-  - data [object]: data to sign
+
+- content type [string]: type of signed data
+    - `text/validator`: hex data with custom validator defined in a contract
+    - `application/clique`: [clique](https://github.com/ethereum/EIPs/issues/225)
+      headers
+    - `text/plain`: simple hex data validated by `account_ecRecover`
+- account [address]: account to sign with
+- data [object]: data to sign
 
 #### Result
-  - calculated signature [data]
+
+- calculated signature [data]
 
 #### Sample call
+
 ```json
 {
   "id": 3,
@@ -357,6 +436,7 @@ Bash example:
   ]
 }
 ```
+
 Response
 
 ```json
@@ -370,16 +450,22 @@ Response
 ### account_signTypedData
 
 #### Sign data
-   Signs a chunk of structured data conformant to [EIP-712](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-712.md) and returns the calculated signature.
+
+Signs a chunk of structured data conformant
+to [EIP-712](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-712.md) and
+returns the calculated signature.
 
 #### Arguments
-  - account [address]: account to sign with
-  - data [object]: data to sign
+
+- account [address]: account to sign with
+- data [object]: data to sign
 
 #### Result
-  - calculated signature [data]
+
+- calculated signature [data]
 
 #### Sample call
+
 ```json
 {
   "id": 68,
@@ -454,6 +540,7 @@ Response
   ]
 }
 ```
+
 Response
 
 ```json
@@ -468,16 +555,20 @@ Response
 
 #### Recover the signing address
 
-Derive the address from the account that was used to sign data with content type `text/plain` and the signature.
+Derive the address from the account that was used to sign data with content
+type `text/plain` and the signature.
 
 #### Arguments
-  - data [data]: data that was signed
-  - signature [data]: the signature to verify
+
+- data [data]: data that was signed
+- signature [data]: the signature to verify
 
 #### Result
-  - derived account [address]
+
+- derived account [address]
 
 #### Sample call
+
 ```json
 {
   "id": 4,
@@ -489,6 +580,7 @@ Derive the address from the account that was used to sign data with content type
   ]
 }
 ```
+
 Response
 
 ```json
@@ -514,6 +606,7 @@ None
 * external API version [string]
 
 #### Sample call
+
 ```json
 {
   "id": 0,
@@ -524,6 +617,7 @@ None
 ```
 
 Response
+
 ```json
 {
     "id": 0,
@@ -536,31 +630,40 @@ Response
 
 These methods needs to be implemented by a UI listener.
 
-By starting the signer with the switch `--stdio-ui-test`, the signer will invoke all known methods, and expect the UI to respond with
-denials. This can be used during development to ensure that the API is (at least somewhat) correctly implemented.
-See `pythonsigner`, which can be invoked via `python3 pythonsigner.py test` to perform the 'denial-handshake-test'.
+By starting the signer with the switch `--stdio-ui-test`, the signer will invoke
+all known methods, and expect the UI to respond with
+denials. This can be used during development to ensure that the API is (at least
+somewhat) correctly implemented.
+See `pythonsigner`, which can be invoked via `python3 pythonsigner.py test` to
+perform the 'denial-handshake-test'.
 
-All methods in this API use object-based parameters, so that there can be no mixup of parameters: each piece of data is accessed by key.
+All methods in this API use object-based parameters, so that there can be no
+mixup of parameters: each piece of data is accessed by key.
 
-See the [ui API changelog](intapi_changelog.md) for information about changes to this API.
+See the [ui API changelog](intapi_changelog.md) for information about changes to
+this API.
 
-OBS! A slight deviation from `json` standard is in place: every request and response should be confined to a single line.
-Whereas the `json` specification allows for linebreaks, linebreaks __should not__ be used in this communication channel, to make
+OBS! A slight deviation from `json` standard is in place: every request and
+response should be confined to a single line.
+Whereas the `json` specification allows for linebreaks, linebreaks __should not
+__ be used in this communication channel, to make
 things simpler for both parties.
 
 ### ApproveTx / `ui_approveTx`
 
 Invoked when there's a transaction for approval.
 
-
 #### Sample call
 
 Here's a method invocation:
+
 ```bash
 
 curl -i -H "Content-Type: application/json" -X POST --data '{"jsonrpc":"2.0","method":"account_signTransaction","params":[{"from":"0x694267f14675d7e1b9494fd8d72fefe1755710fa","gas":"0x333","gasPrice":"0x1","nonce":"0x0","to":"0x07a565b7ed7d7a678680a4c162885bedbb695fe0", "value":"0x0", "data":"0x4401a6e40000000000000000000000000000000000000000000000000000000000000012"},"safeSend(address)"],"id":67}' http://localhost:8550/
 ```
+
 Results in the following invocation on the UI:
+
 ```json
 
 {
@@ -601,6 +704,7 @@ Results in the following invocation on the UI:
 ```
 
 The same method invocation, but with invalid data:
+
 ```bash
 
 curl -i -H "Content-Type: application/json" -X POST --data '{"jsonrpc":"2.0","method":"account_signTransaction","params":[{"from":"0x694267f14675d7e1b9494fd8d72fefe1755710fa","gas":"0x333","gasPrice":"0x1","nonce":"0x0","to":"0x07a565b7ed7d7a678680a4c162885bedbb695fe0", "value":"0x0", "data":"0x4401a6e40000000000000002000000000000000000000000000000000000000000000012"},"safeSend(address)"],"id":67}' http://localhost:8550/
@@ -647,7 +751,6 @@ curl -i -H "Content-Type: application/json" -X POST --data '{"jsonrpc":"2.0","me
 ```
 
 One which has missing `to`, but with no `data`:
-
 
 ```json
 
@@ -718,7 +821,6 @@ Invoked when a request for account listing has been made.
 
 ```
 
-
 ### ApproveSignData / `ui_approveSignData`
 
 #### Sample call
@@ -775,7 +877,8 @@ Invoked when a request for creating a new account has been made.
 
 ### ShowInfo / `ui_showInfo`
 
-The UI should show the info (a single message) to the user. Does not expect response.
+The UI should show the info (a single message) to the user. Does not expect
+response.
 
 #### Sample call
 
@@ -793,7 +896,8 @@ The UI should show the info (a single message) to the user. Does not expect resp
 
 ### ShowError / `ui_showError`
 
-The UI should show the error (a single message) to the user. Does not expect response.
+The UI should show the error (a single message) to the user. Does not expect
+response.
 
 ```json
 
@@ -810,13 +914,18 @@ The UI should show the error (a single message) to the user. Does not expect res
 
 ### OnApprovedTx / `ui_onApprovedTx`
 
-`OnApprovedTx` is called when a transaction has been approved and signed. The call contains the return value that will be sent to the external caller.  The return value from this method is ignored - the reason for having this callback is to allow the ruleset to keep track of approved transactions.
+`OnApprovedTx` is called when a transaction has been approved and signed. The
+call contains the return value that will be sent to the external caller. The
+return value from this method is ignored - the reason for having this callback
+is to allow the ruleset to keep track of approved transactions.
 
 When implementing rate-limited rules, this callback should be used.
 
-TLDR; Use this method to keep track of signed transactions, instead of using the data in `ApproveTx`.
+TLDR; Use this method to keep track of signed transactions, instead of using the
+data in `ApproveTx`.
 
 Example call:
+
 ```json
 
 {
@@ -845,10 +954,12 @@ Example call:
 
 ### OnSignerStartup / `ui_onSignerStartup`
 
-This method provides the UI with information about what API version the signer uses (both internal and external) as well as build-info and external API,
+This method provides the UI with information about what API version the signer
+uses (both internal and external) as well as build-info and external API,
 in k/v-form.
 
 Example call:
+
 ```json
 
 {
@@ -874,6 +985,7 @@ Example call:
 Invoked when Clef requires user input (e.g. a password).
 
 Example call:
+
 ```json
 
 {
@@ -890,33 +1002,38 @@ Example call:
 }
 ```
 
-
 ### Rules for UI apis
 
 A UI should conform to the following rules.
 
-* A UI MUST NOT load any external resources that were not embedded/part of the UI package.
-  * For example, not load icons, stylesheets from the internet
-  * Not load files from the filesystem, unless they reside in the same local directory (e.g. config files)
+* A UI MUST NOT load any external resources that were not embedded/part of the
+  UI package.
+    * For example, not load icons, stylesheets from the internet
+    * Not load files from the filesystem, unless they reside in the same local
+      directory (e.g. config files)
 * A Graphical UI MUST show the blocky-identicon for ethereum addresses.
-* A UI MUST warn display appropriate warning if the destination-account is formatted with invalid checksum.
+* A UI MUST warn display appropriate warning if the destination-account is
+  formatted with invalid checksum.
 * A UI MUST NOT open any ports or services
-  * The signer opens the public port
-* A UI SHOULD verify the permissions on the signer binary, and refuse to execute or warn if permissions allow non-user write.
-* A UI SHOULD inform the user about the `SHA256` or `MD5` hash of the binary being executed
+    * The signer opens the public port
+* A UI SHOULD verify the permissions on the signer binary, and refuse to execute
+  or warn if permissions allow non-user write.
+* A UI SHOULD inform the user about the `SHA256` or `MD5` hash of the binary
+  being executed
 * A UI SHOULD NOT maintain a secondary storage of data, e.g. list of accounts
-  * The signer provides accounts
-* A UI SHOULD, to the best extent possible, use static linking / bundling, so that required libraries are bundled
-along with the UI.
-
+    * The signer provides accounts
+* A UI SHOULD, to the best extent possible, use static linking / bundling, so
+  that required libraries are bundled
+  along with the UI.
 
 ### UI Implementations
 
-There are a couple of implementation for a UI. We'll try to keep this list up to date.
+There are a couple of implementation for a UI. We'll try to keep this list up to
+date.
 
-| Name | Repo | UI type| No external resources| Blocky support| Verifies permissions | Hash information | No secondary storage | Statically linked| Can modify parameters|
-| ---- | ---- | -------| ---- | ---- | ---- |---- | ---- | ---- | ---- |
-| QtSigner| https://github.com/holiman/qtsigner/| Python3/QT-based| :+1:| :+1:| :+1:| :+1:| :+1:| :x: |  :+1: (partially)|
-| GtkSigner| https://github.com/holiman/gtksigner| Python3/GTK-based| :+1:| :x:| :x:| :+1:| :+1:| :x: |  :x: |
-| Frame | https://github.com/floating/frame/commits/go-signer| Electron-based| :x:| :x:| :x:| :x:| ?| :x: |  :x: |
-| Clef UI| https://github.com/ethereum/clef-ui| Golang/QT-based| :+1:| :+1:| :x:| :+1:| :+1:| :x: |  :+1: (approve tx only)|
+| Name      | Repo                                                | UI type           | No external resources | Blocky support | Verifies permissions | Hash information | No secondary storage | Statically linked | Can modify parameters  |
+|-----------|-----------------------------------------------------|-------------------|-----------------------|----------------|----------------------|------------------|----------------------|-------------------|------------------------|
+| QtSigner  | https://github.com/holiman/qtsigner/                | Python3/QT-based  | :+1:                  | :+1:           | :+1:                 | :+1:             | :+1:                 | :x:               | :+1: (partially)       |
+| GtkSigner | https://github.com/holiman/gtksigner                | Python3/GTK-based | :+1:                  | :x:            | :x:                  | :+1:             | :+1:                 | :x:               | :x:                    |
+| Frame     | https://github.com/floating/frame/commits/go-signer | Electron-based    | :x:                   | :x:            | :x:                  | :x:              | ?                    | :x:               | :x:                    |
+| Clef UI   | https://github.com/ethereum/clef-ui                 | Golang/QT-based   | :+1:                  | :+1:           | :x:                  | :+1:             | :+1:                 | :x:               | :+1: (approve tx only) |
