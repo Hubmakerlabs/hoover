@@ -26,22 +26,18 @@ func TestEventToBundleItem(t *testing.T) {
 		if err = json.Unmarshal(b, ev); chk.E(err) {
 			t.Fatal(err)
 		}
-		// log.I.S(ev)
 		var bundle *types.BundleItem
 		if bundle, err = EventToBundleItem(ev); chk.E(err) {
 			t.Fatal(err)
 		}
-		// log.I.F("%v", bundle)
 		var ev2 *event.T
 		if ev2, err = BundleItemToEvent(bundle); chk.E(err) {
 			t.Fatal(err)
 		}
-		// log.I.S(ev2)
 		var b2 B
 		if b2, err = ev2.MarshalJSON(); chk.E(err) {
 			t.Fatal(err)
 		}
-		// log.I.F("\n%s\n\n%s\n\n", bc, b2)
 		if !equals(bc, b2) {
 			t.Errorf("DIFFERENT\n%s\n\n%s\n\n", bc, b2)
 		}
