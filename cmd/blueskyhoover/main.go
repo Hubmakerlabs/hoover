@@ -1,36 +1,43 @@
 package main
 
 import (
-	"context"
 	"fmt"
-	"net/http"
 	"os"
 
-	"github.com/bluesky-social/indigo/api/atproto"
-	"github.com/bluesky-social/indigo/events"
-	"github.com/bluesky-social/indigo/events/schedulers/sequential"
-	"github.com/gorilla/websocket"
+	"github.com/Hubmakerlabs/hoover/cmd/blueskyhoover/firehose"
+	cli "github.com/urfave/cli/v2"
 )
 
-const subReposURL = "wss://bsky.network/xrpc/com.atproto.sync.subscribeRepos"
-
 func main() {
-	var conn *websocket.Conn
-	var err error
-	if conn, _, err = websocket.DefaultDialer.Dial(subReposURL,
-		http.Header{}); chk.E(err) {
+	run(os.Args)
+}
 
-		os.Exit(1)
+func run(args []string) {
+
+	app := cli.App{
+		Name:    "firehose",
+		Usage:   "simple firehose client for bluesky",
+		Version: "0.2",
 	}
-	rsc := &events.RepoStreamCallbacks{
-		RepoCommit: func(evt *atproto.SyncSubscribeRepos_Commit) (err error) {
-			fmt.Println("Event from ", evt.Repo)
-			for _, op := range evt.Ops {
-				fmt.Printf(" - %s record %s\n", op.Action, op.Path)
-			}
-			return
+
+	app.Flags = []cli.Flag{
+		&cli.StringFlag{
+			Name:    "pds-host",
+			Usage:   "method, hostname, and port of PDS instance",
+			Value:   "https://bsky.social",
+			EnvVars: []string{"ATP_PDS_HOST"},
+		},
+		&cli.StringFlag{
+			Name:    "auth",
+			Usage:   "path to JSON file with ATP auth info",
+			Value:   "bsky.auth",
+			EnvVars: []string{"ATP_AUTH_FILE"},
 		},
 	}
-	sched := sequential.NewScheduler("myfirehose", rsc.EventHandler)
-	events.HandleRepoStream(context.Background(), conn, sched)
+	app.Commands = []*cli.Command{
+		firehose.Firehose,
+	}
+
+	fmt.Println(app.Run(args))
+
 }

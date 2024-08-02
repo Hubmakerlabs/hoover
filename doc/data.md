@@ -202,8 +202,6 @@ A tool called Bigsky forms the basis of an aggregation spider, and based on
 this system events on bluesky protocol federations will be gathered, parsed 
 and converted into bundle data and pushed up to the Arweave AO network.
 
-Note that 
-
 ### Profile Information
 
 ```go
