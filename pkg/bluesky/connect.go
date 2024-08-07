@@ -1,0 +1,24 @@
+package bluesky
+
+import (
+	"context"
+	"fmt"
+	"net/http"
+
+	"github.com/gorilla/websocket"
+)
+
+func Connect(c context.Context) (conn *websocket.Conn, err error) {
+	api := "wss://bsky.network/xrpc/com.atproto.sync.subscribeRepos"
+	fmt.Println("dialing: ", api)
+	d := websocket.DefaultDialer
+	conn, _, err = d.Dial(api, http.Header{})
+	if err != nil {
+		err = errorf.E("dial failure: %w", err)
+	}
+	go func() {
+		<-c.Done()
+		_ = conn.Close()
+	}()
+	return
+}
