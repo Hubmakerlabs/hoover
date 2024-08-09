@@ -5,14 +5,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"path"
-	"strconv"
 	"strings"
 
 	"github.com/Hubmakerlabs/hoover/pkg/arweave"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
 	"github.com/bluesky-social/indigo/api/atproto"
-	"github.com/bluesky-social/indigo/api/bsky"
 	lexutil "github.com/bluesky-social/indigo/lex/util"
 	"github.com/bluesky-social/indigo/repo"
 	"github.com/bluesky-social/indigo/repomgr"
@@ -51,7 +48,6 @@ func RepoCommit(ctx context.Context,
 					_ = like
 					arweave.PrintBundleItem(like)
 					fmt.Println()
-					return
 				case strings.HasPrefix(op.Path, Kinds["post"]):
 					var post *types.BundleItem
 					if post, err = FromBskyFeedPost(evt, op, rr, rec); chk.E(err) {
@@ -79,26 +75,6 @@ func RepoCommit(ctx context.Context,
 		// cancel()
 		_ = rr
 		return
-	}
-}
-
-func PrintPost(pst bsky.FeedPost,
-	userProfile, replyUserProfile, likingUserProfile *bsky.ActorDefs_ProfileViewDetailed, postPath string) {
-	if userProfile != nil && userProfile.FollowersCount != nil {
-		// Try to use the display name and follower count if we can get it
-		var rply, likedTxt string
-		if pst.Reply != nil && replyUserProfile != nil && replyUserProfile.FollowersCount != nil {
-			rply = " ➡️ " + replyUserProfile.Handle + ":" + strconv.Itoa(int(*userProfile.FollowersCount)) + "\n" // + "https://staging.bsky.app/profile/" + strings.Split(pst.Reply.Parent.Uri, "/")[2] + "/post/" + path.Base(pst.Reply.Parent.Uri) + "\n"
-		} else if likingUserProfile != nil {
-			likedTxt = likingUserProfile.Handle + ":" + strconv.Itoa(int(*likingUserProfile.FollowersCount)) + " ❤️ "
-			rply = ":\n"
-		} else {
-			rply = ":\n"
-		}
-
-		url := "https://bsky.app/profile/" + userProfile.Handle + "/post/" + path.Base(postPath)
-		fmtdstring := likedTxt + userProfile.Handle + ":" + strconv.Itoa(int(*userProfile.FollowersCount)) + rply + pst.Text + "\n" + url + "\n"
-		log.I.Ln(fmtdstring)
 	}
 }
 

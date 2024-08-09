@@ -52,24 +52,9 @@ func FromBskyFeedLike(
 	}
 	like, ok := to.(*bsky.FeedLike)
 	if !ok {
-		err = errorf.E("did not get app.bsky.feed.post")
+		err = errorf.E("did not get app.bsky.feed.like")
 		return
 	}
-	// banana := lexutil.LexiconTypeDecoder{
-	// 	Val: rec,
-	// }
-	// pst := bsky.FeedLike{}
-	// var b B
-	// if b, err = banana.MarshalJSON(); chk.E(err) {
-	// 	return
-	// }
-	// if err = json.Unmarshal(b, &pst); chk.E(err) {
-	// 	return
-	// }
-	// var createdAt time.Time
-	// if createdAt, err = time.Parse(util.ISO8601, evt.Time); chk.E(err) {
-	// 	return
-	// }
 	if like.Subject == nil {
 		err = errorf.E("like has no subject, data of no use, refers to nothing")
 		return
@@ -77,10 +62,10 @@ func FromBskyFeedLike(
 	bundle = &types.BundleItem{}
 	bundle.Tags = []types.Tag{
 		{Name: "protocol", Value: "bsky"},
+		{Name: "kind", Value: "app.bsky.feed.like"},
 		{Name: "id", Value: op.Cid.String()},
 		{Name: "pubkey", Value: rr.SignedCommit().Did},
 		{Name: "created_at", Value: strconv.FormatInt(createdAt.Unix(), 10)},
-		{Name: "kind", Value: "app.bsky.feed.like"},
 		{Name: "repo", Value: evt.Repo},
 		{Name: "path", Value: op.Path},
 		{Name: "sig", Value: hex.EncodeToString(rr.SignedCommit().Sig)},

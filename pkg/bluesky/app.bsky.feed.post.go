@@ -138,19 +138,14 @@ func FromBskyFeedPost(
 	}
 	bundle.Tags = []types.Tag{
 		{Name: "protocol", Value: "bsky"},
+		{Name: "kind", Value: "app.bsky.feed.post"},
 		{Name: "id", Value: op.Cid.String()},
 		{Name: "pubkey", Value: rr.SignedCommit().Did},
 		{Name: "created_at", Value: strconv.FormatInt(createdAt.Unix(), 10)},
-		{Name: "kind", Value: "app.bsky.feed.like"},
 		{Name: "repo", Value: evt.Repo},
 		{Name: "path", Value: op.Path},
 		{Name: "sig", Value: hex.EncodeToString(rr.SignedCommit().Sig)},
 	}
-
-	// AppendTag(bundle, "protocol", "bsky")
-	// AppendTag(bundle, "id", op.Cid.String())
-	// AppendTag(bundle, "pubkey", rr.SignedCommit().Did)
-	// AppendTag(bundle, "created_at", strconv.FormatInt(createdAt.Unix(), 10))
 	if pst.Embed != nil {
 		if pst.Embed.EmbedRecord != nil {
 			AppendTags(bundle, "#embedrecord",
