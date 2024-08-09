@@ -4,8 +4,10 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"testing"
 
+	"github.com/Hubmakerlabs/hoover/pkg/arweave"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
 	"github.com/Hubmakerlabs/replicatr/pkg/nostr/event"
 	"github.com/mleku/nodl/pkg/event/examples"
@@ -30,6 +32,11 @@ func TestEventToBundleItem(t *testing.T) {
 		if bundle, err = EventToBundleItem(ev); chk.E(err) {
 			t.Fatal(err)
 		}
+		fmt.Println()
+		fmt.Println()
+		fmt.Println(S(b))
+		fmt.Println()
+		arweave.PrintBundleItem(bundle)
 		var ev2 *event.T
 		if ev2, err = BundleItemToEvent(bundle); chk.E(err) {
 			t.Fatal(err)

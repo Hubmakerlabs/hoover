@@ -33,9 +33,13 @@ import (
 // the protocol name, in this case, "nostr"
 func EventToBundleItem(ev *event.T) (bundle *types.BundleItem, err error) {
 	bundle = &types.BundleItem{}
-	bundle.Data = string(text.NostrEscape(nil, text.B(ev.Content)))
+	var b B
+	if b, err = json.Marshal(ev.Content); chk.E(err) {
+		return
+	}
+	bundle.Data = S(b)
 	bundle.Tags = []types.Tag{
-		{Name: "source", Value: "nostr"},
+		{Name: "protocol", Value: "nostr"},
 		{Name: "id", Value: ev.ID.String()},
 		{Name: "pubkey", Value: ev.PubKey},
 		{Name: "created_at", Value: strconv.FormatInt(ev.CreatedAt.I64(), 10)},
@@ -58,8 +62,8 @@ func EventToBundleItem(ev *event.T) (bundle *types.BundleItem, err error) {
 
 func BundleItemToEvent(bundle *types.BundleItem) (ev *event.T, err error) {
 	// first check that the first tag is nostr
-	if bundle.Tags[0].Name != "source" && bundle.Tags[0].Value == "nostr" {
-		err = errorf.E("first tag of bundle is not \"source\" and value is not \"nostr\"")
+	if bundle.Tags[0].Name != "protocol" && bundle.Tags[0].Value == "nostr" {
+		err = errorf.E("first tag of bundle is not \"protocol\" and value is not \"nostr\"")
 		return
 	}
 	ev = &event.T{}

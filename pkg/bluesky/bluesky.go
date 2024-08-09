@@ -4,19 +4,16 @@
 // <insert more notes here>
 package bluesky
 
-var Kinds = []string{
-	"app.bsky.graph.follow",
-	"app.bsky.feed.like",
-	"app.bsky.feed.repost",
-	"app.bsky.feed.post",
-	"app.bsky.graph.block",
-	"app.bsky.actor.profile",
-	"app.bsky.feed.threadgate",
-	"app.bsky.graph.listitem",
-	"app.bsky.graph.list",
-	"app.bsky.graph.starterpack",
-	"app.bsky.graph.listblock",
-	"app.bsky.feed.generator",
+var Kinds = map[string]string{
+	"follow":"app.bsky.graph.follow",
+	"like":"app.bsky.feed.like",
+	"repost":"app.bsky.feed.repost",
+	"post":"app.bsky.feed.post",
+	"block":"app.bsky.graph.block",
+	"profile":"app.bsky.actor.profile",
+	"listitem":"app.bsky.graph.listitem",
+	"list":"app.bsky.graph.list",
+	"listblock":"app.bsky.graph.listblock",
 }
 
 func IsRelevant(kind S) (is bool) {

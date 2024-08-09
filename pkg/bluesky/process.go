@@ -9,8 +9,10 @@ import (
 	"strconv"
 	"strings"
 
-	comatproto "github.com/bluesky-social/indigo/api/atproto"
-	appbsky "github.com/bluesky-social/indigo/api/bsky"
+	"github.com/Hubmakerlabs/hoover/pkg/arweave"
+	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
+	"github.com/bluesky-social/indigo/api/atproto"
+	"github.com/bluesky-social/indigo/api/bsky"
 	lexutil "github.com/bluesky-social/indigo/lex/util"
 	"github.com/bluesky-social/indigo/repo"
 	"github.com/bluesky-social/indigo/repomgr"
@@ -19,8 +21,8 @@ import (
 )
 
 func RepoCommit(ctx context.Context,
-	cancel context.CancelFunc) func(evt *comatproto.SyncSubscribeRepos_Commit) (err error) {
-	return func(evt *comatproto.SyncSubscribeRepos_Commit) (err error) {
+	cancel context.CancelFunc) func(evt *atproto.SyncSubscribeRepos_Commit) (err error) {
+	return func(evt *atproto.SyncSubscribeRepos_Commit) (err error) {
 		var rr *repo.Repo
 		if rr, err = repo.ReadRepoFromCar(ctx, bytes.NewReader(evt.Blocks)); chk.E(err) {
 			return
@@ -40,99 +42,38 @@ func RepoCommit(ctx context.Context,
 					err = errorf.E("mismatch in record and op cid: %s != %s", rc, *op.Cid)
 					return
 				}
-				if strings.HasPrefix(op.Path, "app.bsky.feed.like") {
-					log.I.S(FromBskyFeedLike(evt, op, rr, rec))
-					return
-				}
-				if strings.HasPrefix(op.Path, "app.bsky.feed.post") {
-					banana := lexutil.LexiconTypeDecoder{
-						Val: rec,
-					}
-					pst := appbsky.FeedPost{}
-					var b B
-					if b, err = banana.MarshalJSON(); chk.E(err) {
+				switch {
+				case strings.HasPrefix(op.Path, Kinds["like"]):
+					var like *types.BundleItem
+					if like, err = FromBskyFeedLike(evt, op, rr, rec); chk.E(err) {
 						return
 					}
-					if err = json.Unmarshal(b, &pst); chk.E(err) {
-						return
-					}
-					// var xrpcc *xrpc.Client
-					// var userProfile *appbsky.ActorDefs_ProfileViewDetailed
-					// var replyUserProfile *appbsky.ActorDefs_ProfileViewDetailed
-					// log.I.S(rr)
-					// log.I.S(pst)
-					// Handle if its a post
-					switch pst.LexiconTypeID {
-					case "app.bsky.feed.post":
-						var reply string
-						if len(pst.Text) == 0 {
-							return
-						}
-						if pst.Reply != nil {
-							reply = "Parent: " + pst.Reply.Parent.Uri + "\nRoot: " + pst.Reply.Root.Uri + "\n"
-						}
-						if pst.Facets != nil {
-							for i := range pst.Facets {
-								if pst.Facets[i].Features != nil {
-									for j := range pst.Facets[i].Features {
-										if pst.Facets[i].Features[j].RichtextFacet_Mention != nil {
-
-										}
-										if pst.Facets[i].Features[j].RichtextFacet_Link != nil {
-
-										}
-										if pst.Facets[i].Features[j].RichtextFacet_Tag != nil {
-
-										}
-									}
-								}
-
-							}
-						}
-						if pst.Langs != nil {
-
-						}
-						if pst.Tags != nil {
-
-						}
-						if pst.Embed != nil {
-							if pst.Embed.EmbedRecord != nil {
-								log.I.S(pst.Embed.EmbedRecord)
-							}
-							if pst.Embed.EmbedImages != nil {
-								for _, img := range pst.Embed.EmbedImages.Images {
-									log.I.S(img)
-								}
-							}
-							if pst.Embed.EmbedRecordWithMedia != nil {
-								if pst.Embed.EmbedRecordWithMedia.Record != nil {
-									log.I.S(pst.Embed.EmbedRecordWithMedia.Record)
-								}
-								if pst.Embed.EmbedRecordWithMedia.Media != nil {
-									if pst.Embed.EmbedRecordWithMedia.Media.EmbedImages != nil {
-										for _, img := range pst.Embed.EmbedRecordWithMedia.Media.EmbedImages.Images {
-											log.I.S(img)
-										}
-										if pst.Embed.EmbedRecordWithMedia.Media.EmbedExternal != nil {
-											log.I.S(pst.Embed.EmbedRecordWithMedia.Media.EmbedExternal.External)
-										}
-									}
-								}
-								log.I.S(pst.Embed.EmbedRecordWithMedia.Media.EmbedImages.Images)
-
-							}
-							if pst.Embed.EmbedExternal != nil {
-								log.I.S(pst.Embed.EmbedExternal.External)
-							}
-						}
-						log.I.F("Post\nEvent ID: %s\nCreated At: %s\nUser: %s\nContent: [%d]\n`%s`\n%s",
-							op.Cid, pst.CreatedAt, rr.SignedCommit().Did, len(pst.Text), pst.Text, reply)
-						// log.I.S(pst)
-					}
+					_ = like
+					arweave.PrintBundleItem(like)
+					fmt.Println()
 					return
+				case strings.HasPrefix(op.Path, Kinds["post"]):
+					var post *types.BundleItem
+					if post, err = FromBskyFeedPost(evt, op, rr, rec); chk.E(err) {
+						// normally would return but this shuts down the firehose processing
+						err = nil
+						continue
+						// return
+					}
+					_ = post
+					arweave.PrintBundleItem(post)
+					fmt.Println()
+				case strings.HasPrefix(op.Path, Kinds["follow"]):
+					// var follow *types.BundleItem
+					// if follow, err = FromBskyGraphFollow(evt, op, rr, rec); chk.E(err) {
+					// 	return
+					// }
+					// _ = follow
+					// arweave.PrintBundleItem(follow)
+					// fmt.Println()
 				}
 			default:
-				log.I.Ln(ek)
+				// log.I.Ln(ek)
 			}
 		}
 		// cancel()
@@ -141,8 +82,8 @@ func RepoCommit(ctx context.Context,
 	}
 }
 
-func PrintPost(pst appbsky.FeedPost,
-	userProfile, replyUserProfile, likingUserProfile *appbsky.ActorDefs_ProfileViewDetailed, postPath string) {
+func PrintPost(pst bsky.FeedPost,
+	userProfile, replyUserProfile, likingUserProfile *bsky.ActorDefs_ProfileViewDetailed, postPath string) {
 	if userProfile != nil && userProfile.FollowersCount != nil {
 		// Try to use the display name and follower count if we can get it
 		var rply, likedTxt string
@@ -161,8 +102,8 @@ func PrintPost(pst appbsky.FeedPost,
 	}
 }
 
-func RepoHandle() func(handle *comatproto.SyncSubscribeRepos_Handle) error {
-	return func(handle *comatproto.SyncSubscribeRepos_Handle) error {
+func RepoHandle() func(handle *atproto.SyncSubscribeRepos_Handle) error {
+	return func(handle *atproto.SyncSubscribeRepos_Handle) error {
 		b, err := json.MarshalIndent(handle, "", "  ")
 		if err != nil {
 			return err
@@ -172,8 +113,8 @@ func RepoHandle() func(handle *comatproto.SyncSubscribeRepos_Handle) error {
 	}
 }
 
-func RepoInfo() func(info *comatproto.SyncSubscribeRepos_Info) error {
-	return func(info *comatproto.SyncSubscribeRepos_Info) error {
+func RepoInfo() func(info *atproto.SyncSubscribeRepos_Info) error {
+	return func(info *atproto.SyncSubscribeRepos_Info) error {
 		b, err := json.MarshalIndent(info, "", "  ")
 		if err != nil {
 			return err
@@ -184,8 +125,8 @@ func RepoInfo() func(info *comatproto.SyncSubscribeRepos_Info) error {
 	}
 }
 
-func RepoMigrate() func(mig *comatproto.SyncSubscribeRepos_Migrate) error {
-	return func(mig *comatproto.SyncSubscribeRepos_Migrate) error {
+func RepoMigrate() func(mig *atproto.SyncSubscribeRepos_Migrate) error {
+	return func(mig *atproto.SyncSubscribeRepos_Migrate) error {
 		b, err := json.Marshal(mig)
 		if err != nil {
 			return err
@@ -196,8 +137,8 @@ func RepoMigrate() func(mig *comatproto.SyncSubscribeRepos_Migrate) error {
 	}
 }
 
-func RepoTombstone() func(tomb *comatproto.SyncSubscribeRepos_Tombstone) error {
-	return func(tomb *comatproto.SyncSubscribeRepos_Tombstone) error {
+func RepoTombstone() func(tomb *atproto.SyncSubscribeRepos_Tombstone) error {
+	return func(tomb *atproto.SyncSubscribeRepos_Tombstone) error {
 		b, err := json.Marshal(tomb)
 		if err != nil {
 			return err
@@ -208,8 +149,8 @@ func RepoTombstone() func(tomb *comatproto.SyncSubscribeRepos_Tombstone) error {
 	}
 }
 
-func LabelLabels() func(labels *comatproto.LabelSubscribeLabels_Labels) error {
-	return func(labels *comatproto.LabelSubscribeLabels_Labels) error {
+func LabelLabels() func(labels *atproto.LabelSubscribeLabels_Labels) error {
+	return func(labels *atproto.LabelSubscribeLabels_Labels) error {
 		b, err := json.Marshal(labels)
 		if err != nil {
 			return err
@@ -220,8 +161,8 @@ func LabelLabels() func(labels *comatproto.LabelSubscribeLabels_Labels) error {
 	}
 }
 
-func LabelInfo() func(info *comatproto.LabelSubscribeLabels_Info) error {
-	return func(info *comatproto.LabelSubscribeLabels_Info) error {
+func LabelInfo() func(info *atproto.LabelSubscribeLabels_Info) error {
+	return func(info *atproto.LabelSubscribeLabels_Info) error {
 		b, err := json.Marshal(info)
 		if err != nil {
 			return err

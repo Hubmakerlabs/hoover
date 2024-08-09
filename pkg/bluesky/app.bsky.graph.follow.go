@@ -1,5 +1,12 @@
 package bluesky
 
+import (
+	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
+	"github.com/bluesky-social/indigo/api/atproto"
+	"github.com/bluesky-social/indigo/repo"
+	typegen "github.com/whyrusleeping/cbor-gen"
+)
+
 // {
 //   "lexicon": 1,
 //   "id": "app.bsky.graph.follow",
@@ -21,8 +28,15 @@ package bluesky
 // }
 
 // FromBskyGraphFollow is
-func FromBskyGraphFollow() {
+func FromBskyGraphFollow(
+	evt *atproto.SyncSubscribeRepos_Commit,
+	op *atproto.SyncSubscribeRepos_RepoOp,
+	rr *repo.Repo,
+	rec typegen.CBORMarshaler,
+) (bundle *types.BundleItem, err error) {
 
+
+	return
 }
 
 // ToBskyGraphFollow is
