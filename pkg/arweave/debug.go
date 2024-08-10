@@ -8,6 +8,9 @@ import (
 )
 
 func PrintBundleItem(bi *types.BundleItem) {
+	if bi == nil {
+		return
+	}
 	var err error
 	for _, t := range bi.Tags {
 		if len(t.Name) < 1 {

@@ -41,32 +41,38 @@ func RepoCommit(ctx context.Context,
 				}
 				switch {
 				case strings.HasPrefix(op.Path, Kinds["like"]):
-					var like *types.BundleItem
-					if like, err = FromBskyFeedLike(evt, op, rr, rec); chk.E(err) {
+					// var like *types.BundleItem
+					// if like, err = FromBskyFeedLike(evt, op, rr, rec); chk.E(err) {
+					// 	// normally would return but this shuts down the firehose processing
+					// 	err = nil
+					// 	continue
+					// 	// return
+					// }
+					// _ = like
+					// arweave.PrintBundleItem(like)
+					// fmt.Println()
+				case strings.HasPrefix(op.Path, Kinds["post"]):
+					// var post *types.BundleItem
+					// if post, err = FromBskyFeedPost(evt, op, rr, rec); chk.E(err) {
+					// 	// normally would return but this shuts down the firehose processing
+					// 	err = nil
+					// 	continue
+					// 	// return
+					// }
+					// _ = post
+					// arweave.PrintBundleItem(post)
+					// fmt.Println()
+				case strings.HasPrefix(op.Path, Kinds["follow"]):
+					var follow *types.BundleItem
+					if follow, err = FromBskyGraphFollow(evt, op, rr, rec); chk.E(err) {
+						// normally would return but this shuts down the firehose processing
+						// err = nil
+						// continue
 						return
 					}
-					_ = like
-					arweave.PrintBundleItem(like)
+					_ = follow
+					arweave.PrintBundleItem(follow)
 					fmt.Println()
-				case strings.HasPrefix(op.Path, Kinds["post"]):
-					var post *types.BundleItem
-					if post, err = FromBskyFeedPost(evt, op, rr, rec); chk.E(err) {
-						// normally would return but this shuts down the firehose processing
-						err = nil
-						continue
-						// return
-					}
-					_ = post
-					arweave.PrintBundleItem(post)
-					fmt.Println()
-				case strings.HasPrefix(op.Path, Kinds["follow"]):
-					// var follow *types.BundleItem
-					// if follow, err = FromBskyGraphFollow(evt, op, rr, rec); chk.E(err) {
-					// 	return
-					// }
-					// _ = follow
-					// arweave.PrintBundleItem(follow)
-					// fmt.Println()
 				}
 			default:
 				// log.I.Ln(ek)

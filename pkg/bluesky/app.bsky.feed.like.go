@@ -62,7 +62,7 @@ func FromBskyFeedLike(
 	bundle = &types.BundleItem{}
 	bundle.Tags = []types.Tag{
 		{Name: "protocol", Value: "bsky"},
-		{Name: "kind", Value: "app.bsky.feed.like"},
+		{Name: "kind", Value: Kinds["like"]},
 		{Name: "id", Value: op.Cid.String()},
 		{Name: "pubkey", Value: rr.SignedCommit().Did},
 		{Name: "created_at", Value: strconv.FormatInt(createdAt.Unix(), 10)},

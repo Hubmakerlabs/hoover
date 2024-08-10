@@ -8,7 +8,7 @@ import (
 
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
 	"github.com/bluesky-social/indigo/api/atproto"
-	appbsky "github.com/bluesky-social/indigo/api/bsky"
+	"github.com/bluesky-social/indigo/api/bsky"
 	"github.com/bluesky-social/indigo/repo"
 	"github.com/mleku/nodl/pkg/text"
 	typegen "github.com/whyrusleeping/cbor-gen"
@@ -120,14 +120,14 @@ func FromBskyFeedPost(
 
 	var createdAt time.Time
 	var to any
-	if to, createdAt, err = UnmarshalEvent(evt, rec, &appbsky.FeedPost{}); chk.E(err) {
+	if to, createdAt, err = UnmarshalEvent(evt, rec, &bsky.FeedPost{}); chk.E(err) {
 		return
 	}
 	if to == nil {
 		err = errorf.E("failed to unmarshal post")
 		return
 	}
-	pst, ok := to.(*appbsky.FeedPost)
+	pst, ok := to.(*bsky.FeedPost)
 	if !ok {
 		err = errorf.E("did not get app.bsky.feed.post")
 		return
@@ -138,7 +138,7 @@ func FromBskyFeedPost(
 	}
 	bundle.Tags = []types.Tag{
 		{Name: "protocol", Value: "bsky"},
-		{Name: "kind", Value: "app.bsky.feed.post"},
+		{Name: "kind", Value: Kinds["post"]},
 		{Name: "id", Value: op.Cid.String()},
 		{Name: "pubkey", Value: rr.SignedCommit().Did},
 		{Name: "created_at", Value: strconv.FormatInt(createdAt.Unix(), 10)},
