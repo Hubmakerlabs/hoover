@@ -30,8 +30,8 @@ func RepoCommit(ctx context.Context,
 			case repomgr.EvtKindCreateRecord, repomgr.EvtKindUpdateRecord:
 				var rc cid.Cid
 				var rec typegen.CBORMarshaler
-				if rc, rec, err = rr.GetRecord(ctx, op.Path); chk.D(err) {
-					err = errorf.E("getting record %s (%s) within seq %d for %s: %w",
+				if rc, rec, err = rr.GetRecord(ctx, op.Path); err != nil {
+					err = fmt.Errorf("getting record %s (%s) within seq %d for %s: %w",
 						op.Path, *op.Cid, evt.Seq, evt.Repo, err)
 					return nil
 				}
@@ -85,15 +85,26 @@ func RepoCommit(ctx context.Context,
 					// arweave.PrintBundleItem(repost)
 					// fmt.Println()
 				case strings.HasPrefix(op.Path, Kinds["block"]):
-					var block *types.BundleItem
-					if block, err = FromBskyGraphBlock(evt, op, rr, rec); chk.E(err) {
+					// var block *types.BundleItem
+					// if block, err = FromBskyGraphBlock(evt, op, rr, rec); chk.E(err) {
+					// 	// normally would return but this shuts down the firehose processing
+					// 	// err = nil
+					// 	// continue
+					// 	return
+					// }
+					// _ = block
+					// arweave.PrintBundleItem(block)
+					// fmt.Println()
+				case strings.HasPrefix(op.Path, Kinds["profile"]):
+					var profile *types.BundleItem
+					if profile, err = FromBskyActorProfile(evt, op, rr, rec); chk.E(err) {
 						// normally would return but this shuts down the firehose processing
 						// err = nil
 						// continue
 						return
 					}
-					_ = block
-					arweave.PrintBundleItem(block)
+					_ = profile
+					arweave.PrintBundleItem(profile)
 					fmt.Println()
 				}
 			default:
