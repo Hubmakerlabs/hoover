@@ -52,7 +52,7 @@ func FromBskyGraphFollow(
 	}
 	fol, ok := to.(*bsky.GraphFollow)
 	if !ok {
-		err = errorf.E("did not get app.bsky.feed.post")
+		err = errorf.E("did not get", Kinds["follow"])
 		return
 	}
 	bundle = &types.BundleItem{}

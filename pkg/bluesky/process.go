@@ -30,7 +30,7 @@ func RepoCommit(ctx context.Context,
 			case repomgr.EvtKindCreateRecord, repomgr.EvtKindUpdateRecord:
 				var rc cid.Cid
 				var rec typegen.CBORMarshaler
-				if rc, rec, err = rr.GetRecord(ctx, op.Path); chk.E(err) {
+				if rc, rec, err = rr.GetRecord(ctx, op.Path); chk.D(err) {
 					err = errorf.E("getting record %s (%s) within seq %d for %s: %w",
 						op.Path, *op.Cid, evt.Seq, evt.Repo, err)
 					return nil
@@ -63,15 +63,37 @@ func RepoCommit(ctx context.Context,
 					// arweave.PrintBundleItem(post)
 					// fmt.Println()
 				case strings.HasPrefix(op.Path, Kinds["follow"]):
-					var follow *types.BundleItem
-					if follow, err = FromBskyGraphFollow(evt, op, rr, rec); chk.E(err) {
+					// var follow *types.BundleItem
+					// if follow, err = FromBskyGraphFollow(evt, op, rr, rec); chk.E(err) {
+					// 	// normally would return but this shuts down the firehose processing
+					// 	// err = nil
+					// 	// continue
+					// 	return
+					// }
+					// _ = follow
+					// arweave.PrintBundleItem(follow)
+					// fmt.Println()
+				case strings.HasPrefix(op.Path, Kinds["repost"]):
+					// var repost *types.BundleItem
+					// if repost, err = FromBskyFeedRepost(evt, op, rr, rec); chk.E(err) {
+					// 	// normally would return but this shuts down the firehose processing
+					// 	// err = nil
+					// 	// continue
+					// 	return
+					// }
+					// _ = repost
+					// arweave.PrintBundleItem(repost)
+					// fmt.Println()
+				case strings.HasPrefix(op.Path, Kinds["block"]):
+					var block *types.BundleItem
+					if block, err = FromBskyGraphBlock(evt, op, rr, rec); chk.E(err) {
 						// normally would return but this shuts down the firehose processing
 						// err = nil
 						// continue
 						return
 					}
-					_ = follow
-					arweave.PrintBundleItem(follow)
+					_ = block
+					arweave.PrintBundleItem(block)
 					fmt.Println()
 				}
 			default:

@@ -13,28 +13,34 @@ import (
 	typegen "github.com/whyrusleeping/cbor-gen"
 )
 
-// {
-//   "lexicon": 1,
-//   "id": "app.bsky.feed.repost",
-//   "defs": {
-//     "main": {
-//       "description": "Record representing a 'repost' of an existing Bluesky post.",
-//       "type": "record",
-//       "key": "tid",
-//       "record": {
-//         "type": "object",
-//         "required": ["subject", "createdAt"],
-//         "properties": {
-//           "subject": { "type": "ref", "ref": "com.atproto.repo.strongRef" },
-//           "createdAt": { "type": "string", "format": "datetime" }
-//         }
-//       }
-//     }
-//   }
-// }
+/*
+{
+  "lexicon": 1,
+  "id": "app.bsky.graph.block",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record declaring a 'block' relationship against another account. NOTE: blocks are public in Bluesky; see blog posts for details.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": ["subject", "createdAt"],
+        "properties": {
+          "subject": {
+            "type": "string",
+            "format": "did",
+            "description": "DID of the account to be blocked."
+          },
+          "createdAt": { "type": "string", "format": "datetime" }
+        }
+      }
+    }
+  }
+}
+*/
 
-// FromBskyFeedRepost is
-func FromBskyFeedRepost(
+// FromBskyGraphBlock is
+func FromBskyGraphBlock(
 	evt *atproto.SyncSubscribeRepos_Commit,
 	op *atproto.SyncSubscribeRepos_RepoOp,
 	rr *repo.Repo,
@@ -43,22 +49,22 @@ func FromBskyFeedRepost(
 
 	var createdAt time.Time
 	var to any
-	if to, createdAt, err = UnmarshalEvent(evt, rec, &bsky.FeedRepost{}); chk.E(err) {
+	if to, createdAt, err = UnmarshalEvent(evt, rec, &bsky.GraphBlock{}); chk.E(err) {
 		return
 	}
 	if to == nil {
 		err = errorf.E("failed to unmarshal post")
 		return
 	}
-	repost, ok := to.(*bsky.FeedRepost)
+	repost, ok := to.(*bsky.GraphBlock)
 	if !ok {
-		err = errorf.E("did not get", Kinds["repost"])
+		err = errorf.E("did not get", Kinds["block"])
 		return
 	}
 	bundle = &types.BundleItem{}
 	bundle.Tags = []types.Tag{
 		{Name: "protocol", Value: "bsky"},
-		{Name: "kind", Value: Kinds["repost"]},
+		{Name: "kind", Value: Kinds["block"]},
 		{Name: "id", Value: op.Cid.String()},
 		{Name: "pubkey", Value: rr.SignedCommit().Did},
 		{Name: "created_at", Value: strconv.FormatInt(createdAt.Unix(), 10)},
@@ -70,11 +76,11 @@ func FromBskyFeedRepost(
 		return
 	}
 	AppendTag(bundle, "#sent_timestamp", strconv.FormatInt(createdAt.Unix(), 10))
-	AppendTags(bundle, "#subject", []S{repost.Subject.Cid, repost.Subject.Uri})
+	AppendTag(bundle, "#subject", repost.Subject)
 	return
 }
 
-// ToBskyFeedRepost is
-func ToBskyFeedRepost() {
+// ToBskyGraphBlock is
+func ToBskyGraphBlock() {
 
 }

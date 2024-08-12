@@ -5,10 +5,10 @@
 package bluesky
 
 var Kinds = map[string]string{
-	"follow":"app.bsky.graph.follow",
 	"like":"app.bsky.feed.like",
-	"repost":"app.bsky.feed.repost",
 	"post":"app.bsky.feed.post",
+	"follow":"app.bsky.graph.follow",
+	"repost":"app.bsky.feed.repost",
 	"block":"app.bsky.graph.block",
 	"profile":"app.bsky.actor.profile",
 	"listitem":"app.bsky.graph.listitem",
