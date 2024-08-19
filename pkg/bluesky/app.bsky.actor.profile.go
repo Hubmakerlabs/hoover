@@ -100,8 +100,8 @@ func FromBskyActorProfile(
 		if createdAt, err = time.Parse(util.ISO8601, *profile.CreatedAt); chk.E(err) {
 			return
 		}
+		AppendTag(bundle, "#updated_at", strconv.FormatInt(createdAt.Unix(), 10))
 	}
-	AppendTag(bundle, "#updated_at", strconv.FormatInt(createdAt.Unix(), 10))
 	if profile.DisplayName!=nil {
 		AppendTag(bundle, "#displayname", *profile.DisplayName)
 	}

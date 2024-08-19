@@ -75,7 +75,7 @@ func FromBskyGraphBlock(
 	if createdAt, err = time.Parse(util.ISO8601, repost.CreatedAt); chk.E(err) {
 		return
 	}
-	AppendTag(bundle, "#sent_timestamp", strconv.FormatInt(createdAt.Unix(), 10))
+	AppendTag(bundle, "#updated_at", strconv.FormatInt(createdAt.Unix(), 10))
 	AppendTag(bundle, "#subject", repost.Subject)
 	return
 }

@@ -41,49 +41,49 @@ func RepoCommit(ctx context.Context,
 				}
 				switch {
 				case strings.HasPrefix(op.Path, Kinds["like"]):
-					// var like *types.BundleItem
-					// if like, err = FromBskyFeedLike(evt, op, rr, rec); chk.E(err) {
-					// 	// normally would return but this shuts down the firehose processing
-					// 	err = nil
-					// 	continue
-					// 	// return
-					// }
-					// _ = like
-					// arweave.PrintBundleItem(like)
-					// fmt.Println()
+					var like *types.BundleItem
+					if like, err = FromBskyFeedLike(evt, op, rr, rec); chk.E(err) {
+						// normally would return but this shuts down the firehose processing
+						err = nil
+						continue
+						// return
+					}
+					_ = like
+					arweave.PrintBundleItem(like)
+					fmt.Println()
 				case strings.HasPrefix(op.Path, Kinds["post"]):
-					// var post *types.BundleItem
-					// if post, err = FromBskyFeedPost(evt, op, rr, rec); chk.E(err) {
-					// 	// normally would return but this shuts down the firehose processing
-					// 	err = nil
-					// 	continue
-					// 	// return
-					// }
-					// _ = post
-					// arweave.PrintBundleItem(post)
-					// fmt.Println()
+					var post *types.BundleItem
+					if post, err = FromBskyFeedPost(evt, op, rr, rec); chk.E(err) {
+						// normally would return but this shuts down the firehose processing
+						err = nil
+						continue
+						// return
+					}
+					_ = post
+					arweave.PrintBundleItem(post)
+					fmt.Println()
 				case strings.HasPrefix(op.Path, Kinds["follow"]):
-					// var follow *types.BundleItem
-					// if follow, err = FromBskyGraphFollow(evt, op, rr, rec); chk.E(err) {
-					// 	// normally would return but this shuts down the firehose processing
-					// 	// err = nil
-					// 	// continue
-					// 	return
-					// }
-					// _ = follow
-					// arweave.PrintBundleItem(follow)
-					// fmt.Println()
+					var follow *types.BundleItem
+					if follow, err = FromBskyGraphFollow(evt, op, rr, rec); chk.E(err) {
+						// normally would return but this shuts down the firehose processing
+						// err = nil
+						// continue
+						return
+					}
+					_ = follow
+					arweave.PrintBundleItem(follow)
+					fmt.Println()
 				case strings.HasPrefix(op.Path, Kinds["repost"]):
-					// var repost *types.BundleItem
-					// if repost, err = FromBskyFeedRepost(evt, op, rr, rec); chk.E(err) {
-					// 	// normally would return but this shuts down the firehose processing
-					// 	// err = nil
-					// 	// continue
-					// 	return
-					// }
-					// _ = repost
-					// arweave.PrintBundleItem(repost)
-					// fmt.Println()
+					var repost *types.BundleItem
+					if repost, err = FromBskyFeedRepost(evt, op, rr, rec); chk.E(err) {
+						// normally would return but this shuts down the firehose processing
+						// err = nil
+						// continue
+						return
+					}
+					_ = repost
+					arweave.PrintBundleItem(repost)
+					fmt.Println()
 				case strings.HasPrefix(op.Path, Kinds["block"]):
 					// var block *types.BundleItem
 					// if block, err = FromBskyGraphBlock(evt, op, rr, rec); chk.E(err) {
@@ -96,16 +96,27 @@ func RepoCommit(ctx context.Context,
 					// arweave.PrintBundleItem(block)
 					// fmt.Println()
 				case strings.HasPrefix(op.Path, Kinds["profile"]):
-					var profile *types.BundleItem
-					if profile, err = FromBskyActorProfile(evt, op, rr, rec); chk.E(err) {
-						// normally would return but this shuts down the firehose processing
-						// err = nil
-						// continue
-						return
-					}
-					_ = profile
-					arweave.PrintBundleItem(profile)
-					fmt.Println()
+					// var profile *types.BundleItem
+					// if profile, err = FromBskyActorProfile(evt, op, rr, rec); chk.E(err) {
+					// 	// normally would return but this shuts down the firehose processing
+					// 	// err = nil
+					// 	// continue
+					// 	return
+					// }
+					// _ = profile
+					// arweave.PrintBundleItem(profile)
+					// fmt.Println()
+				case strings.HasPrefix(op.Path, Kinds["list"]):
+					// var list *types.BundleItem
+					// if list, err = FromBskyGraphList(evt, op, rr, rec); chk.E(err) {
+					// 	// normally would return but this shuts down the firehose processing
+					// 	// err = nil
+					// 	// continue
+					// 	return
+					// }
+					// _ = list
+					// arweave.PrintBundleItem(list)
+					// fmt.Println()
 				}
 			default:
 				// log.I.Ln(ek)

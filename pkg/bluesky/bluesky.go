@@ -11,8 +11,8 @@ var Kinds = map[string]string{
 	"repost":"app.bsky.feed.repost",
 	"block":"app.bsky.graph.block",
 	"profile":"app.bsky.actor.profile",
-	"listitem":"app.bsky.graph.listitem",
 	"list":"app.bsky.graph.list",
+	"listitem":"app.bsky.graph.listitem",
 	"listblock":"app.bsky.graph.listblock",
 }
 

@@ -73,7 +73,7 @@ func FromBskyFeedLike(
 	if createdAt, err = time.Parse(util.ISO8601, like.CreatedAt); chk.E(err) {
 		return
 	}
-	AppendTag(bundle, "#sent_timestamp", strconv.FormatInt(createdAt.Unix(), 10))
+	AppendTag(bundle, "#updated_at", strconv.FormatInt(createdAt.Unix(), 10))
 	AppendTags(bundle, "#subject", []string{like.Subject.Cid, like.Subject.Uri})
 	return
 }

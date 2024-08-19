@@ -10,6 +10,7 @@ import (
 	"github.com/bluesky-social/indigo/api/atproto"
 	"github.com/bluesky-social/indigo/api/bsky"
 	"github.com/bluesky-social/indigo/repo"
+	"github.com/bluesky-social/indigo/util"
 	"github.com/mleku/nodl/pkg/text"
 	typegen "github.com/whyrusleeping/cbor-gen"
 )
@@ -132,10 +133,7 @@ func FromBskyFeedPost(
 		err = errorf.E("did not get app.bsky.feed.post")
 		return
 	}
-
-	bundle = &types.BundleItem{
-		Data: string(text.NostrEscape(nil, text.B(pst.Text))),
-	}
+	bundle = &types.BundleItem{}
 	bundle.Tags = []types.Tag{
 		{Name: "protocol", Value: "bsky"},
 		{Name: "kind", Value: Kinds["post"]},
@@ -145,7 +143,13 @@ func FromBskyFeedPost(
 		{Name: "repo", Value: evt.Repo},
 		{Name: "path", Value: op.Path},
 		{Name: "sig", Value: hex.EncodeToString(rr.SignedCommit().Sig)},
+		{Name: "content", Value: string(text.NostrEscape(nil, B(pst.Text)))},
 	}
+	if createdAt, err = time.Parse(util.ISO8601, pst.CreatedAt); chk.E(err) {
+		return
+	}
+	AppendTag(bundle, "#updated_at", strconv.FormatInt(createdAt.Unix(), 10))
+	// todo: there be binary blobs in here that need to be dumped in the Data field of the bundle
 	if pst.Embed != nil {
 		if pst.Embed.EmbedRecord != nil {
 			AppendTags(bundle, "#embedrecord",
@@ -182,7 +186,8 @@ func FromBskyFeedPost(
 					if feats.RichtextFacet_Mention != nil {
 						if feats.RichtextFacet_Mention.Did != "" {
 							AppendTag(bundle,
-								"#facet_features_richtext_mention", feats.RichtextFacet_Mention.Did)
+								"#facet_features_richtext_mention",
+								feats.RichtextFacet_Mention.Did)
 						}
 					}
 					if feats.RichtextFacet_Link != nil {
@@ -223,10 +228,12 @@ func FromBskyFeedPost(
 	}
 	if pst.Reply != nil {
 		if pst.Reply.Parent != nil && pst.Reply.Parent.Uri != "" {
-			AppendTags(bundle, "#reply_parent", []string{pst.Reply.Parent.Cid, pst.Reply.Parent.Uri})
+			AppendTags(bundle, "#reply_parent",
+				[]string{pst.Reply.Parent.Cid, pst.Reply.Parent.Uri})
 		}
 		if pst.Reply.Root != nil && pst.Reply.Root.Uri != "" {
-			AppendTags(bundle, "#reply_root", []string{pst.Reply.Parent.Cid, pst.Reply.Root.Uri})
+			AppendTags(bundle, "#reply_root",
+				[]string{pst.Reply.Parent.Cid, pst.Reply.Root.Uri})
 		}
 	}
 	if pst.Tags != nil && len(pst.Tags) > 0 {

@@ -69,7 +69,7 @@ func FromBskyGraphFollow(
 	if createdAt, err = time.Parse(util.ISO8601, fol.CreatedAt); chk.E(err) {
 		return
 	}
-	AppendTag(bundle, "#sent_timestamp", strconv.FormatInt(createdAt.Unix(), 10))
+	AppendTag(bundle, "#updated_at", strconv.FormatInt(createdAt.Unix(), 10))
 	AppendTag(bundle, "#subject", fol.Subject)
 	return
 }
