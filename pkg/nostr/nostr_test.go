@@ -33,21 +33,9 @@ func TestEventToBundleItem(t *testing.T) {
 			t.Fatal(err)
 		}
 		fmt.Println()
-		fmt.Println()
 		fmt.Println(S(b))
 		fmt.Println()
 		arweave.PrintBundleItem(bundle)
-		var ev2 *event.T
-		if ev2, err = BundleItemToEvent(bundle); chk.E(err) {
-			t.Fatal(err)
-		}
-		var b2 B
-		if b2, err = ev2.MarshalJSON(); chk.E(err) {
-			t.Fatal(err)
-		}
-		if !equals(bc, b2) {
-			t.Errorf("DIFFERENT\n%s\n\n%s\n\n", bc, b2)
-		}
 		b = b[:0]
 		b = nil
 	}

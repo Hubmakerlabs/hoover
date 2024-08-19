@@ -48,20 +48,20 @@ Kind: `Repost`
 
 Kind: `Like`
 
-1. `Likes-Event-ID` - protocol native reference to a post from a user
+1. `Like-Event-ID` - protocol native reference to a post from a user
 
 ### Follow
 
 Kind: `Follow`
 
-1. `Add-Remove` - boolean (true/false)
+1. `Add` - boolean (true/false)
 2. `Follow-User-ID` - User is now/now not following this user
 
 ### Block
 
 Kind: `Block`
 
-1. `Add-Remove` - boolean (true/false)
+1. `Add` - boolean (true/false)
 2. `Block-User-ID` - User is now/now not following this user
 
 ### Profile
@@ -72,7 +72,7 @@ Kind: `Profile`
 2. `Display-Name` - protocol based field that should be prominently showed for a user
 3. `Avatar-Image` - URL for the image of a user (can be in-protocol embedded in a nested bundle)
 4. `Banner-Image` - URL for the image that would be showed in the background of a profile page
-5. `Bio` - (2kb max)
+5. `Bio` - (2kb max, or if larger, embedded with `embed` and the nested bundle is labeled `Bio`)
 6. `Website` - URL related to the user
 7. `Verification` - external verification information (nip-05 for nostr)
 8. `Payment-Address` - (lightning emoji and LN address eg 🗲mleku@getalby.com for lightning)
@@ -88,10 +88,11 @@ This facility will be implemented after the textual data as the uploading of the
    1. `audio/aac`
    2. `video/mp4`
    3. `image/png`
-
-...and so on... The type description will be the same as the one found in the bluesky embed.
-
-2. `Origin` - this will generally be `bluesky` and will indicate that the URL can be found via a `bsky` protocol query.
+   4. ...
+2. `Origin` - this will generally be `bluesky` and will indicate that the URL can be found via a `bsky` protocol query. For general web service, this will be the protocol name `http` `https` `magnet` `arweave` etc.
 3. `URI` - the identifier that the protocol that stores the data will recognize how to fetch the data.
+4. `Size` - the size of the embedded data in bytes
+5. `Dimensions` - for images and videos, the pixels Horizontal by Vertical `HxV`
+6. `Duration` - For video and audio, the playback time in seconds
 
 The `Data` field of the bundle will contain the binary file itself.

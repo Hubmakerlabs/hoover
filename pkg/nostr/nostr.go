@@ -9,14 +9,17 @@ import (
 	"strconv"
 
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
-	"github.com/Hubmakerlabs/replicatr/pkg/ec/hex"
 	"github.com/Hubmakerlabs/replicatr/pkg/nostr/event"
-	"github.com/Hubmakerlabs/replicatr/pkg/nostr/eventid"
 	"github.com/Hubmakerlabs/replicatr/pkg/nostr/kind"
-	"github.com/Hubmakerlabs/replicatr/pkg/nostr/tag"
-	"github.com/Hubmakerlabs/replicatr/pkg/nostr/timestamp"
-	"github.com/mleku/nodl/pkg/text"
 )
+
+func GetNostrKindToBundle(k kind.T) (s string) {
+	switch k {
+	case kind.Repost, kind.GenericRepost:
+		s = "Repost"
+	}
+	return
+}
 
 // EventToBundleItem constructs the data parts of an Arweave Bundle prior to
 // adding the cryptographic authentication parts.
@@ -39,12 +42,12 @@ func EventToBundleItem(ev *event.T) (bundle *types.BundleItem, err error) {
 	}
 	bundle.Data = S(b)
 	bundle.Tags = []types.Tag{
-		{Name: "protocol", Value: "nostr"},
-		{Name: "id", Value: ev.ID.String()},
-		{Name: "pubkey", Value: ev.PubKey},
-		{Name: "created_at", Value: strconv.FormatInt(ev.CreatedAt.I64(), 10)},
-		{Name: "kind", Value: strconv.Itoa(int(ev.Kind.ToUint16()))},
-		{Name: "sig", Value: ev.Sig},
+		{Name: "Protocol", Value: "nostr"},
+		{Name: "Event-ID", Value: ev.ID.String()},
+		{Name: "User-ID", Value: ev.PubKey},
+		{Name: "Timestamp", Value: strconv.FormatInt(ev.CreatedAt.I64(), 10)},
+		{Name: "Kind", Value: strconv.Itoa(int(ev.Kind.ToUint16()))},
+		{Name: "Signature", Value: ev.Sig},
 	}
 	for _, tt := range ev.Tags {
 		// tags are prefixed by a hash symbol so they don't conflict with the
@@ -56,63 +59,6 @@ func EventToBundleItem(ev *event.T) (bundle *types.BundleItem, err error) {
 		}
 		bundle.Tags = append(bundle.Tags,
 			types.Tag{Name: name, Value: string(b)})
-	}
-	return
-}
-
-func BundleItemToEvent(bundle *types.BundleItem) (ev *event.T, err error) {
-	// first check that the first tag is nostr
-	if bundle.Tags[0].Name != "protocol" && bundle.Tags[0].Value == "nostr" {
-		err = errorf.E("first tag of bundle is not \"protocol\" and value is not \"nostr\"")
-		return
-	}
-	ev = &event.T{}
-	ev.Content = string(text.NostrUnescape([]byte(bundle.Data)))
-	for _, tt := range bundle.Tags[1:] {
-		switch tt.Name {
-		case "id":
-			ev.ID = eventid.T(tt.Value)
-			b := make(B, len(ev.ID)/2)
-			if _, err = hex.Decode(b, B(ev.ID)); chk.E(err) {
-				return
-			}
-		case "pubkey":
-			ev.PubKey = tt.Value
-			b := make(B, len(ev.PubKey)/2)
-			if _, err = hex.Decode(b, B(ev.PubKey)); chk.E(err) {
-				return
-			}
-		case "created_at":
-			var ca int
-			if ca, err = strconv.Atoi(tt.Value); chk.E(err) {
-				return
-			}
-			ev.CreatedAt = timestamp.T(ca)
-		case "kind":
-			var k int
-			if k, err = strconv.Atoi(tt.Value); chk.E(err) {
-				return
-			}
-			ev.Kind = kind.T(k)
-		case "sig":
-			ev.Sig = tt.Value
-			b := make(B, len(ev.Sig)/2)
-			if _, err = hex.Decode(b, B(ev.Sig)); chk.E(err) {
-				return
-			}
-		default:
-			if tt.Name[0] != '#' {
-				err = errorf.E("tags must have a # prefix '%s'", tt.Name)
-				return
-			}
-			var val tag.T
-			if err = json.Unmarshal([]byte(tt.Value), &val); chk.E(err) {
-				return
-			}
-			t := tag.T{tt.Name[1:]}
-			t = append(t, val...)
-			ev.Tags = append(ev.Tags, t)
-		}
 	}
 	return
 }
