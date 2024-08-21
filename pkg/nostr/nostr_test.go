@@ -32,8 +32,11 @@ func TestEventToBundleItem(t *testing.T) {
 		if bundle, err = EventToBundleItem(ev); chk.E(err) {
 			t.Fatal(err)
 		}
-		fmt.Println()
-		fmt.Println(S(b))
+		if bundle==nil{
+			continue
+		}
+		// fmt.Println()
+		// fmt.Println(S(b))
 		fmt.Println()
 		arweave.PrintBundleItem(bundle)
 		b = b[:0]

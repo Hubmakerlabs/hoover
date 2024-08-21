@@ -37,7 +37,8 @@ func PrintBundleItem(bi *types.BundleItem) {
 			fmt.Printf("\"%s\",\"%s\"\n", t.Name, t.Value)
 		}
 	}
-	fmt.Printf("Data: %d\n", len(bi.Data))
-	// i don't want to see this garbage
-	// fmt.Printf("Data: \"%s\"\n", bi.Data)
+	// fmt.Printf("Data: %d\n", len(bi.Data))
+	if len(bi.Data)>0{
+		fmt.Printf("Data: %d\n```\n%s\n```\n", len(bi.Data), bi.Data)
+	}
 }

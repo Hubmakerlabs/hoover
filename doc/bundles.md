@@ -25,18 +25,29 @@
 
 ## Event Data
 
-Where the name has a ### put in place a zero prefixed 3 character number
+Reference tags for media and URLs are recorded in the same order they are found in the original protocol.
 
 ### 1. Posts
 
 Kind: `Post`
 
-1. `Post-Text` - (this should probably be as raw binary in the Data field, because of size)
-2. `Richtext-###` - these need to be in nested bundles due to size
-3. `Image-###` - standard formatted URL with protocol, address and path.
-4. `Media-###` - same as Image-#
-5. `Links-###` - standard proto://address/path style, one per numbered entry
-6. `Embed-###` - identifiers of nested bundle related to URLs from the previous media references - the number represents the position in the nested bundle list, the URL will correspond to the reference tag from the previous items, and the data itself stored in the nested bundle Data field (optional)
+1. Post content is stored in the binary Data field
+2. `Richtext` - these need to be in nested bundles due to size
+3. `Image` - standard formatted URL with protocol, address and path.
+4. `Medi` - same as Image-#
+5. `Links` - standard proto://address/path style, one per numbered entry
+6. `Embed` - identifiers of nested bundle related to URLs from the previous media references - the number represents the position in the nested bundle list, the URL will correspond to the reference tag from the previous items, and the data itself stored in the nested bundle Data field (optional)
+
+#### Tags
+
+Posts often come with tags aside from those listed above, specifically, references to protocol events and protocol users, and hashtags.
+
+1. `Mention` - reference to another user on the protocol, can be more than one
+2. `Event-Reference` - protocol reference to another event, usually a post or repost.
+3. `Source` - when the original post came from another protocol (in nostr this is `#proxy`) with source type and URL, for example: `activitypub,http://example.com/post.html`
+4. `Hashtag` - when the post contains a hash tag reference added by the user to help others find the post
+5. `Emoji` - custom emojis that will be found in the post text, formatted as "name,URL" for example: `pikachu,https://example.com/pikachu.gif`
+6. `Content-Warning` - if the usuer has manually flagged the post as NSFW etc (value may have more info)
 
 ### 2. Reposts
 

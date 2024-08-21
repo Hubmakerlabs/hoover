@@ -5,13 +5,23 @@ package pkg
 // Common
 
 const (
-	Protocol  = "Protocol"
-	EventId   = "Event-ID"
-	UserId    = "User-ID"
-	Timestamp = "Timestamp"
-	Kind      = "Kind"
-	Path      = "Path"
-	Signature = "Signature"
+	Protocol       = "Protocol"
+	EventId        = "Event-ID"
+	UserId         = "User-ID"
+	Timestamp      = "Timestamp"
+	Kind           = "Kind"
+	Path           = "Path"
+	Signature      = "Signature"
+	Label          = "Label"
+	LabelNamespace = "Label-Namespace"
+)
+
+// Protocols
+
+const (
+	Nostr     = "Nostr"
+	Bsky      = "Bluesky"
+	Farcaster = "Farcaster"
 )
 
 // Kinds
@@ -28,24 +38,31 @@ const (
 // Posts
 
 const (
-	PostText = "Post-Text"
-	Richtext = "Richtext"
-	Image    = "Image"
-	Media    = "Media"
-	Links    = "Links"
-	Embed    = "Embed"
+	PostText       = "Post-Text"
+	Richtext       = "Richtext"
+	Image          = "Image"
+	Media          = "Media"
+	Links          = "Links"
+	Embed          = "Embed"
+	Mention        = "Mention"
+	ReplyTo        = "Reply-To"
+	Source         = "Source"
+	Hashtag        = "Hashtag"
+	Emoji          = "Emoji"
+	ContentWarning = "Content-Warning"
 )
 
 // Profile
 
+// About field of Nostr and Bio of other protocols should go in bundle data to allow large bios.
 const (
-	UserName     = "User-Name"
-	DisplayName  = "Display-Name"
-	AvatarImage  = "Avatar-Image"
-	BannerImage  = "Banner-Image"
-	Bio          = "Bio"
-	Website      = "Website"
-	Verification = "Verification"
+	UserName       = "User-Name"
+	DisplayName    = "Display-Name"
+	AvatarImage    = "Avatar-Image"
+	BannerImage    = "Banner-Image"
+	Website        = "Website"
+	Verification   = "Verification"
+	PaymentAddress = "Payment-Address"
 )
 
 // The rest
@@ -55,7 +72,9 @@ const (
 	LikeEventId   = "Like-Event-ID"
 	Add           = "Add"
 	FollowUserId  = "Follow-User-ID"
+	FollowTag     = "Follow-Tag"
 	BlockUserId   = "Block-User-ID"
+	BlockTag      = "Block-Tag"
 )
 
 // Embeds
