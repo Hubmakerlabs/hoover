@@ -10,6 +10,7 @@ const (
 	UserId         = "User-ID"
 	Timestamp      = "Timestamp"
 	Kind           = "Kind"
+	Repository     = "Repository"
 	Path           = "Path"
 	Signature      = "Signature"
 	Label          = "Label"

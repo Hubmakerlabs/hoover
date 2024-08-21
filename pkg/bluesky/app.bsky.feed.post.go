@@ -1,7 +1,6 @@
 package bluesky
 
 import (
-	"encoding/hex"
 	"fmt"
 	"strconv"
 	"time"
@@ -11,7 +10,6 @@ import (
 	"github.com/bluesky-social/indigo/api/bsky"
 	"github.com/bluesky-social/indigo/repo"
 	"github.com/bluesky-social/indigo/util"
-	"github.com/mleku/nodl/pkg/text"
 	typegen "github.com/whyrusleeping/cbor-gen"
 )
 
@@ -134,17 +132,18 @@ func FromBskyFeedPost(
 		return
 	}
 	bundle = &types.BundleItem{}
-	bundle.Tags = []types.Tag{
-		{Name: "protocol", Value: "bsky"},
-		{Name: "kind", Value: Kinds["post"]},
-		{Name: "id", Value: op.Cid.String()},
-		{Name: "pubkey", Value: rr.SignedCommit().Did},
-		{Name: "created_at", Value: strconv.FormatInt(createdAt.Unix(), 10)},
-		{Name: "repo", Value: evt.Repo},
-		{Name: "path", Value: op.Path},
-		{Name: "sig", Value: hex.EncodeToString(rr.SignedCommit().Sig)},
-		{Name: "content", Value: string(text.NostrEscape(nil, B(pst.Text)))},
-	}
+	bundle.Tags = GetCommon(rr, createdAt, op, evt)
+	// bundle.Tags = []types.Tag{
+	// 	{Name: "protocol", Value: "bsky"},
+	// 	{Name: "kind", Value: Kinds["post"]},
+	// 	{Name: "id", Value: op.Cid.String()},
+	// 	{Name: "pubkey", Value: rr.SignedCommit().Did},
+	// 	{Name: "created_at", Value: strconv.FormatInt(createdAt.Unix(), 10)},
+	// 	{Name: "repo", Value: evt.Repo},
+	// 	{Name: "path", Value: op.Path},
+	// 	{Name: "sig", Value: hex.EncodeToString(rr.SignedCommit().Sig)},
+	// 	{Name: "content", Value: string(text.NostrEscape(nil, B(pst.Text)))},
+	// }
 	if createdAt, err = time.Parse(util.ISO8601, pst.CreatedAt); chk.E(err) {
 		return
 	}

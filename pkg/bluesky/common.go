@@ -6,19 +6,13 @@ import (
 	"time"
 
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
-	"github.com/bluesky-social/indigo/api/atproto"
 	"github.com/bluesky-social/indigo/api/bsky"
 	lexutil "github.com/bluesky-social/indigo/lex/util"
 	"github.com/bluesky-social/indigo/util"
-	typegen "github.com/whyrusleeping/cbor-gen"
 )
 
 // UnmarshalEvent accepts a bsky commit event and a record type, and the concrete type
-func UnmarshalEvent(
-	evt *atproto.SyncSubscribeRepos_Commit,
-	rec typegen.CBORMarshaler,
-	to any,
-) (decoded any, createdAt time.Time, err error) {
+func UnmarshalEvent(evt Ev, rec Rec, to any) (decoded any, createdAt Time, err error) {
 
 	if rec == nil {
 		err = errorf.E("nil record, cannot unmarshal")
@@ -93,7 +87,8 @@ func EmbedExternal(bundle *types.BundleItem, name string, embed *bsky.EmbedExter
 
 // EmbedExternalRecordWithMedia creates a tag with all the junk in an EmbedRecordWithMedia into one.
 // It makes an extremely long tag field but this is the retardation of the bluesky API.
-func EmbedExternalRecordWithMedia(bundle *types.BundleItem, name string, embed *bsky.EmbedRecordWithMedia) {
+func EmbedExternalRecordWithMedia(bundle *types.BundleItem, name string,
+	embed *bsky.EmbedRecordWithMedia) {
 	if embed.Record != nil {
 		EmbedRecord(bundle, name+"_record", embed.Record)
 	}
@@ -118,7 +113,8 @@ func EmbedExternalRecordWithMedia(bundle *types.BundleItem, name string, embed *
 					}
 					tags = append(tags, img.Alt)
 					if img.AspectRatio != nil {
-						tags = append(tags, fmt.Sprintf("%dx%d", img.AspectRatio.Width, img.AspectRatio.Height))
+						tags = append(tags,
+							fmt.Sprintf("%dx%d", img.AspectRatio.Width, img.AspectRatio.Height))
 					}
 					AppendTags(bundle, fmt.Sprintf("%s%s%03d", name, "_image", i), tags)
 				}

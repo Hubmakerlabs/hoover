@@ -1,7 +1,6 @@
 package bluesky
 
 import (
-	"encoding/hex"
 	"strconv"
 	"time"
 
@@ -56,16 +55,17 @@ func FromBskyFeedRepost(
 		return
 	}
 	bundle = &types.BundleItem{}
-	bundle.Tags = []types.Tag{
-		{Name: "protocol", Value: "bsky"},
-		{Name: "kind", Value: Kinds["repost"]},
-		{Name: "id", Value: op.Cid.String()},
-		{Name: "pubkey", Value: rr.SignedCommit().Did},
-		{Name: "created_at", Value: strconv.FormatInt(createdAt.Unix(), 10)},
-		{Name: "repo", Value: evt.Repo},
-		{Name: "path", Value: op.Path},
-		{Name: "sig", Value: hex.EncodeToString(rr.SignedCommit().Sig)},
-	}
+	bundle.Tags = GetCommon(rr, createdAt, op, evt)
+	// bundle.Tags = []types.Tag{
+	// 	{Name: "protocol", Value: "bsky"},
+	// 	{Name: "kind", Value: Kinds["repost"]},
+	// 	{Name: "id", Value: op.Cid.String()},
+	// 	{Name: "pubkey", Value: rr.SignedCommit().Did},
+	// 	{Name: "created_at", Value: strconv.FormatInt(createdAt.Unix(), 10)},
+	// 	{Name: "repo", Value: evt.Repo},
+	// 	{Name: "path", Value: op.Path},
+	// 	{Name: "sig", Value: hex.EncodeToString(rr.SignedCommit().Sig)},
+	// }
 	if createdAt, err = time.Parse(util.ISO8601, repost.CreatedAt); chk.E(err) {
 		return
 	}

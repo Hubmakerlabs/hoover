@@ -1,15 +1,9 @@
 package bluesky
 
 import (
-	"encoding/hex"
-	"strconv"
-	"time"
-
+	"github.com/Hubmakerlabs/hoover/pkg"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
-	"github.com/bluesky-social/indigo/api/atproto"
 	"github.com/bluesky-social/indigo/api/bsky"
-	"github.com/bluesky-social/indigo/repo"
-	"github.com/bluesky-social/indigo/util"
 	"github.com/whyrusleeping/cbor-gen"
 )
 
@@ -34,14 +28,10 @@ import (
 // }
 
 // FromBskyFeedLike is
-func FromBskyFeedLike(
-	evt *atproto.SyncSubscribeRepos_Commit,
-	op *atproto.SyncSubscribeRepos_RepoOp,
-	rr *repo.Repo,
-	rec typegen.CBORMarshaler,
+func FromBskyFeedLike(evt Ev, op Op, rr Repo, rec typegen.CBORMarshaler,
 ) (bundle *types.BundleItem, err error) {
 
-	var createdAt time.Time
+	var createdAt Time
 	var to any
 	if to, createdAt, err = UnmarshalEvent(evt, rec, &bsky.FeedLike{}); chk.E(err) {
 		return
@@ -60,27 +50,18 @@ func FromBskyFeedLike(
 		return
 	}
 	bundle = &types.BundleItem{}
-	bundle.Tags = []types.Tag{
-		{Name: "protocol", Value: "bsky"},
-		{Name: "kind", Value: Kinds["like"]},
-		{Name: "id", Value: op.Cid.String()},
-		{Name: "pubkey", Value: rr.SignedCommit().Did},
-		{Name: "created_at", Value: strconv.FormatInt(createdAt.Unix(), 10)},
-		{Name: "repo", Value: evt.Repo},
-		{Name: "path", Value: op.Path},
-		{Name: "sig", Value: hex.EncodeToString(rr.SignedCommit().Sig)},
-	}
-	if createdAt, err = time.Parse(util.ISO8601, like.CreatedAt); chk.E(err) {
-		return
-	}
-	AppendTag(bundle, "#updated_at", strconv.FormatInt(createdAt.Unix(), 10))
-	AppendTags(bundle, "#subject", []string{like.Subject.Cid, like.Subject.Uri})
+	bundle.Tags = GetCommon(rr, createdAt, op, evt)
+	// bundle.Tags = []types.Tag{
+	// 	{Name: pkg.Protocol, Value: pkg.Bsky},
+	// 	{Name: pkg.Kind, Value: pkg.Like},
+	// 	{Name: pkg.EventId, Value: op.Cid.String()},
+	// 	{Name: pkg.UserId, Value: rr.SignedCommit().Did},
+	// 	{Name: pkg.Timestamp, Value: strconv.FormatInt(createdAt.Unix(), 10)},
+	// 	{Name: pkg.Repository, Value: evt.Repo},
+	// 	{Name: pkg.Path, Value: op.Path},
+	// 	{Name: pkg.Signature, Value: hex.EncodeToString(rr.SignedCommit().Sig)},
+	// }
+	AppendTag(bundle, pkg.LikeEventId, like.Subject.Cid)
+	AppendTag(bundle, pkg.URI, like.Subject.Uri)
 	return
 }
-
-// todo: no way we are trying to reconstruct this lol... just for it to be authenticated, ok, enough.
-
-// // ToBskyFeedLike is
-// func ToBskyFeedLike() {
-//
-// }
