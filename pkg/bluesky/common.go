@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Hubmakerlabs/hoover/pkg"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
 	"github.com/bluesky-social/indigo/api/bsky"
 	lexutil "github.com/bluesky-social/indigo/lex/util"
@@ -68,7 +69,13 @@ func GetLexBlobTags(img *lexutil.LexBlob) (tags []string) {
 }
 
 func EmbedImages(bundle *types.BundleItem, name string, img *bsky.EmbedImages_Image) {
-	AppendTags(bundle, name, GetImageTags(img))
+	imgTags := GetImageTags(img)
+	for i := range imgTags {
+		if imgTags[i]!=""{
+			AppendTag(bundle, fmt.Sprintf("%s-%s-%03d", name, pkg.Tag, i), imgTags[i])
+		}
+	}
+	// AppendTags(bundle, name, GetImageTags(img))
 }
 
 func EmbedRecord(bundle *types.BundleItem, name string, record *bsky.EmbedRecord) {
@@ -82,7 +89,7 @@ func EmbedExternal(bundle *types.BundleItem, name string, embed *bsky.EmbedExter
 		thumbTags := GetLexBlobTags(ext.Thumb)
 		imgTags = append(imgTags, thumbTags...)
 	}
-	AppendTags(bundle, fmt.Sprintf("%s%s", name, "_external"), imgTags)
+	AppendTags(bundle, fmt.Sprintf("%s-%s", name, pkg.External), imgTags)
 }
 
 // EmbedExternalRecordWithMedia creates a tag with all the junk in an EmbedRecordWithMedia into one.

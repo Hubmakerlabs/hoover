@@ -7,6 +7,7 @@ package bluesky
 import (
 	"encoding/hex"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/Hubmakerlabs/hoover/pkg"
@@ -19,23 +20,29 @@ import (
 // bluesky names are crazy ugly stutter parties
 
 type (
-	Repo = *repo.Repo
-	Time = time.Time
-	Op = *atproto.SyncSubscribeRepos_RepoOp
-	Ev = *atproto.SyncSubscribeRepos_Commit
-	Rec = typegen.CBORMarshaler
+	Repo       = *repo.Repo
+	Time       = time.Time
+	Op         = *atproto.SyncSubscribeRepos_RepoOp
+	Ev         = *atproto.SyncSubscribeRepos_Commit
+	Rec        = typegen.CBORMarshaler
+	BundleItem = *types.BundleItem
 )
 
 var Kinds = map[string]string{
-	"like":      "app.bsky.feed.like",
-	"post":      "app.bsky.feed.post",
-	"follow":    "app.bsky.graph.follow",
-	"repost":    "app.bsky.feed.repost",
-	"block":     "app.bsky.graph.block",
-	"profile":   "app.bsky.actor.profile",
-	"list":      "app.bsky.graph.list",
-	"listitem":  "app.bsky.graph.listitem",
-	"listblock": "app.bsky.graph.listblock",
+	pkg.Like:    "app.bsky.feed.like",
+	pkg.Post:    "app.bsky.feed.post",
+	pkg.Follow:  "app.bsky.graph.follow",
+	pkg.Repost:  "app.bsky.feed.repost",
+	pkg.Block:   "app.bsky.graph.block",
+	pkg.Profile: "app.bsky.actor.profile",
+}
+var BskyKinds = map[string]string{
+	"app.bsky.feed.like":     pkg.Like,
+	"app.bsky.feed.post":     pkg.Post,
+	"app.bsky.graph.follow":  pkg.Follow,
+	"app.bsky.feed.repost":   pkg.Repost,
+	"app.bsky.graph.block":   pkg.Block,
+	"app.bsky.actor.profile": pkg.Profile,
 }
 
 func IsRelevant(kind S) (is bool) {
@@ -49,9 +56,10 @@ func IsRelevant(kind S) (is bool) {
 }
 
 func GetCommon(rr *repo.Repo, createdAt Time, op Op, evt Ev) []types.Tag {
+	split := strings.Split(op.Path, "/")
 	return []types.Tag{
 		{Name: pkg.Protocol, Value: pkg.Bsky},
-		{Name: pkg.Kind, Value: pkg.Like},
+		{Name: pkg.Kind, Value: BskyKinds[split[0]]},
 		{Name: pkg.EventId, Value: op.Cid.String()},
 		{Name: pkg.UserId, Value: rr.SignedCommit().Did},
 		{Name: pkg.Timestamp, Value: strconv.FormatInt(createdAt.Unix(), 10)},

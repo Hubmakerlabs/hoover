@@ -55,7 +55,7 @@ func FromBskyFeedRepost(
 		return
 	}
 	bundle = &types.BundleItem{}
-	bundle.Tags = GetCommon(rr, createdAt, op, evt)
+	bundle.Tags = GetCommon( rr, createdAt, op, evt)
 	// bundle.Tags = []types.Tag{
 	// 	{Name: "protocol", Value: "bsky"},
 	// 	{Name: "kind", Value: Kinds["repost"]},

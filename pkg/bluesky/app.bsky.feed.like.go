@@ -1,10 +1,11 @@
 package bluesky
 
 import (
+	"errors"
+
 	"github.com/Hubmakerlabs/hoover/pkg"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
 	"github.com/bluesky-social/indigo/api/bsky"
-	"github.com/whyrusleeping/cbor-gen"
 )
 
 // {
@@ -28,12 +29,10 @@ import (
 // }
 
 // FromBskyFeedLike is
-func FromBskyFeedLike(evt Ev, op Op, rr Repo, rec typegen.CBORMarshaler,
-) (bundle *types.BundleItem, err error) {
-
+func FromBskyFeedLike(evt Ev, op Op, rr Repo, rec Rec) (bundle BundleItem, err error) {
 	var createdAt Time
 	var to any
-	if to, createdAt, err = UnmarshalEvent(evt, rec, &bsky.FeedLike{}); chk.E(err) {
+	if to, createdAt, err = UnmarshalEvent(evt, rec, &bsky.FeedLike{}); err != nil {
 		return
 	}
 	if to == nil {
@@ -46,21 +45,11 @@ func FromBskyFeedLike(evt Ev, op Op, rr Repo, rec typegen.CBORMarshaler,
 		return
 	}
 	if like.Subject == nil {
-		err = errorf.E("like has no subject, data of no use, refers to nothing")
+		err = errors.New("like has no subject, data of no use, refers to nothing")
 		return
 	}
 	bundle = &types.BundleItem{}
 	bundle.Tags = GetCommon(rr, createdAt, op, evt)
-	// bundle.Tags = []types.Tag{
-	// 	{Name: pkg.Protocol, Value: pkg.Bsky},
-	// 	{Name: pkg.Kind, Value: pkg.Like},
-	// 	{Name: pkg.EventId, Value: op.Cid.String()},
-	// 	{Name: pkg.UserId, Value: rr.SignedCommit().Did},
-	// 	{Name: pkg.Timestamp, Value: strconv.FormatInt(createdAt.Unix(), 10)},
-	// 	{Name: pkg.Repository, Value: evt.Repo},
-	// 	{Name: pkg.Path, Value: op.Path},
-	// 	{Name: pkg.Signature, Value: hex.EncodeToString(rr.SignedCommit().Sig)},
-	// }
 	AppendTag(bundle, pkg.LikeEventId, like.Subject.Cid)
 	AppendTag(bundle, pkg.URI, like.Subject.Uri)
 	return

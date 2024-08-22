@@ -2,14 +2,13 @@ package bluesky
 
 import (
 	"fmt"
-	"strconv"
 	"time"
 
+	"github.com/Hubmakerlabs/hoover/pkg"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
 	"github.com/bluesky-social/indigo/api/atproto"
 	"github.com/bluesky-social/indigo/api/bsky"
 	"github.com/bluesky-social/indigo/repo"
-	"github.com/bluesky-social/indigo/util"
 	typegen "github.com/whyrusleeping/cbor-gen"
 )
 
@@ -133,22 +132,6 @@ func FromBskyFeedPost(
 	}
 	bundle = &types.BundleItem{}
 	bundle.Tags = GetCommon(rr, createdAt, op, evt)
-	// bundle.Tags = []types.Tag{
-	// 	{Name: "protocol", Value: "bsky"},
-	// 	{Name: "kind", Value: Kinds["post"]},
-	// 	{Name: "id", Value: op.Cid.String()},
-	// 	{Name: "pubkey", Value: rr.SignedCommit().Did},
-	// 	{Name: "created_at", Value: strconv.FormatInt(createdAt.Unix(), 10)},
-	// 	{Name: "repo", Value: evt.Repo},
-	// 	{Name: "path", Value: op.Path},
-	// 	{Name: "sig", Value: hex.EncodeToString(rr.SignedCommit().Sig)},
-	// 	{Name: "content", Value: string(text.NostrEscape(nil, B(pst.Text)))},
-	// }
-	if createdAt, err = time.Parse(util.ISO8601, pst.CreatedAt); chk.E(err) {
-		return
-	}
-	AppendTag(bundle, "#updated_at", strconv.FormatInt(createdAt.Unix(), 10))
-	// todo: there be binary blobs in here that need to be dumped in the Data field of the bundle
 	if pst.Embed != nil {
 		if pst.Embed.EmbedRecord != nil {
 			AppendTags(bundle, "#embedrecord",
@@ -157,15 +140,15 @@ func FromBskyFeedPost(
 		if pst.Embed.EmbedImages != nil {
 			for _, img := range pst.Embed.EmbedImages.Images {
 				if img != nil {
-					EmbedImages(bundle, "#embedimage", img)
+					EmbedImages(bundle, pkg.EmbedImage, img)
 				}
 			}
 		}
 		if pst.Embed.EmbedRecordWithMedia != nil {
-			EmbedExternalRecordWithMedia(bundle, "#embed", pst.Embed.EmbedRecordWithMedia)
+			EmbedExternalRecordWithMedia(bundle, pkg.Embed, pst.Embed.EmbedRecordWithMedia)
 		}
 		if pst.Embed.EmbedExternal != nil {
-			EmbedExternal(bundle, "#embed_external", pst.Embed.EmbedExternal)
+			EmbedExternal(bundle, pkg.EmbedExternal, pst.Embed.EmbedExternal)
 		}
 	}
 	if pst.Entities != nil {
@@ -174,7 +157,7 @@ func FromBskyFeedPost(
 			if entity.Index != nil {
 				index = fmt.Sprintf("%d-%d", entity.Index.Start, entity.Index.End)
 			}
-			AppendTags(bundle, fmt.Sprintf("#entities%03d", i), []string{index,
+			AppendTags(bundle, fmt.Sprintf("%s-%03d", pkg.Entities, i), []string{index,
 				entity.Type, entity.Value})
 		}
 	}
@@ -185,20 +168,24 @@ func FromBskyFeedPost(
 					if feats.RichtextFacet_Mention != nil {
 						if feats.RichtextFacet_Mention.Did != "" {
 							AppendTag(bundle,
-								"#facet_features_richtext_mention",
+								fmt.Sprintf("%s-Mention", pkg.Richtext),
+								// "#facet_features_richtext_mention",
 								feats.RichtextFacet_Mention.Did)
 						}
 					}
 					if feats.RichtextFacet_Link != nil {
 						if feats.RichtextFacet_Link.Uri != "" {
 							AppendTag(bundle,
-								"#facet_features_richtext_link", feats.RichtextFacet_Link.Uri)
+								fmt.Sprintf("%s-Link", pkg.Richtext),
+								feats.RichtextFacet_Link.Uri)
 						}
 					}
 					if feats.RichtextFacet_Tag != nil {
 						if feats.RichtextFacet_Tag.Tag != "" {
 							AppendTag(bundle,
-								"#facet_features_richtext_tag", feats.RichtextFacet_Tag.Tag)
+								fmt.Sprintf("%s-Tag", pkg.Richtext),
+								// "#facet_features_richtext_tag",
+								feats.RichtextFacet_Tag.Tag)
 						}
 					}
 				}
@@ -216,32 +203,46 @@ func FromBskyFeedPost(
 						}
 					}
 					if len(labels) > 0 {
-						AppendTags(bundle, "#labels", labels)
+						for i := range labels {
+							AppendTag(bundle, fmt.Sprintf("%s-%03d", pkg.Label, i), labels[i])
+						}
+						// AppendTags(bundle, "#labels", labels)
 					}
 				}
 			}
 		}
 	}
 	if pst.Langs != nil && len(pst.Langs) > 0 {
-		AppendTags(bundle, "#langs", pst.Langs)
+		if len(pst.Langs) == 1 {
+			AppendTag(bundle, fmt.Sprintf("%s", pkg.Language), pst.Langs[0])
+		} else {
+			for i := range pst.Langs {
+				AppendTag(bundle, fmt.Sprintf("%s-%03d", pkg.Language, i), pst.Langs[i])
+			}
+		}
+		// AppendTags(bundle, "#langs", pst.Langs)
 	}
 	if pst.Reply != nil {
-		if pst.Reply.Parent != nil && pst.Reply.Parent.Uri != "" {
-			AppendTags(bundle, "#reply_parent",
-				[]string{pst.Reply.Parent.Cid, pst.Reply.Parent.Uri})
-		}
 		if pst.Reply.Root != nil && pst.Reply.Root.Uri != "" {
-			AppendTags(bundle, "#reply_root",
-				[]string{pst.Reply.Parent.Cid, pst.Reply.Root.Uri})
+			AppendTag(bundle, fmt.Sprintf("%s-%s-%s", pkg.Reply, pkg.Root, pkg.Id),
+				pst.Reply.Parent.Cid)
+			AppendTag(bundle, fmt.Sprintf("%s-%s-%s", pkg.Reply, pkg.Root, pkg.URI),
+				pst.Reply.Parent.Uri)
+			// AppendTags(bundle, fmt.Sprintf("%s-%s", pkg.Reply, pkg.Root),
+			// 	[]string{pst.Reply.Root.Cid, pst.Reply.Root.Uri})
+		}
+		if pst.Reply.Parent != nil && pst.Reply.Parent.Uri != "" {
+			AppendTag(bundle, fmt.Sprintf("%s-%s-%s", pkg.Reply, pkg.Parent, pkg.Id),
+				pst.Reply.Parent.Cid)
+			AppendTag(bundle, fmt.Sprintf("%s-%s-%s", pkg.Reply, pkg.Parent, pkg.URI),
+				pst.Reply.Parent.Uri)
 		}
 	}
 	if pst.Tags != nil && len(pst.Tags) > 0 {
-		AppendTags(bundle, "#tags", pst.Tags)
+		for i := range pst.Tags {
+			AppendTag(bundle, fmt.Sprintf("%s-%03d", pkg.Tag, i), pst.Tags[i])
+		}
+		// AppendTags(bundle, "#tags", pst.Tags)
 	}
 	return
-}
-
-// ToBskyFeedPost is
-func ToBskyFeedPost() {
-
 }
