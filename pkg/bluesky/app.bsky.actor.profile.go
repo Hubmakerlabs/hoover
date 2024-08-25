@@ -85,10 +85,10 @@ func FromBskyActorProfile(evt Ev, op Op, rr Repo, rec Rec) (bundle BundleItem, e
 		bundle.Data = *profile.Description
 	}
 	if profile.Avatar != nil {
-		GetLexBlobTags(bundle, J(Avatar, Image), profile.Avatar)
+		AppendLexBlobTags(bundle, J(Avatar, Image), profile.Avatar)
 	}
 	if profile.Banner != nil {
-		GetLexBlobTags(bundle, J(Banner, Image), profile.Banner)
+		AppendLexBlobTags(bundle, J(Banner, Image), profile.Banner)
 	}
 	return
 }

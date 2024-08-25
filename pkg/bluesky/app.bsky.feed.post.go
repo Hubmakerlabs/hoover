@@ -2,6 +2,7 @@ package bluesky
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	. "github.com/Hubmakerlabs/hoover/pkg"
@@ -144,10 +145,17 @@ func FromBskyFeedPost(evt Ev, op Op, rr Repo, rec Rec) (bundle BundleItem, err e
 			AppendTag(bundle, J(Embed, Record, Id), pst.Embed.EmbedRecord.Record.Cid)
 		}
 		if pst.Embed.EmbedImages != nil {
-			// var count int
-			// for _, embeds := range pst.Embed.EmbedImages.Images {
-			//
-			// }
+			var count int
+			if len(pst.Embed.EmbedImages.Images) == 1 {
+				AppendImageTags(bundle, J(Embed, Image), pst.Embed.EmbedImages.Images[0])
+			} else {
+				for _, embed := range pst.Embed.EmbedImages.Images {
+					if embed != nil {
+						AppendImageTags(bundle, J(Embed, Image, count), embed)
+						count++
+					}
+				}
+			}
 		}
 		if pst.Embed.EmbedRecordWithMedia != nil {
 			EmbedExternalRecordWithMedia(bundle, Embed, pst.Embed.EmbedRecordWithMedia)
@@ -158,11 +166,9 @@ func FromBskyFeedPost(evt Ev, op Op, rr Repo, rec Rec) (bundle BundleItem, err e
 	}
 	if pst.Entities != nil {
 		for i, entity := range pst.Entities {
-			var index string
-			if entity.Index != nil {
-				index = fmt.Sprintf("%d-%d", entity.Index.Start, entity.Index.End)
-			}
-			AppendTag(bundle, J(Entities, i, Index), index)
+			AppendTag(bundle, J(Entities, i, Index, Start),
+				strconv.FormatInt(entity.Index.Start, 10))
+			AppendTag(bundle, J(Entities, i, Index), strconv.FormatInt(entity.Index.End, 10))
 			AppendTag(bundle, J(Entities, i, Type), entity.Type)
 			AppendTag(bundle, J(Entities, i, Value), entity.Value)
 		}
@@ -170,33 +176,50 @@ func FromBskyFeedPost(evt Ev, op Op, rr Repo, rec Rec) (bundle BundleItem, err e
 	if pst.Facets != nil {
 		for i := range pst.Facets {
 			if pst.Facets[i].Features != nil {
-				for _, feats := range pst.Facets[i].Features {
+				var prefix string
+				if len(pst.Facets) == 1 {
+					prefix = J(Richtext)
+				} else {
+					prefix = J(Richtext, i)
+				}
+				for j, feats := range pst.Facets[i].Features {
+					if len(pst.Facets[i].Features) == 1 {
+						prefix = J(prefix)
+					} else {
+						prefix = J(prefix, j)
+					}
 					if feats.RichtextFacet_Mention != nil {
 						if feats.RichtextFacet_Mention.Did != "" {
-							AppendTag(bundle, J(Richtext, Mention),
+							AppendTag(bundle, J(prefix, Mention),
 								feats.RichtextFacet_Mention.Did)
 						}
 					}
 					if feats.RichtextFacet_Link != nil {
 						if feats.RichtextFacet_Link.Uri != "" {
-							AppendTag(bundle, J(Richtext, Link),
+							AppendTag(bundle, J(prefix, Uri),
 								feats.RichtextFacet_Link.Uri)
 						}
 					}
 					if feats.RichtextFacet_Tag != nil {
 						if feats.RichtextFacet_Tag.Tag != "" {
-							AppendTag(bundle, J(Richtext, Tag),
+							AppendTag(bundle, J(prefix, Tag),
 								feats.RichtextFacet_Tag.Tag)
 						}
 					}
 				}
 			}
 			if pst.Facets[i].Index != nil {
-				AppendTag(bundle, J(Richtext, Tag, Start),
-					fmt.Sprint(pst.Facets[i].Index.ByteStart))
-				AppendTag(bundle, J(Richtext, Tag, End),
-					fmt.Sprint(pst.Facets[i].Index.ByteEnd))
-
+				if len(pst.Facets) == 1 {
+					AppendTag(bundle, J(Richtext, Tag, Start),
+						fmt.Sprint(pst.Facets[i].Index.ByteStart))
+					AppendTag(bundle, J(Richtext, Tag, End),
+						fmt.Sprint(pst.Facets[i].Index.ByteEnd))
+				} else {
+					AppendTag(bundle, J(Richtext, i, Tag, Start),
+						fmt.Sprint(pst.Facets[i].Index.ByteStart))
+					AppendTag(bundle, J(Richtext, i, Tag, End),
+						fmt.Sprint(pst.Facets[i].Index.ByteEnd))
+				}
 			}
 		}
 	}
@@ -211,10 +234,13 @@ func FromBskyFeedPost(evt Ev, op Op, rr Repo, rec Rec) (bundle BundleItem, err e
 						}
 					}
 					if len(labels) > 0 {
-						for i := range labels {
-							AppendTag(bundle, fmt.Sprintf("%s-%03d", Label, i), labels[i])
+						if len(labels) == 1 {
+							AppendTag(bundle, J(Label), labels[0])
+						} else {
+							for i := range labels {
+								AppendTag(bundle, J(Label, i), labels[i])
+							}
 						}
-						// AppendTags(bundle, "#labels", labels)
 					}
 				}
 			}
@@ -222,17 +248,21 @@ func FromBskyFeedPost(evt Ev, op Op, rr Repo, rec Rec) (bundle BundleItem, err e
 	}
 	if pst.Langs != nil && len(pst.Langs) > 0 {
 		if len(pst.Langs) == 1 {
-			AppendTag(bundle, fmt.Sprintf("%s", Language), pst.Langs[0])
+			AppendTag(bundle, Language, pst.Langs[0])
 		} else {
 			for i := range pst.Langs {
-				AppendTag(bundle, fmt.Sprintf("%s-%03d", Language, i), pst.Langs[i])
+				AppendTag(bundle, J(Language, i), pst.Langs[i])
 			}
 		}
 		// AppendTags(bundle, "#langs", pst.Langs)
 	}
 	if pst.Tags != nil && len(pst.Tags) > 0 {
-		for i := range pst.Tags {
-			AppendTag(bundle, J(Tag, i), pst.Tags[i])
+		if len(pst.Tags) == 1 {
+			AppendTag(bundle, Tag, pst.Tags[0])
+		} else {
+			for i := range pst.Tags {
+				AppendTag(bundle, J(Tag, i), pst.Tags[i])
+			}
 		}
 	}
 	return

@@ -14,7 +14,7 @@ func J(s ...any) string {
 		if vs, ok := v.(string); ok {
 			ss = append(ss, vs)
 		} else if vi, ok := v.(int); ok {
-			ss = append(ss, fmt.Sprintf("%03d", vi))
+			ss = append(ss, fmt.Sprintf("%d", vi))
 		} else {
 			ss = append(ss, fmt.Sprintf("%v", v))
 		}
@@ -25,43 +25,35 @@ func J(s ...any) string {
 // Common
 
 var (
-	Un             = "Un" // todo for future use for delete/unfollow/unblock/unlike
-	Id             = "Id"
-	Event          = "Event"
-	Protocol       = "Protocol"
-	User           = "User"
-	Timestamp      = "Timestamp"
-	Kind           = "Kind"
-	Repository     = "Repository"
-	Path           = "Path"
-	Signature      = "Signature"
-	Label          = "Label"
-	Namespace      = "Namespace"
-	LabelNamespace = J(Label, Namespace)
+	Un         = "Un" // todo for future use for delete/unfollow/unblock/unlike
+	Id         = "Id"
+	Event      = "Event"
+	Protocol   = "Protocol"
+	User       = "User"
+	Timestamp  = "Timestamp"
+	Kind       = "Kind"
+	Repository = "Repository"
+	Path       = "Path"
+	Signature  = "Signature"
+	Label      = "Label"
+	Namespace  = "Namespace"
 )
 
-// Protocols
-
 var (
+	// Protocols
 	Nostr     = "Nostr"
 	Bsky      = "Bluesky"
 	Farcaster = "Farcaster"
-)
 
-// Kinds
-
-var (
+	// Kinds
 	Post    = "Post"
 	Repost  = "Repost"
 	Like    = "Like"
 	Follow  = "Follow"
 	Block   = "Block"
 	Profile = "Profile"
-)
 
-// Posts
-
-var (
+	// Posts
 	Text           = "Text"
 	Richtext       = "Richtext"
 	Image          = "Image"
@@ -97,12 +89,9 @@ var (
 	Parent         = "Parent"
 	Root           = "Root"
 	Tag            = "Tag"
-)
+	Thumb          = "Thumb"
 
-// Profile
-
-// About field of Nostr and Bio of other protocols should go in bundle data to allow large bios.
-var (
+	// Profiles
 	Name         = "Name"
 	Display      = "Display"
 	Avatar       = "Avatar"
@@ -111,22 +100,11 @@ var (
 	Verification = "Verification"
 	Payment      = "Payment"
 	Address      = "Address"
-)
 
-// The rest
+	// The rest
+	Add = "Add"
 
-var (
-	RepostEventId = J(Repost, Event, Id)
-	Add           = "Add"
-	FollowUserId  = J(Follow, User, Id)
-	FollowTag     = J(Follow, Tag)
-	BlockUserId   = J(Block, User, Id)
-	BlockTag      = J(Block, Tag)
-)
-
-// Embeds
-
-var (
+	// Embeds
 	Reference  = "Reference"
 	Origin     = "Origin"
 	Uri        = "Uri"

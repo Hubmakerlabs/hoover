@@ -40,61 +40,61 @@ func RepoCommit(ctx context.Context,
 					return
 				}
 				switch {
-				// case strings.HasPrefix(op.Path, Kinds(pkg.Like)):
-				// var like *types.BundleItem
-				// if like, err = FromBskyFeedLike(evt, op, rr, rec); err != nil {
-				// 	// normally would return but this shuts down the firehose processing
-				// 	err = nil
-				// 	continue
-				// 	// return
-				// }
-				// _ = like
-				// arweave.PrintBundleItem(like)
-				// fmt.Println()
-				// case strings.HasPrefix(op.Path, Kinds(pkg.Post)):
-				// 	var post *types.BundleItem
-				// 	if post, err = FromBskyFeedPost(evt, op, rr, rec); chk.E(err) {
-				// 		// normally would return but this shuts down the firehose processing
-				// 		err = nil
-				// 		continue
-				// 		// return
-				// 	}
-				// 	_ = post
-				// 	arweave.PrintBundleItem(post)
-				// 	fmt.Println()
-				// case strings.HasPrefix(op.Path, Kinds(pkg.Follow)):
-				// 	var follow *types.BundleItem
-				// 	if follow, err = FromBskyGraphFollow(evt, op, rr, rec); chk.E(err) {
-				// 		// normally would return but this shuts down the firehose processing
-				// 		// err = nil
-				// 		// continue
-				// 		return
-				// 	}
-				// 	_ = follow
-				// 	arweave.PrintBundleItem(follow)
-				// 	fmt.Println()
-				// case strings.HasPrefix(op.Path, Kinds(pkg.Repost)):
-				// 	var repost *types.BundleItem
-				// 	if repost, err = FromBskyFeedRepost(evt, op, rr, rec); chk.E(err) {
-				// 		// normally would return but this shuts down the firehose processing
-				// 		// err = nil
-				// 		// continue
-				// 		return
-				// 	}
-				// 	_ = repost
-				// 	arweave.PrintBundleItem(repost)
-				// 	fmt.Println()
-				case strings.HasPrefix(op.Path, Kinds(pkg.Profile)):
-					var profile *types.BundleItem
-					if profile, err = FromBskyActorProfile(evt, op, rr, rec); chk.E(err) {
+				case strings.HasPrefix(op.Path, Kinds(pkg.Post)):
+					var post *types.BundleItem
+					if post, err = FromBskyFeedPost(evt, op, rr, rec); chk.E(err) {
 						// normally would return but this shuts down the firehose processing
-						// err = nil
-						// continue
-						return
+						err = nil
+						continue
+						// return
 					}
-					_ = profile
-					arweave.PrintBundleItem(profile)
+					_ = post
+					arweave.PrintBundleItem(post)
 					fmt.Println()
+					case strings.HasPrefix(op.Path, Kinds(pkg.Like)):
+						var like *types.BundleItem
+						if like, err = FromBskyFeedLike(evt, op, rr, rec); err != nil {
+							// normally would return but this shuts down the firehose processing
+							err = nil
+							continue
+							// return
+						}
+						_ = like
+						arweave.PrintBundleItem(like)
+						fmt.Println()
+					case strings.HasPrefix(op.Path, Kinds(pkg.Follow)):
+						var follow *types.BundleItem
+						if follow, err = FromBskyGraphFollow(evt, op, rr, rec); chk.E(err) {
+							// normally would return but this shuts down the firehose processing
+							// err = nil
+							// continue
+							return
+						}
+						_ = follow
+						arweave.PrintBundleItem(follow)
+						fmt.Println()
+					case strings.HasPrefix(op.Path, Kinds(pkg.Repost)):
+						var repost *types.BundleItem
+						if repost, err = FromBskyFeedRepost(evt, op, rr, rec); chk.E(err) {
+							// normally would return but this shuts down the firehose processing
+							// err = nil
+							// continue
+							return
+						}
+						_ = repost
+						arweave.PrintBundleItem(repost)
+						fmt.Println()
+					case strings.HasPrefix(op.Path, Kinds(pkg.Profile)):
+						var profile *types.BundleItem
+						if profile, err = FromBskyActorProfile(evt, op, rr, rec); chk.E(err) {
+							// normally would return but this shuts down the firehose processing
+							// err = nil
+							// continue
+							return
+						}
+						_ = profile
+						arweave.PrintBundleItem(profile)
+						fmt.Println()
 				}
 			default:
 				// log.I.Ln(ek)
