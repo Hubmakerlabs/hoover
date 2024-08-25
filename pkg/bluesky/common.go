@@ -74,19 +74,9 @@ func AppendTag(bundle *types.BundleItem, name, value string) {
 // }
 
 func GetLexBlobTags(bundle *types.BundleItem, prefix string, img *lexutil.LexBlob) {
-	names := []string{
-		Ref,
-		Mimetype,
-		Size,
-	}
-	tags := []string{
-		img.Ref.String(),
-		img.MimeType,
-		fmt.Sprintf("%d", img.Size)}
-	for i, n := range names {
-		AppendTag(bundle, J(prefix, n), tags[i])
-	}
-	return
+	AppendTag(bundle, J(prefix, Ref), img.Ref.String())
+	AppendTag(bundle, J(prefix, Mimetype), img.MimeType)
+	AppendTag(bundle, J(prefix, Size), strconv.FormatInt(img.Size, 10))
 }
 
 func GetImageTags(img *bsky.EmbedImages_Image) []string {
@@ -101,7 +91,7 @@ func GetImageTags(img *bsky.EmbedImages_Image) []string {
 }
 
 func EmbedImages(bundle *types.BundleItem, name string, img *bsky.EmbedImages_Image) {
-	AppendTag(bundle, J(Embed, Image, ), img.Alt)
+	AppendTag(bundle, J(Embed, Image), img.Alt)
 	// img.Image
 	// img.AspectRatio
 	// imgTags := GetImageTags(img)

@@ -63,7 +63,6 @@ var (
 
 var (
 	Text           = "Text"
-	PostText       = J(Post, Text)
 	Richtext       = "Richtext"
 	Image          = "Image"
 	Embed          = "Embed"
@@ -75,7 +74,6 @@ var (
 	Title          = "Title"
 	Description    = "Description"
 	External       = "External"
-	EmbedImage     = J(Embed, Image)
 	Record         = "Record"
 	Entities       = "Entities"
 	Language       = "Language"
@@ -105,13 +103,14 @@ var (
 
 // About field of Nostr and Bio of other protocols should go in bundle data to allow large bios.
 var (
-	Name           = "Name"
-	Display        = "Display"
-	Avatar         = "Avatar"
-	Banner         = "Banner"
-	Website        = "Website"
-	Verification   = "Verification"
-	PaymentAddress = "Payment-Address"
+	Name         = "Name"
+	Display      = "Display"
+	Avatar       = "Avatar"
+	Banner       = "Banner"
+	Website      = "Website"
+	Verification = "Verification"
+	Payment      = "Payment"
+	Address      = "Address"
 )
 
 // The rest
