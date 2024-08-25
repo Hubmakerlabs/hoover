@@ -1,16 +1,12 @@
-// Package bluesky is a set of functions for pulling events from bluesky and
-// sending them to Arweave AO.
-//
-// <insert more notes here>
+// Package bluesky is a set of functions for pulling events from bluesky and sending them to
+// Arweave AO.
 package bluesky
 
 import (
-	"encoding/hex"
-	"strconv"
-	"strings"
+	"sync"
 	"time"
 
-	"github.com/Hubmakerlabs/hoover/pkg"
+	. "github.com/Hubmakerlabs/hoover/pkg"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
 	"github.com/bluesky-social/indigo/api/atproto"
 	"github.com/bluesky-social/indigo/repo"
@@ -28,44 +24,52 @@ type (
 	BundleItem = *types.BundleItem
 )
 
-var Kinds = map[string]string{
-	pkg.Like:    "app.bsky.feed.like",
-	pkg.Post:    "app.bsky.feed.post",
-	pkg.Follow:  "app.bsky.graph.follow",
-	pkg.Repost:  "app.bsky.feed.repost",
-	pkg.Block:   "app.bsky.graph.block",
-	pkg.Profile: "app.bsky.actor.profile",
+var mx sync.Mutex
+
+func Kinds(k string) (s string) {
+	mx.Lock()
+	defer mx.Unlock()
+	var ok bool
+	if s, ok = kinds[k]; ok {
+		return
+	}
+	return ""
 }
-var BskyKinds = map[string]string{
-	"app.bsky.feed.like":     pkg.Like,
-	"app.bsky.feed.post":     pkg.Post,
-	"app.bsky.graph.follow":  pkg.Follow,
-	"app.bsky.feed.repost":   pkg.Repost,
-	"app.bsky.graph.block":   pkg.Block,
-	"app.bsky.actor.profile": pkg.Profile,
+func BskyKinds(k string) (s string) {
+	mx.Lock()
+	defer mx.Unlock()
+	var ok bool
+	if s, ok = bskyKinds[k]; ok {
+		return
+	}
+	return ""
 }
 
-func IsRelevant(kind S) (is bool) {
-	for i := range Kinds {
-		if kind == Kinds[i] {
+var kinds = map[string]string{
+	Like:    "app.bsky.feed.like",
+	Post:    "app.bsky.feed.post",
+	Follow:  "app.bsky.graph.follow",
+	Repost:  "app.bsky.feed.repost",
+	Block:   "app.bsky.graph.block",
+	Profile: "app.bsky.actor.profile",
+}
+var bskyKinds = map[string]string{
+	"app.bsky.feed.like":     Like,
+	"app.bsky.feed.post":     Post,
+	"app.bsky.graph.follow":  Follow,
+	"app.bsky.feed.repost":   Repost,
+	"app.bsky.graph.block":   Block,
+	"app.bsky.actor.profile": Profile,
+}
+
+func IsRelevant(kind string) (is bool) {
+	mx.Lock()
+	defer mx.Unlock()
+	for i := range kinds {
+		if kind == kinds[i] {
 			is = true
 			break
 		}
 	}
 	return
-}
-
-func GetCommon(rr *repo.Repo, createdAt Time, op Op, evt Ev) []types.Tag {
-	split := strings.Split(op.Path, "/")
-	return []types.Tag{
-		{Name: pkg.Protocol, Value: pkg.Bsky},
-		{Name: pkg.Kind, Value: BskyKinds[split[0]]},
-		{Name: pkg.EventId, Value: op.Cid.String()},
-		{Name: pkg.UserId, Value: rr.SignedCommit().Did},
-		{Name: pkg.Timestamp, Value: strconv.FormatInt(createdAt.Unix(), 10)},
-		{Name: pkg.Repository, Value: evt.Repo},
-		{Name: pkg.Path, Value: op.Path},
-		{Name: pkg.Signature, Value: hex.EncodeToString(rr.SignedCommit().Sig)},
-	}
-
 }

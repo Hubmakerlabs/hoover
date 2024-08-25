@@ -4,12 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Hubmakerlabs/hoover/pkg"
+	. "github.com/Hubmakerlabs/hoover/pkg"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
-	"github.com/bluesky-social/indigo/api/atproto"
 	"github.com/bluesky-social/indigo/api/bsky"
-	"github.com/bluesky-social/indigo/repo"
-	typegen "github.com/whyrusleeping/cbor-gen"
 )
 
 // {
@@ -109,13 +106,7 @@ import (
 // }
 
 // FromBskyFeedPost is
-func FromBskyFeedPost(
-	evt *atproto.SyncSubscribeRepos_Commit,
-	op *atproto.SyncSubscribeRepos_RepoOp,
-	rr *repo.Repo,
-	rec typegen.CBORMarshaler,
-) (bundle *types.BundleItem, err error) {
-
+func FromBskyFeedPost(evt Ev, op Op, rr Repo, rec Rec) (bundle BundleItem, err error) {
 	var createdAt time.Time
 	var to any
 	if to, createdAt, err = UnmarshalEvent(evt, rec, &bsky.FeedPost{}); chk.E(err) {
@@ -131,24 +122,38 @@ func FromBskyFeedPost(
 		return
 	}
 	bundle = &types.BundleItem{}
-	bundle.Tags = GetCommon(rr, createdAt, op, evt)
+	if err = GetCommon(bundle, rr, createdAt, op, evt); chk.E(err) {
+		return
+	}
+	if pst.Text != "" {
+		bundle.Data = pst.Text
+	}
+	if pst.Reply != nil {
+		if pst.Reply.Root != nil && pst.Reply.Root.Uri != "" {
+			AppendTag(bundle, J(Reply, Root, Id), pst.Reply.Parent.Cid)
+			AppendTag(bundle, J(Reply, Root, Uri), pst.Reply.Parent.Uri)
+		}
+		if pst.Reply.Parent != nil && pst.Reply.Parent.Uri != "" {
+			AppendTag(bundle, J(Reply, Parent, Id), pst.Reply.Parent.Cid)
+			AppendTag(bundle, J(Reply, Parent, Uri), pst.Reply.Parent.Uri)
+		}
+	}
 	if pst.Embed != nil {
 		if pst.Embed.EmbedRecord != nil {
-			AppendTags(bundle, "#embedrecord",
-				[]S{pst.Embed.EmbedRecord.Record.Uri, pst.Embed.EmbedRecord.Record.Cid})
+			AppendTag(bundle, J(Embed, Record, Uri), pst.Embed.EmbedRecord.Record.Uri)
+			AppendTag(bundle, J(Embed, Record, Id), pst.Embed.EmbedRecord.Record.Cid)
 		}
 		if pst.Embed.EmbedImages != nil {
-			for _, img := range pst.Embed.EmbedImages.Images {
-				if img != nil {
-					EmbedImages(bundle, pkg.EmbedImage, img)
-				}
-			}
+			// var count int
+			// for _, embeds := range pst.Embed.EmbedImages.Images {
+			//
+			// }
 		}
 		if pst.Embed.EmbedRecordWithMedia != nil {
-			EmbedExternalRecordWithMedia(bundle, pkg.Embed, pst.Embed.EmbedRecordWithMedia)
+			EmbedExternalRecordWithMedia(bundle, Embed, pst.Embed.EmbedRecordWithMedia)
 		}
 		if pst.Embed.EmbedExternal != nil {
-			EmbedExternal(bundle, pkg.EmbedExternal, pst.Embed.EmbedExternal)
+			EmbedExternal(bundle, J(Embed, External), pst.Embed.EmbedExternal)
 		}
 	}
 	if pst.Entities != nil {
@@ -157,8 +162,9 @@ func FromBskyFeedPost(
 			if entity.Index != nil {
 				index = fmt.Sprintf("%d-%d", entity.Index.Start, entity.Index.End)
 			}
-			AppendTags(bundle, fmt.Sprintf("%s-%03d", pkg.Entities, i), []string{index,
-				entity.Type, entity.Value})
+			AppendTag(bundle, J(Entities, i, Index), index)
+			AppendTag(bundle, J(Entities, i, Type), entity.Type)
+			AppendTag(bundle, J(Entities, i, Value), entity.Value)
 		}
 	}
 	if pst.Facets != nil {
@@ -167,28 +173,30 @@ func FromBskyFeedPost(
 				for _, feats := range pst.Facets[i].Features {
 					if feats.RichtextFacet_Mention != nil {
 						if feats.RichtextFacet_Mention.Did != "" {
-							AppendTag(bundle,
-								fmt.Sprintf("%s-Mention", pkg.Richtext),
-								// "#facet_features_richtext_mention",
+							AppendTag(bundle, J(Richtext, Mention),
 								feats.RichtextFacet_Mention.Did)
 						}
 					}
 					if feats.RichtextFacet_Link != nil {
 						if feats.RichtextFacet_Link.Uri != "" {
-							AppendTag(bundle,
-								fmt.Sprintf("%s-Link", pkg.Richtext),
+							AppendTag(bundle, J(Richtext, Link),
 								feats.RichtextFacet_Link.Uri)
 						}
 					}
 					if feats.RichtextFacet_Tag != nil {
 						if feats.RichtextFacet_Tag.Tag != "" {
-							AppendTag(bundle,
-								fmt.Sprintf("%s-Tag", pkg.Richtext),
-								// "#facet_features_richtext_tag",
+							AppendTag(bundle, J(Richtext, Tag),
 								feats.RichtextFacet_Tag.Tag)
 						}
 					}
 				}
+			}
+			if pst.Facets[i].Index != nil {
+				AppendTag(bundle, J(Richtext, Tag, Start),
+					fmt.Sprint(pst.Facets[i].Index.ByteStart))
+				AppendTag(bundle, J(Richtext, Tag, End),
+					fmt.Sprint(pst.Facets[i].Index.ByteEnd))
+
 			}
 		}
 	}
@@ -204,7 +212,7 @@ func FromBskyFeedPost(
 					}
 					if len(labels) > 0 {
 						for i := range labels {
-							AppendTag(bundle, fmt.Sprintf("%s-%03d", pkg.Label, i), labels[i])
+							AppendTag(bundle, fmt.Sprintf("%s-%03d", Label, i), labels[i])
 						}
 						// AppendTags(bundle, "#labels", labels)
 					}
@@ -214,35 +222,18 @@ func FromBskyFeedPost(
 	}
 	if pst.Langs != nil && len(pst.Langs) > 0 {
 		if len(pst.Langs) == 1 {
-			AppendTag(bundle, fmt.Sprintf("%s", pkg.Language), pst.Langs[0])
+			AppendTag(bundle, fmt.Sprintf("%s", Language), pst.Langs[0])
 		} else {
 			for i := range pst.Langs {
-				AppendTag(bundle, fmt.Sprintf("%s-%03d", pkg.Language, i), pst.Langs[i])
+				AppendTag(bundle, fmt.Sprintf("%s-%03d", Language, i), pst.Langs[i])
 			}
 		}
 		// AppendTags(bundle, "#langs", pst.Langs)
 	}
-	if pst.Reply != nil {
-		if pst.Reply.Root != nil && pst.Reply.Root.Uri != "" {
-			AppendTag(bundle, fmt.Sprintf("%s-%s-%s", pkg.Reply, pkg.Root, pkg.Id),
-				pst.Reply.Parent.Cid)
-			AppendTag(bundle, fmt.Sprintf("%s-%s-%s", pkg.Reply, pkg.Root, pkg.URI),
-				pst.Reply.Parent.Uri)
-			// AppendTags(bundle, fmt.Sprintf("%s-%s", pkg.Reply, pkg.Root),
-			// 	[]string{pst.Reply.Root.Cid, pst.Reply.Root.Uri})
-		}
-		if pst.Reply.Parent != nil && pst.Reply.Parent.Uri != "" {
-			AppendTag(bundle, fmt.Sprintf("%s-%s-%s", pkg.Reply, pkg.Parent, pkg.Id),
-				pst.Reply.Parent.Cid)
-			AppendTag(bundle, fmt.Sprintf("%s-%s-%s", pkg.Reply, pkg.Parent, pkg.URI),
-				pst.Reply.Parent.Uri)
-		}
-	}
 	if pst.Tags != nil && len(pst.Tags) > 0 {
 		for i := range pst.Tags {
-			AppendTag(bundle, fmt.Sprintf("%s-%03d", pkg.Tag, i), pst.Tags[i])
+			AppendTag(bundle, J(Tag, i), pst.Tags[i])
 		}
-		// AppendTags(bundle, "#tags", pst.Tags)
 	}
 	return
 }

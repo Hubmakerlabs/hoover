@@ -1,20 +1,44 @@
 package bluesky
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"strconv"
+	"strings"
 	"time"
 
-	"github.com/Hubmakerlabs/hoover/pkg"
+	. "github.com/Hubmakerlabs/hoover/pkg"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
 	"github.com/bluesky-social/indigo/api/bsky"
 	lexutil "github.com/bluesky-social/indigo/lex/util"
+	"github.com/bluesky-social/indigo/repo"
 	"github.com/bluesky-social/indigo/util"
 )
 
+func GetCommon(bundle *types.BundleItem, rr *repo.Repo, createdAt Time, op Op,
+	evt Ev) (err error) {
+	split := strings.Split(op.Path, "/")
+	if len(split) < 1 {
+		return fmt.Errorf("invalid Op.Path: '%s'", op.Path)
+	}
+	k := BskyKinds(split[0])
+	if k == "" {
+		return fmt.Errorf("invalid Op.Path kind: '%s'", k)
+	}
+	AppendTag(bundle, Protocol, Bsky)
+	AppendTag(bundle, Kind, k)
+	AppendTag(bundle, J(Event, Id), op.Cid.String())
+	AppendTag(bundle, J(User, Id), rr.SignedCommit().Did)
+	AppendTag(bundle, Timestamp, strconv.FormatInt(createdAt.Unix(), 10))
+	AppendTag(bundle, Repository, evt.Repo)
+	AppendTag(bundle, Path, op.Path)
+	AppendTag(bundle, Signature, hex.EncodeToString(rr.SignedCommit().Sig))
+	return
+}
+
 // UnmarshalEvent accepts a bsky commit event and a record type, and the concrete type
 func UnmarshalEvent(evt Ev, rec Rec, to any) (decoded any, createdAt Time, err error) {
-
 	if rec == nil {
 		err = errorf.E("nil record, cannot unmarshal")
 		return
@@ -39,14 +63,30 @@ func AppendTag(bundle *types.BundleItem, name, value string) {
 	bundle.Tags = append(bundle.Tags, types.Tag{Name: name, Value: value})
 }
 
-func AppendTags(bundle *types.BundleItem, name S, values []S) {
-	var b B
-	var err error
-	if b, err = json.Marshal(values); chk.E(err) {
-		return
+// func AppendTags(bundle *types.BundleItem, name S, values []S) {
+// 	var b B
+// 	var err error
+// 	if b, err = json.Marshal(values); chk.E(err) {
+// 		return
+// 	}
+// 	tag := types.Tag{Name: name, Value: S(b)}
+// 	bundle.Tags = append(bundle.Tags, tag)
+// }
+
+func GetLexBlobTags(bundle *types.BundleItem, prefix string, img *lexutil.LexBlob) {
+	names := []string{
+		Ref,
+		Mimetype,
+		Size,
 	}
-	tag := types.Tag{Name: name, Value: S(b)}
-	bundle.Tags = append(bundle.Tags, tag)
+	tags := []string{
+		img.Ref.String(),
+		img.MimeType,
+		fmt.Sprintf("%d", img.Size)}
+	for i, n := range names {
+		AppendTag(bundle, J(prefix, n), tags[i])
+	}
+	return
 }
 
 func GetImageTags(img *bsky.EmbedImages_Image) []string {
@@ -56,40 +96,35 @@ func GetImageTags(img *bsky.EmbedImages_Image) []string {
 	if img.AspectRatio != nil {
 		tags = append(tags, fmt.Sprintf("%dx%d", img.AspectRatio.Width, img.AspectRatio.Height))
 	}
-	tags = append(tags, GetLexBlobTags(img.Image)...)
+	// tags = append(tags, GetLexBlobTags(img.Image)...)
 	return tags
 }
 
-func GetLexBlobTags(img *lexutil.LexBlob) (tags []string) {
-	tags = []string{
-		img.Ref.String(),
-		img.MimeType,
-		fmt.Sprintf("%d", img.Size)}
-	return
-}
-
 func EmbedImages(bundle *types.BundleItem, name string, img *bsky.EmbedImages_Image) {
-	imgTags := GetImageTags(img)
-	for i := range imgTags {
-		if imgTags[i]!=""{
-			AppendTag(bundle, fmt.Sprintf("%s-%s-%03d", name, pkg.Tag, i), imgTags[i])
-		}
-	}
+	AppendTag(bundle, J(Embed, Image, ), img.Alt)
+	// img.Image
+	// img.AspectRatio
+	// imgTags := GetImageTags(img)
+	// for i := range imgTags {
+	// 	if imgTags[i] != "" {
+	// 		AppendTag(bundle, J(name, Tag, i), imgTags[i])
+	// 	}
+	// }
 	// AppendTags(bundle, name, GetImageTags(img))
 }
 
 func EmbedRecord(bundle *types.BundleItem, name string, record *bsky.EmbedRecord) {
-	AppendTags(bundle, name, []string{"record", record.Record.Cid, record.Record.Uri})
+	// AppendTags(bundle, name, []string{"record", record.Record.Cid, record.Record.Uri})
 }
 
 func EmbedExternal(bundle *types.BundleItem, name string, embed *bsky.EmbedExternal) {
-	ext := embed.External
-	imgTags := []string{ext.Uri, ext.Title, ext.Description}
-	if ext.Thumb != nil {
-		thumbTags := GetLexBlobTags(ext.Thumb)
-		imgTags = append(imgTags, thumbTags...)
-	}
-	AppendTags(bundle, fmt.Sprintf("%s-%s", name, pkg.External), imgTags)
+	// ext := embed.External
+	// imgTags := []string{ext.Uri, ext.Title, ext.Description}
+	// if ext.Thumb != nil {
+	// 	// thumbTags := GetLexBlobTags(ext.Thumb)
+	// 	// imgTags = append(imgTags, thumbTags...)
+	// }
+	// AppendTags(bundle, fmt.Sprintf("%s-%s", name, External), imgTags)
 }
 
 // EmbedExternalRecordWithMedia creates a tag with all the junk in an EmbedRecordWithMedia into one.
@@ -109,7 +144,7 @@ func EmbedExternalRecordWithMedia(bundle *types.BundleItem, name string,
 					var tags []string
 					var lbtags []string
 					if img.Image != nil {
-						lbtags = GetLexBlobTags(img.Image)
+						// lbtags = GetLexBlobTags(img.Image)
 					}
 					log.I.S(img)
 					tags = []string{
@@ -123,18 +158,18 @@ func EmbedExternalRecordWithMedia(bundle *types.BundleItem, name string,
 						tags = append(tags,
 							fmt.Sprintf("%dx%d", img.AspectRatio.Width, img.AspectRatio.Height))
 					}
-					AppendTags(bundle, fmt.Sprintf("%s%s%03d", name, "_image", i), tags)
+					// AppendTags(bundle, fmt.Sprintf("%s%s%03d", name, "_image", i), tags)
 				}
 			}
 		}
 		if embed.Media.EmbedExternal != nil && embed.Media.EmbedExternal.External != nil {
-			ext := embed.Media.EmbedExternal.External
-			imgTags := []string{ext.Uri, ext.Title, ext.Description}
-			if ext.Thumb != nil {
-				thumbTags := GetLexBlobTags(ext.Thumb)
-				imgTags = append(imgTags, thumbTags...)
-			}
-			AppendTags(bundle, fmt.Sprintf("%s%s", name, "_media_external"), imgTags)
+			// ext := embed.Media.EmbedExternal.External
+			// imgTags := []string{ext.Uri, ext.Title, ext.Description}
+			// if ext.Thumb != nil {
+			// 	// thumbTags := GetLexBlobTags(ext.Thumb)
+			// 	// imgTags = append(imgTags, thumbTags...)
+			// }
+			// AppendTags(bundle, fmt.Sprintf("%s%s", name, "_media_external"), imgTags)
 		}
 	}
 }

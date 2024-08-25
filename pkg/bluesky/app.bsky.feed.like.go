@@ -3,7 +3,7 @@ package bluesky
 import (
 	"errors"
 
-	"github.com/Hubmakerlabs/hoover/pkg"
+	. "github.com/Hubmakerlabs/hoover/pkg"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
 	"github.com/bluesky-social/indigo/api/bsky"
 )
@@ -28,7 +28,11 @@ import (
 //   }
 // }
 
-// FromBskyFeedLike is
+// FromBskyFeedLike is for a like.
+//
+// In bluesky protocol, the reverse operation, unlike, is actually from a delete operation.
+//
+// Todo: for now, the reverse operations will not be handled but it should be done for MS2
 func FromBskyFeedLike(evt Ev, op Op, rr Repo, rec Rec) (bundle BundleItem, err error) {
 	var createdAt Time
 	var to any
@@ -41,16 +45,18 @@ func FromBskyFeedLike(evt Ev, op Op, rr Repo, rec Rec) (bundle BundleItem, err e
 	}
 	like, ok := to.(*bsky.FeedLike)
 	if !ok {
-		err = errorf.E("did not get app.bsky.feed.like")
+		err = errorf.E("did not get %", BskyKinds(Like))
 		return
 	}
 	if like.Subject == nil {
 		err = errors.New("like has no subject, data of no use, refers to nothing")
 		return
 	}
-	bundle = &types.BundleItem{}
-	bundle.Tags = GetCommon(rr, createdAt, op, evt)
-	AppendTag(bundle, pkg.LikeEventId, like.Subject.Cid)
-	AppendTag(bundle, pkg.URI, like.Subject.Uri)
+	bundle = new(types.BundleItem)
+	if err = GetCommon(bundle, rr, createdAt, op, evt); chk.E(err) {
+		return
+	}
+	AppendTag(bundle, J(Like, Event, Id), like.Subject.Cid)
+	AppendTag(bundle, J(Like, Uri), like.Subject.Uri)
 	return
 }

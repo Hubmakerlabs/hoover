@@ -1,25 +1,48 @@
 package pkg
 
+import (
+	"fmt"
+	"strings"
+)
+
 // Constants defining the standard tag field names
+
+// J joins two strings in HTTP-Header-Case, aka Train-Case
+func J(s ...any) string {
+	var ss []string
+	for _, v := range s {
+		if vs, ok := v.(string); ok {
+			ss = append(ss, vs)
+		} else if vi, ok := v.(int); ok {
+			ss = append(ss, fmt.Sprintf("%03d", vi))
+		} else {
+			ss = append(ss, fmt.Sprintf("%v", v))
+		}
+	}
+	return strings.Join(ss, "-")
+}
 
 // Common
 
-const (
+var (
+	Un             = "Un" // todo for future use for delete/unfollow/unblock/unlike
+	Id             = "Id"
+	Event          = "Event"
 	Protocol       = "Protocol"
-	EventId        = "Event-ID"
-	UserId         = "User-ID"
+	User           = "User"
 	Timestamp      = "Timestamp"
 	Kind           = "Kind"
 	Repository     = "Repository"
 	Path           = "Path"
 	Signature      = "Signature"
 	Label          = "Label"
-	LabelNamespace = "Label-Namespace"
+	Namespace      = "Namespace"
+	LabelNamespace = J(Label, Namespace)
 )
 
 // Protocols
 
-const (
+var (
 	Nostr     = "Nostr"
 	Bsky      = "Bluesky"
 	Farcaster = "Farcaster"
@@ -27,7 +50,7 @@ const (
 
 // Kinds
 
-const (
+var (
 	Post    = "Post"
 	Repost  = "Repost"
 	Like    = "Like"
@@ -38,23 +61,36 @@ const (
 
 // Posts
 
-const (
-	PostText       = "Post-Text"
+var (
+	Text           = "Text"
+	PostText       = J(Post, Text)
 	Richtext       = "Richtext"
 	Image          = "Image"
 	Embed          = "Embed"
-	EmbedImage     = "Embed-Image"
-	EmbedExternal  = "Embed-External"
+	Alt            = "Alt"
+	Ref            = "Ref"
+	Facet          = "Facet"
+	Mimetype       = "Mimetype"
+	Aspect         = "Aspect"
+	Title          = "Title"
+	Description    = "Description"
 	External       = "External"
-	EmbedRecord    = "Embed-Record"
+	EmbedImage     = J(Embed, Image)
+	Record         = "Record"
 	Entities       = "Entities"
 	Language       = "Language"
+	Index          = "Index"
+	Type           = "Type"
+	Value          = "Value"
+	Link           = "Link"
+	Start          = "Start"
+	End            = "End"
 	Media          = "Media"
 	Links          = "Links"
 	EmbedCid       = "EmbedCid"
 	EmbedURI       = "EmbedURI"
 	Mention        = "Mention"
-	ReplyTo        = "Reply-To"
+	ReplyTo        = "ReplyTo"
 	Source         = "Source"
 	Hashtag        = "Hashtag"
 	Emoji          = "Emoji"
@@ -62,18 +98,17 @@ const (
 	Reply          = "Reply"
 	Parent         = "Parent"
 	Root           = "Root"
-	Id             = "Id"
 	Tag            = "Tag"
 )
 
 // Profile
 
 // About field of Nostr and Bio of other protocols should go in bundle data to allow large bios.
-const (
-	UserName       = "User-Name"
-	DisplayName    = "Display-Name"
-	AvatarImage    = "Avatar-Image"
-	BannerImage    = "Banner-Image"
+var (
+	Name           = "Name"
+	Display        = "Display"
+	Avatar         = "Avatar"
+	Banner         = "Banner"
 	Website        = "Website"
 	Verification   = "Verification"
 	PaymentAddress = "Payment-Address"
@@ -81,23 +116,21 @@ const (
 
 // The rest
 
-const (
-	RepostEventId = "Repost-Event-ID"
-	LikeEventId   = "Like-Event-ID"
+var (
+	RepostEventId = J(Repost, Event, Id)
 	Add           = "Add"
-	FollowUserId  = "Follow-User-ID"
-	FollowTag     = "Follow-Tag"
-	BlockUserId   = "Block-User-ID"
-	BlockTag      = "Block-Tag"
+	FollowUserId  = J(Follow, User, Id)
+	FollowTag     = J(Follow, Tag)
+	BlockUserId   = J(Block, User, Id)
+	BlockTag      = J(Block, Tag)
 )
 
 // Embeds
 
-const (
+var (
 	Reference  = "Reference"
-	MimeType   = "Mime-Type"
 	Origin     = "Origin"
-	URI        = "URI"
+	Uri        = "Uri"
 	Size       = "Size"
 	Dimensions = "Dimensions"
 	Duration   = "Duration"

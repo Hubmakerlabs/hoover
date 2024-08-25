@@ -1,15 +1,11 @@
 package bluesky
 
 import (
-	"strconv"
 	"time"
 
+	. "github.com/Hubmakerlabs/hoover/pkg"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
-	"github.com/bluesky-social/indigo/api/atproto"
 	"github.com/bluesky-social/indigo/api/bsky"
-	"github.com/bluesky-social/indigo/repo"
-	"github.com/bluesky-social/indigo/util"
-	typegen "github.com/whyrusleeping/cbor-gen"
 )
 
 // {
@@ -63,13 +59,7 @@ import (
 // }
 
 // FromBskyActorProfile is
-func FromBskyActorProfile(
-	evt *atproto.SyncSubscribeRepos_Commit,
-	op *atproto.SyncSubscribeRepos_RepoOp,
-	rr *repo.Repo,
-	rec typegen.CBORMarshaler,
-) (bundle *types.BundleItem, err error) {
-
+func FromBskyActorProfile(evt Ev, op Op, rr Repo, rec Rec) (bundle BundleItem, err error) {
 	var createdAt time.Time
 	var to any
 	if to, createdAt, err = UnmarshalEvent(evt, rec, &bsky.ActorProfile{}); chk.E(err) {
@@ -81,41 +71,24 @@ func FromBskyActorProfile(
 	}
 	profile, ok := to.(*bsky.ActorProfile)
 	if !ok {
-		err = errorf.E("did not get", Kinds["profile"])
+		err = errorf.E("did not get", Kinds(Profile))
 		return
 	}
 	bundle = &types.BundleItem{}
-	bundle.Tags = GetCommon(rr, createdAt, op, evt)
-	// bundle.Tags = []types.Tag{
-	// 	{Name: "protocol", Value: "bsky"},
-	// 	{Name: "kind", Value: Kinds["profile"]},
-	// 	{Name: "id", Value: op.Cid.String()},
-	// 	{Name: "pubkey", Value: rr.SignedCommit().Did},
-	// 	{Name: "created_at", Value: strconv.FormatInt(createdAt.Unix(), 10)},
-	// 	{Name: "repo", Value: evt.Repo},
-	// 	{Name: "path", Value: op.Path},
-	// 	{Name: "sig", Value: hex.EncodeToString(rr.SignedCommit().Sig)},
-	// }
-	if profile.CreatedAt!=nil {
-		if createdAt, err = time.Parse(util.ISO8601, *profile.CreatedAt); chk.E(err) {
-			return
-		}
-		AppendTag(bundle, "#updated_at", strconv.FormatInt(createdAt.Unix(), 10))
+	if err = GetCommon(bundle, rr, createdAt, op, evt); chk.E(err) {
+		return
 	}
-	if profile.DisplayName!=nil {
-		AppendTag(bundle, "#displayname", *profile.DisplayName)
+	if profile.DisplayName != nil && *profile.DisplayName != "" {
+		AppendTag(bundle, J(Display, Name), *profile.DisplayName)
 	}
-	if profile.Description!=nil {
-		AppendTag(bundle, "#description", *profile.Description)
+	if profile.Description != nil {
+		bundle.Data = *profile.Description
 	}
 	if profile.Avatar != nil {
-		AppendTags(bundle, "#avatar", GetLexBlobTags(profile.Avatar))
+		GetLexBlobTags(bundle, J(Avatar, Image), profile.Avatar)
 	}
 	if profile.Banner != nil {
-		AppendTags(bundle, "#banner", GetLexBlobTags(profile.Banner))
-	}
-	if profile.JoinedViaStarterPack != nil {
-		AppendTags(bundle, "#starterpack", []S{profile.JoinedViaStarterPack.Cid, profile.JoinedViaStarterPack.Uri})
+		GetLexBlobTags(bundle, J(Banner, Image), profile.Banner)
 	}
 	return
 }

@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/Hubmakerlabs/hoover/pkg"
+	. "github.com/Hubmakerlabs/hoover/pkg"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
 	"github.com/Hubmakerlabs/replicatr/pkg/nostr/event"
 	"github.com/Hubmakerlabs/replicatr/pkg/nostr/kind"
@@ -20,17 +20,17 @@ import (
 func GetNostrKindToBundle(k kind.T) (s string) {
 	switch k {
 	case kind.TextNote, kind.LongFormContent:
-		s = pkg.Post
+		s = Post
 	case kind.Repost, kind.GenericRepost:
-		s = pkg.Repost
+		s = Repost
 	case kind.Follows:
-		s = pkg.Follow
+		s = Follow
 	case kind.Reaction:
-		s = pkg.Like
+		s = Like
 	case kind.MuteList:
-		s = pkg.Block
+		s = Block
 	case kind.ProfileMetadata:
-		s = pkg.Profile
+		s = Profile
 	}
 	return
 }
@@ -47,35 +47,35 @@ func EventToBundleItem(ev *event.T) (bundle *types.BundleItem, err error) {
 	bundle = &types.BundleItem{}
 	bundle.Data = ev.Content
 	bundle.Tags = []types.Tag{
-		{Name: pkg.Protocol, Value: pkg.Nostr},
-		{Name: pkg.Kind, Value: k},
-		{Name: pkg.EventId, Value: ev.ID.String()},
-		{Name: pkg.UserId, Value: ev.PubKey},
-		{Name: pkg.Timestamp, Value: strconv.FormatInt(ev.CreatedAt.I64(), 10)},
-		{Name: pkg.Signature, Value: ev.Sig},
+		{Name: Protocol, Value: Nostr},
+		{Name: Kind, Value: k},
+		{Name: J(Event, Id), Value: ev.ID.String()},
+		{Name: J(User, Id), Value: ev.PubKey},
+		{Name: Timestamp, Value: strconv.FormatInt(ev.CreatedAt.I64(), 10)},
+		{Name: Signature, Value: ev.Sig},
 	}
 	switch k {
-	case pkg.Post:
+	case Post:
 		for i, t := range ev.Tags {
 			switch ev.Tags[i][0] {
 			case "e":
 				if len(t) > 1 {
 					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  pkg.ReplyTo,
+						Name:  ReplyTo,
 						Value: t[1],
 					})
 				}
 			case "p":
 				if len(t) > 1 {
 					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  pkg.Mention,
+						Name:  Mention,
 						Value: t[1],
 					})
 				}
 			case "t":
 				if len(t) > 1 {
 					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  pkg.Hashtag,
+						Name:  Hashtag,
 						Value: t[1],
 					})
 				}
@@ -87,7 +87,7 @@ func EventToBundleItem(ev *event.T) (bundle *types.BundleItem, err error) {
 						sauce = t[2]
 					}
 					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  pkg.Source,
+						Name:  Source,
 						Value: fmt.Sprintf("%s,%s", sauce, uri),
 					})
 				}
@@ -99,7 +99,7 @@ func EventToBundleItem(ev *event.T) (bundle *types.BundleItem, err error) {
 						sauce = t[2]
 					}
 					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  pkg.Emoji,
+						Name:  Emoji,
 						Value: fmt.Sprintf("%s,%s", uri, sauce),
 					})
 				}
@@ -109,32 +109,32 @@ func EventToBundleItem(ev *event.T) (bundle *types.BundleItem, err error) {
 					desc = t[1]
 				}
 				bundle.Tags = append(bundle.Tags, types.Tag{
-					Name:  pkg.ContentWarning,
+					Name:  ContentWarning,
 					Value: desc,
 				})
 			case "l":
 				if len(t) > 1 {
 					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  pkg.Label,
+						Name:  Label,
 						Value: t[1],
 					})
 				}
 			case "L":
 				if len(t) > 1 {
 					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  pkg.LabelNamespace,
+						Name:  LabelNamespace,
 						Value: t[1],
 					})
 				}
 			}
 		}
-	case pkg.Repost:
+	case Repost:
 		for i, t := range ev.Tags {
 			switch ev.Tags[i][0] {
 			case "e":
 				if len(t) > 1 {
 					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  pkg.RepostEventId,
+						Name:  RepostEventId,
 						Value: t[1],
 					})
 				}
@@ -146,47 +146,47 @@ func EventToBundleItem(ev *event.T) (bundle *types.BundleItem, err error) {
 						sauce = t[2]
 					}
 					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  pkg.Source,
+						Name:  Source,
 						Value: fmt.Sprintf("%s,%s", sauce, uri),
 					})
 				}
 			case "p":
 				if len(t) > 1 {
 					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  pkg.Mention,
+						Name:  Mention,
 						Value: t[1],
 					})
 				}
 			case "l":
 				if len(t) > 1 {
 					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  pkg.Label,
+						Name:  Label,
 						Value: t[1],
 					})
 				}
 			case "L":
 				if len(t) > 1 {
 					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  pkg.LabelNamespace,
+						Name:  LabelNamespace,
 						Value: t[1],
 					})
 				}
 			}
 		}
-	case pkg.Like:
+	case Like:
 		for i, t := range ev.Tags {
 			switch ev.Tags[i][0] {
 			case "e":
 				if len(t) > 1 {
 					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  pkg.LikeEventId,
+						Name:  J(Like, Event, Id),
 						Value: t[1],
 					})
 				}
 			case "p":
 				if len(t) > 1 {
 					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  pkg.Mention,
+						Name:  Mention,
 						Value: t[1],
 					})
 				}
@@ -198,52 +198,52 @@ func EventToBundleItem(ev *event.T) (bundle *types.BundleItem, err error) {
 						sauce = t[2]
 					}
 					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  pkg.Source,
+						Name:  Source,
 						Value: fmt.Sprintf("%s,%s", sauce, uri),
 					})
 				}
 			}
 		}
-	case pkg.Follow:
+	case Follow:
 		for i, t := range ev.Tags {
 			switch ev.Tags[i][0] {
 			case "p":
 				if len(t) > 1 {
 					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  pkg.FollowUserId,
+						Name:  FollowUserId,
 						Value: t[1],
 					})
 				}
 			case "t":
 				if len(t) > 1 {
 					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  pkg.FollowTag,
+						Name:  FollowTag,
 						Value: t[1],
 					})
 				}
 			}
 		}
-	case pkg.Block:
+	case Block:
 		for i, t := range ev.Tags {
 			switch ev.Tags[i][0] {
 			case "p":
 				if len(t) > 1 {
 					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  pkg.BlockUserId,
+						Name:  BlockUserId,
 						Value: t[1],
 					})
 				}
 			case "t":
 				if len(t) > 1 {
 					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  pkg.BlockTag,
+						Name:  BlockTag,
 						Value: t[1],
 					})
 				}
 			}
 		}
 
-	case pkg.Profile:
+	case Profile:
 		// remove data field in case it's empty
 		bundle.Data = ""
 		var prf ProfileMetadata
@@ -254,14 +254,14 @@ func EventToBundleItem(ev *event.T) (bundle *types.BundleItem, err error) {
 		if prf.Name != "" {
 			hasContent = true
 			bundle.Tags = append(bundle.Tags, types.Tag{
-				Name:  pkg.UserName,
+				Name:  J(User, Name),
 				Value: prf.Name,
 			})
 		}
 		if prf.DisplayName != "" {
 			hasContent = true
 			bundle.Tags = append(bundle.Tags, types.Tag{
-				Name:  pkg.DisplayName,
+				Name:  J(Display, Name),
 				Value: prf.DisplayName,
 			})
 		}
@@ -272,35 +272,35 @@ func EventToBundleItem(ev *event.T) (bundle *types.BundleItem, err error) {
 		if prf.Picture != "" {
 			hasContent = true
 			bundle.Tags = append(bundle.Tags, types.Tag{
-				Name:  pkg.AvatarImage,
+				Name:  J(Avatar, Image),
 				Value: prf.Picture,
 			})
 		}
 		if prf.Banner != "" {
 			hasContent = true
 			bundle.Tags = append(bundle.Tags, types.Tag{
-				Name:  pkg.BannerImage,
+				Name:  J(Banner, Image),
 				Value: prf.Banner,
 			})
 		}
 		if prf.Website != "" {
 			hasContent = true
 			bundle.Tags = append(bundle.Tags, types.Tag{
-				Name:  pkg.Website,
+				Name:  Website,
 				Value: prf.Website,
 			})
 		}
 		if prf.NIP05 != "" {
 			hasContent = true
 			bundle.Tags = append(bundle.Tags, types.Tag{
-				Name:  pkg.Verification,
+				Name:  Verification,
 				Value: prf.NIP05,
 			})
 		}
 		if prf.LUD16 != "" {
 			hasContent = true
 			bundle.Tags = append(bundle.Tags, types.Tag{
-				Name:  pkg.PaymentAddress,
+				Name:  PaymentAddress,
 				Value: prf.LUD16,
 			})
 		}
@@ -310,21 +310,21 @@ func EventToBundleItem(ev *event.T) (bundle *types.BundleItem, err error) {
 			case "e":
 				if len(t) > 1 {
 					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  pkg.ReplyTo,
+						Name:  ReplyTo,
 						Value: t[1],
 					})
 				}
 			case "p":
 				if len(t) > 1 {
 					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  pkg.Mention,
+						Name:  Mention,
 						Value: t[1],
 					})
 				}
 			case "t":
 				if len(t) > 1 {
 					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  pkg.Hashtag,
+						Name:  Hashtag,
 						Value: t[1],
 					})
 				}
@@ -336,7 +336,7 @@ func EventToBundleItem(ev *event.T) (bundle *types.BundleItem, err error) {
 						sauce = t[2]
 					}
 					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  pkg.Source,
+						Name:  Source,
 						Value: fmt.Sprintf("%s,%s", sauce, uri),
 					})
 				}
@@ -348,7 +348,7 @@ func EventToBundleItem(ev *event.T) (bundle *types.BundleItem, err error) {
 						sauce = t[2]
 					}
 					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  pkg.Emoji,
+						Name:  Emoji,
 						Value: fmt.Sprintf("%s,%s", uri, sauce),
 					})
 				}
@@ -358,20 +358,20 @@ func EventToBundleItem(ev *event.T) (bundle *types.BundleItem, err error) {
 					desc = t[1]
 				}
 				bundle.Tags = append(bundle.Tags, types.Tag{
-					Name:  pkg.ContentWarning,
+					Name:  ContentWarning,
 					Value: desc,
 				})
 			case "l":
 				if len(t) > 1 {
 					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  pkg.Label,
+						Name:  Label,
 						Value: t[1],
 					})
 				}
 			case "L":
 				if len(t) > 1 {
 					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  pkg.LabelNamespace,
+						Name:  LabelNamespace,
 						Value: t[1],
 					})
 				}

@@ -3,12 +3,9 @@ package bluesky
 import (
 	"time"
 
-	"github.com/Hubmakerlabs/hoover/pkg"
+	. "github.com/Hubmakerlabs/hoover/pkg"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
-	"github.com/bluesky-social/indigo/api/atproto"
 	"github.com/bluesky-social/indigo/api/bsky"
-	"github.com/bluesky-social/indigo/repo"
-	typegen "github.com/whyrusleeping/cbor-gen"
 )
 
 // {
@@ -31,14 +28,12 @@ import (
 //   }
 // }
 
-// FromBskyGraphFollow is
-func FromBskyGraphFollow(
-	evt *atproto.SyncSubscribeRepos_Commit,
-	op *atproto.SyncSubscribeRepos_RepoOp,
-	rr *repo.Repo,
-	rec typegen.CBORMarshaler,
-) (bundle *types.BundleItem, err error) {
-
+// FromBskyGraphFollow is for a follow.
+//
+// In bluesky protocol, the reverse operation, unfollow, is actually from a delete operation.
+//
+// Todo: for now, the reverse operations will not be handled but it should be done for MS2
+func FromBskyGraphFollow(evt Ev, op Op, rr Repo, rec Rec) (bundle BundleItem, err error) {
 	var createdAt time.Time
 	var to any
 	if to, createdAt, err = UnmarshalEvent(evt, rec, &bsky.GraphFollow{}); chk.E(err) {
@@ -50,12 +45,14 @@ func FromBskyGraphFollow(
 	}
 	fol, ok := to.(*bsky.GraphFollow)
 	if !ok {
-		err = errorf.E("did not get", Kinds["follow"])
+		err = errorf.E("did not get", Kinds(Follow))
 		return
 	}
 	bundle = &types.BundleItem{}
-	bundle.Tags = GetCommon(rr, createdAt, op, evt)
-	AppendTag(bundle, pkg.LikeEventId, fol.Subject)
+	if err = GetCommon(bundle, rr, createdAt, op, evt); chk.E(err) {
+		return
+	}
+	AppendTag(bundle, J(Follow, User, Id), fol.Subject)
 	return
 }
 
