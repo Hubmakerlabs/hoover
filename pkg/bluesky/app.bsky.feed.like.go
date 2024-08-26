@@ -2,8 +2,10 @@ package bluesky
 
 import (
 	"errors"
+	"strings"
 
 	. "github.com/Hubmakerlabs/hoover/pkg"
+	ao "github.com/Hubmakerlabs/hoover/pkg/arweave"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
 	"github.com/bluesky-social/indigo/api/bsky"
 )
@@ -56,7 +58,18 @@ func FromBskyFeedLike(evt Ev, op Op, rr Repo, rec Rec) (bundle BundleItem, err e
 	if err = GetCommon(bundle, rr, createdAt, op, evt); chk.E(err) {
 		return
 	}
-	AppendTag(bundle, J(Like, Event, Id), like.Subject.Cid)
-	AppendTag(bundle, J(Like, Uri), like.Subject.Uri)
+	ao.AppendTag(bundle, J(Like, Event, Id), like.Subject.Cid)
+	// ao.AppendTag(bundle, J(Like, Uri), like.Subject.Uri)
+	// so there is a mention with the poster's ID to search on
+	s1 := strings.Split(like.Subject.Uri, "://")
+	if len(s1) > 1 {
+		s2 := strings.Split(s1[1], "/")
+		if len(s2) > 1 {
+			ao.AppendTag(bundle, J(Like, Path), strings.Join(s2[1:], "/"))
+		}
+		if len(s2) > 0 {
+			ao.AppendTag(bundle, Mention, s2[0])
+		}
+	}
 	return
 }

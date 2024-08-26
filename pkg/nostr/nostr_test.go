@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/Hubmakerlabs/hoover/pkg/arweave"
+	ao "github.com/Hubmakerlabs/hoover/pkg/arweave"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
 	"github.com/Hubmakerlabs/replicatr/pkg/nostr/event"
 	"github.com/mleku/nodl/pkg/event/examples"
@@ -38,7 +38,7 @@ func TestEventToBundleItem(t *testing.T) {
 		// fmt.Println()
 		// fmt.Println(S(b))
 		fmt.Println()
-		arweave.PrintBundleItem(bundle)
+		ao.PrintBundleItem(bundle)
 		b = b[:0]
 		b = nil
 	}

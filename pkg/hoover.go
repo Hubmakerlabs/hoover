@@ -80,7 +80,6 @@ var (
 	EmbedCid       = "EmbedCid"
 	EmbedURI       = "EmbedURI"
 	Mention        = "Mention"
-	ReplyTo        = "ReplyTo"
 	Source         = "Source"
 	Hashtag        = "Hashtag"
 	Emoji          = "Emoji"

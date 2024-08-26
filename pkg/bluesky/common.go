@@ -9,6 +9,7 @@ import (
 	"time"
 
 	. "github.com/Hubmakerlabs/hoover/pkg"
+	ao "github.com/Hubmakerlabs/hoover/pkg/arweave"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
 	"github.com/bluesky-social/indigo/api/bsky"
 	lexutil "github.com/bluesky-social/indigo/lex/util"
@@ -26,14 +27,14 @@ func GetCommon(bundle *types.BundleItem, rr *repo.Repo, createdAt Time, op Op,
 	if k == "" {
 		return fmt.Errorf("invalid Op.Path kind: '%s'", k)
 	}
-	AppendTag(bundle, Protocol, Bsky)
-	AppendTag(bundle, Kind, k)
-	AppendTag(bundle, J(Event, Id), op.Cid.String())
-	AppendTag(bundle, J(User, Id), rr.SignedCommit().Did)
-	AppendTag(bundle, Timestamp, strconv.FormatInt(createdAt.Unix(), 10))
-	AppendTag(bundle, Repository, evt.Repo)
-	AppendTag(bundle, Path, op.Path)
-	AppendTag(bundle, Signature, hex.EncodeToString(rr.SignedCommit().Sig))
+	ao.AppendTag(bundle, Protocol, Bsky)
+	ao.AppendTag(bundle, Kind, k)
+	ao.AppendTag(bundle, J(Event, Id), op.Cid.String())
+	ao.AppendTag(bundle, J(User, Id), rr.SignedCommit().Did)
+	ao.AppendTag(bundle, Timestamp, strconv.FormatInt(createdAt.Unix(), 10))
+	ao.AppendTag(bundle, Repository, evt.Repo)
+	ao.AppendTag(bundle, Path, op.Path)
+	ao.AppendTag(bundle, Signature, hex.EncodeToString(rr.SignedCommit().Sig))
 	return
 }
 
@@ -59,43 +60,39 @@ func UnmarshalEvent(evt Ev, rec Rec, to any) (decoded any, createdAt Time, err e
 	return to, createdAt, nil
 }
 
-func AppendTag(bundle *types.BundleItem, name, value string) {
-	bundle.Tags = append(bundle.Tags, types.Tag{Name: name, Value: value})
-}
-
 func AppendLexBlobTags(bundle *types.BundleItem, prefix string, img *lexutil.LexBlob) {
-	AppendTag(bundle, J(prefix, Ref), img.Ref.String())
-	AppendTag(bundle, J(prefix, Mimetype), img.MimeType)
-	AppendTag(bundle, J(prefix, Size), strconv.FormatInt(img.Size, 10))
+	ao.AppendTag(bundle, J(prefix, Ref), img.Ref.String())
+	ao.AppendTag(bundle, J(prefix, Mimetype), img.MimeType)
+	ao.AppendTag(bundle, J(prefix, Size), strconv.FormatInt(img.Size, 10))
 }
 
 func AppendImageTags(bundle *types.BundleItem, prefix string,
 	img *bsky.EmbedImages_Image) {
 	if img.Alt != "" {
-		AppendTag(bundle, J(prefix, Alt), img.Alt)
+		ao.AppendTag(bundle, J(prefix, Alt), img.Alt)
 	}
 	AppendLexBlobTags(bundle, prefix, img.Image)
 	if img.AspectRatio != nil {
-		AppendTag(bundle, J(prefix, Aspect),
+		ao.AppendTag(bundle, J(prefix, Aspect),
 			fmt.Sprintf("%dx%d", img.AspectRatio.Width, img.AspectRatio.Height))
 	}
 }
 
 func EmbedRecord(bundle *types.BundleItem, prefix string, record *bsky.EmbedRecord) {
 	if record.Record != nil {
-		AppendTag(bundle, J(prefix, Id), record.Record.Cid)
-		AppendTag(bundle, J(prefix, Uri), record.Record.Uri)
+		ao.AppendTag(bundle, J(prefix, Id), record.Record.Cid)
+		ao.AppendTag(bundle, J(prefix, Uri), record.Record.Uri)
 	}
 }
 
 func EmbedExternal(bundle *types.BundleItem, prefix string, embed *bsky.EmbedExternal) {
 	ext := embed.External
-	AppendTag(bundle, J(prefix, Description), ext.Description)
+	ao.AppendTag(bundle, J(prefix, Description), ext.Description)
 	if ext.Thumb != nil {
 		AppendLexBlobTags(bundle, J(prefix, Thumb), ext.Thumb)
 	}
-	AppendTag(bundle, J(prefix, Title), ext.Title)
-	AppendTag(bundle, J(prefix, Uri), ext.Uri)
+	ao.AppendTag(bundle, J(prefix, Title), ext.Title)
+	ao.AppendTag(bundle, J(prefix, Uri), ext.Uri)
 }
 
 // EmbedExternalRecordWithMedia creates a tag with all the junk in an EmbedRecordWithMedia into one.
@@ -119,10 +116,10 @@ func EmbedExternalRecordWithMedia(bundle *types.BundleItem, prefix string,
 		}
 		if embed.Media.EmbedExternal != nil && embed.Media.EmbedExternal.External != nil {
 			ext := embed.Media.EmbedExternal.External
-			AppendTag(bundle, J(prefix, Uri), ext.Uri)
+			ao.AppendTag(bundle, J(prefix, Uri), ext.Uri)
 			AppendLexBlobTags(bundle, prefix, ext.Thumb)
-			AppendTag(bundle, J(prefix, Description), ext.Description)
-			AppendTag(bundle, J(prefix, Title), ext.Title)
+			ao.AppendTag(bundle, J(prefix, Description), ext.Description)
+			ao.AppendTag(bundle, J(prefix, Title), ext.Title)
 		}
 	}
 }

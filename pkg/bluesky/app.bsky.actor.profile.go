@@ -4,6 +4,7 @@ import (
 	"time"
 
 	. "github.com/Hubmakerlabs/hoover/pkg"
+	ao "github.com/Hubmakerlabs/hoover/pkg/arweave"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
 	"github.com/bluesky-social/indigo/api/bsky"
 )
@@ -79,7 +80,7 @@ func FromBskyActorProfile(evt Ev, op Op, rr Repo, rec Rec) (bundle BundleItem, e
 		return
 	}
 	if profile.DisplayName != nil && *profile.DisplayName != "" {
-		AppendTag(bundle, J(Display, Name), *profile.DisplayName)
+		ao.AppendTag(bundle, J(Display, Name), *profile.DisplayName)
 	}
 	if profile.Description != nil {
 		bundle.Data = *profile.Description

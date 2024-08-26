@@ -4,6 +4,7 @@ import (
 	"time"
 
 	. "github.com/Hubmakerlabs/hoover/pkg"
+	ao "github.com/Hubmakerlabs/hoover/pkg/arweave"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
 	"github.com/bluesky-social/indigo/api/bsky"
 )
@@ -48,8 +49,8 @@ func FromBskyFeedRepost(evt Ev, op Op, rr Repo, rec Rec) (bundle BundleItem, err
 	if err = GetCommon(bundle, rr, createdAt, op, evt); chk.E(err) {
 		return
 	}
-	AppendTag(bundle, J(Repost, Event, Id), repost.Subject.Cid)
-	AppendTag(bundle, J(Repost, Event, Uri), repost.Subject.Uri)
+	ao.AppendTag(bundle, J(Repost, Event, Id), repost.Subject.Cid)
+	ao.AppendTag(bundle, J(Repost, Event, Uri), repost.Subject.Uri)
 	return
 }
 

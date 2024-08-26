@@ -10,6 +10,7 @@ import (
 	"strconv"
 
 	. "github.com/Hubmakerlabs/hoover/pkg"
+	ao "github.com/Hubmakerlabs/hoover/pkg/arweave"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
 	"github.com/Hubmakerlabs/replicatr/pkg/nostr/event"
 	"github.com/Hubmakerlabs/replicatr/pkg/nostr/kind"
@@ -61,7 +62,7 @@ func EventToBundleItem(ev *event.T) (bundle *types.BundleItem, err error) {
 			case "e":
 				if len(t) > 1 {
 					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  ReplyTo,
+						Name:  J(Reply, Parent, Id),
 						Value: t[1],
 					})
 				}
@@ -86,10 +87,8 @@ func EventToBundleItem(ev *event.T) (bundle *types.BundleItem, err error) {
 					if len(t) > 2 {
 						sauce = t[2]
 					}
-					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  Source,
-						Value: fmt.Sprintf("%s,%s", sauce, uri),
-					})
+					ao.AppendTag(bundle, J(Source), sauce)
+					ao.AppendTag(bundle, J(Source, Uri), uri)
 				}
 			case "emoji":
 				if len(t) > 1 {
@@ -122,7 +121,7 @@ func EventToBundleItem(ev *event.T) (bundle *types.BundleItem, err error) {
 			case "L":
 				if len(t) > 1 {
 					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  LabelNamespace,
+						Name:  J(Label, Namespace),
 						Value: t[1],
 					})
 				}
@@ -134,7 +133,7 @@ func EventToBundleItem(ev *event.T) (bundle *types.BundleItem, err error) {
 			case "e":
 				if len(t) > 1 {
 					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  RepostEventId,
+						Name:  J(Repost, Event, Id),
 						Value: t[1],
 					})
 				}
@@ -145,10 +144,8 @@ func EventToBundleItem(ev *event.T) (bundle *types.BundleItem, err error) {
 					if len(t) > 2 {
 						sauce = t[2]
 					}
-					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  Source,
-						Value: fmt.Sprintf("%s,%s", sauce, uri),
-					})
+					ao.AppendTag(bundle, J(Source), sauce)
+					ao.AppendTag(bundle, J(Source, Uri), uri)
 				}
 			case "p":
 				if len(t) > 1 {
@@ -167,7 +164,7 @@ func EventToBundleItem(ev *event.T) (bundle *types.BundleItem, err error) {
 			case "L":
 				if len(t) > 1 {
 					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  LabelNamespace,
+						Name:  J(Label, Namespace),
 						Value: t[1],
 					})
 				}
@@ -197,10 +194,8 @@ func EventToBundleItem(ev *event.T) (bundle *types.BundleItem, err error) {
 					if len(t) > 2 {
 						sauce = t[2]
 					}
-					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  Source,
-						Value: fmt.Sprintf("%s,%s", sauce, uri),
-					})
+					ao.AppendTag(bundle, J(Source), sauce)
+					ao.AppendTag(bundle, J(Source, Uri), uri)
 				}
 			}
 		}
@@ -210,14 +205,14 @@ func EventToBundleItem(ev *event.T) (bundle *types.BundleItem, err error) {
 			case "p":
 				if len(t) > 1 {
 					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  FollowUserId,
+						Name:  J(Follow, User, Id),
 						Value: t[1],
 					})
 				}
 			case "t":
 				if len(t) > 1 {
 					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  FollowTag,
+						Name:  J(Follow, Tag),
 						Value: t[1],
 					})
 				}
@@ -229,14 +224,14 @@ func EventToBundleItem(ev *event.T) (bundle *types.BundleItem, err error) {
 			case "p":
 				if len(t) > 1 {
 					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  BlockUserId,
+						Name:  J(Block, User, Id),
 						Value: t[1],
 					})
 				}
 			case "t":
 				if len(t) > 1 {
 					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  BlockTag,
+						Name:  J(Block, Tag),
 						Value: t[1],
 					})
 				}
@@ -300,7 +295,7 @@ func EventToBundleItem(ev *event.T) (bundle *types.BundleItem, err error) {
 		if prf.LUD16 != "" {
 			hasContent = true
 			bundle.Tags = append(bundle.Tags, types.Tag{
-				Name:  PaymentAddress,
+				Name:  J(Payment, Address),
 				Value: prf.LUD16,
 			})
 		}
@@ -310,7 +305,7 @@ func EventToBundleItem(ev *event.T) (bundle *types.BundleItem, err error) {
 			case "e":
 				if len(t) > 1 {
 					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  ReplyTo,
+						Name:  J(Reply, Parent, Id),
 						Value: t[1],
 					})
 				}
@@ -371,7 +366,7 @@ func EventToBundleItem(ev *event.T) (bundle *types.BundleItem, err error) {
 			case "L":
 				if len(t) > 1 {
 					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  LabelNamespace,
+						Name:  J(Label, Namespace),
 						Value: t[1],
 					})
 				}

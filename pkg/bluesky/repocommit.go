@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/Hubmakerlabs/hoover/pkg"
-	"github.com/Hubmakerlabs/hoover/pkg/arweave"
+	arweave "github.com/Hubmakerlabs/hoover/pkg/arweave"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
 	"github.com/bluesky-social/indigo/api/atproto"
 	"github.com/bluesky-social/indigo/lex/util"

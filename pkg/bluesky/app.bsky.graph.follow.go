@@ -4,6 +4,7 @@ import (
 	"time"
 
 	. "github.com/Hubmakerlabs/hoover/pkg"
+	ao "github.com/Hubmakerlabs/hoover/pkg/arweave"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
 	"github.com/bluesky-social/indigo/api/bsky"
 )
@@ -52,7 +53,7 @@ func FromBskyGraphFollow(evt Ev, op Op, rr Repo, rec Rec) (bundle BundleItem, er
 	if err = GetCommon(bundle, rr, createdAt, op, evt); chk.E(err) {
 		return
 	}
-	AppendTag(bundle, J(Follow, User, Id), fol.Subject)
+	ao.AppendTag(bundle, J(Follow, User, Id), fol.Subject)
 	return
 }
 

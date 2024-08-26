@@ -1,4 +1,4 @@
-package arweave
+package ao
 
 import (
 	"bytes"
