@@ -4,7 +4,7 @@ Data aggregator for Nostr, Bluesky and Farcaster to Arweave AO
 
 ## Documentation
 
-- [Arweave AO Social Network Data Hoover](docs/readme.md) - detailed documentation of how 
+- [Arweave AO Social Network Data Hoover](doc/readme.md) - detailed documentation of how 
   data is 
   aggregated and the schema for bundling and searchability for Arweave AO
 
