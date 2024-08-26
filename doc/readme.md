@@ -50,13 +50,120 @@ There is 5 event kinds that are aggregated by the Hoover:
 
 These form the most essential parts of keeping track of the activity and the users interactions on these protocols, and what is relevant to us is primarily data that is to be used on a read-only basis but retaining enough information to authenticate the data and refer back to its original sources in order to facilitate potential bidirectional bridging, which we are not implementing but are taking care to ensure that the data structure design does not need substantial changes in order to enable.
 
+> The exact protocol specific structure mappings are not described in here precisely, see the source code to learn what protocol specific fields are referred to here using these common names.
+
+## Generic Data Format
+
+The following is the field names and descriptions of what goes in them that we aim to make common across the plurality of the protocol data:
+
+### Common to All
+
+#### `Protocol`
+
+For this work, the protocols are `Nostr`, `Bluesky`, `Farcaster`
+
+#### `Kind`
+
+`Kind` is one of `Profile`, `Post`, `Repost`, `Like`,  `Follow`
+
+#### `Event-Id`
+
+The protocol specific identifier, usually a string encoded binary hash of the raw event data in a canonical form, for `Nostr` it is a 64 character hexadecimal; `Bluesky` is a Base32 encoded form; `Farcaster` uses <insert form here>
+
+#### `User-Id`
+
+A protocol specific encoding, again for `Nostr` it is a 64 character hexadecimal value, representing an X-only 32 byte BIP-340 key derived from its secret key using secp256k1 curve; 
+
+`Bluesky` uses a compound fingerprint form in Base32 that follows this format: `did:plc:d7dpssyilm4animmy2lgvjuc`;
+
+ Farcaster uses <insert formatting information here>
+
+#### `Timestamp`
+
+For simplicity, we use decimal encoded Unix timestamps based on whatever the protocol representation represents. Nostr uses this form and it is simple to convert to any time zone or format via most language time libraries.
+
+#### `Signature`
+
+`Signature` is again a string encoded value, and it represents the signature that when combined with the `User-Id` and `Event-Id` validates as correct.
+
+This verification can be done on these three data points, however full verification that the content is correct requires fetching the event from the protocol and performing the protocol specified canonical format, `Event-Id` derivation and particular signature algorithm.
+
+ `Nostr` encodes signatures as 128 character hexadecimal, as does `Bluesky`. 
+
+`Farcaster` represents them as <insert signature format here>
+
+#### Bluesky specific extra fields
+
+`Bluesky` has additional fields related to its federation structure, these fields are essential to finding the original event:
+
+####  `Repository`
+
+`did:plc:zekywwxrjlpk3tnx4nlyyfrt` representing the federation server's public identifier
+
+####  `Path` 
+
+`app.bsky.feed.post/3l2ma3mh4yy2a` representing the repository specific event identifier, consisting of the bluesky event type identifier and an event identifier key in Base32
+
+### Profile
+
+The `Data` field of a profile bundle contains the user's biography field from the protocol specific form, as it often permits more than a tag maximum of 2048 bytes.
+
+#### `Display-Name`
+
+The main display name used in user interfaces for this user
+
+#### `User-Name`
+
+Optional - present for `Nostr` but not `Bluesky` - a secondary identifier used in some parts of interfaces, notably for recognising a reference when composing a `Post` - these are all lower case no spaces, underscores allowed (like JSON object field keys)
+
+#### `Avatar-Image`
+
+A URL if appearing alone, for `Bluesky` there are additional fields all starting with this same prefix and ending with `Ref`, `Mimetype`, `Size`, the `Ref` representing a `Bluesky` style Base32 file identifier hash needed to fetch the image from this network.
+
+#### `Banner-Image`
+
+The same as the above except usually a larger, wider image for showing in the background of a user profile page. Same differences between `Nostr` and `Bluesky` as the `Avatar-Image`
+
+### Post 
+
+### Repost 
+
+### Like 
+
+### Follow
+
 ## Nostr
 
+### Profile
 
+### Post 
+
+### Repost 
+
+### Like 
+
+### Follow
 
 ## Bluesky
 
+### Profile
 
+### Post 
+
+### Repost 
+
+### Like 
+
+### Follow
 
 ## Farcaster
 
+### Profile
+
+### Post 
+
+### Repost 
+
+### Like 
+
+### Follow
