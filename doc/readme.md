@@ -62,6 +62,16 @@ These form the most essential parts of keeping track of the activity and the use
 
 > The exact protocol specific structure mappings are not described in here precisely, see the source code to learn what protocol specific fields are referred to here using these common names.
 
+This specification follows two primary idioms as used with Arweave:
+
+- Key names use `Train-Case` like HTTP headers
+- Each key refers to only one value, and tree-structure can be created by appending suffixes to subordinates, for example:
+  - `Generic-Key-Name`
+    - `Generic-Key-Name-Subordinate-1`
+    - `Generic-Key-Name-Subcategory`
+      - `Generic-Key-Subcategory-Subelement`
+- Where there is more than one element with the same name type, except at the top level, such as `Hashtag`, for only one element use the name as is, but for multiple, such as images, append a suffix `-#` with a number prior to any subordinate qualifier suffixes that may follow if needed.
+
 ## Generic Data Format
 
 The following is the field names and descriptions of what goes in them that we aim to make common across the plurality of the protocol data:
@@ -135,6 +145,8 @@ A URL if appearing alone, for `Bluesky` there are additional fields all starting
 The same as the above except usually a larger, wider image for showing in the background of a user profile page. Same differences between `Nostr` and `Bluesky` as the `Avatar-Image`
 
 ### Post 
+
+
 
 ### Repost 
 
