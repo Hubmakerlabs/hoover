@@ -1,10 +1,12 @@
-# Arweave AO Social Network Data Hoover
+# Arweave AO
+
+## Social Network Data Hoover
 
 #### Aggregator for social network data for use of Arweave developers as part of Arweave AO enabled applications
 
 -----
 
-## Built under contract with Arweave for Hubmaker Labs
+## Built under contract with Arweave by Hubmaker Labs
 
 Work completed during August and September 2024
 
@@ -32,11 +34,19 @@ As such, the Hoover attends to only 5 primary event types, which contain common 
 
 ### The Differences and Similarities of the Protocols We are Supporting
 
-**Nostr** is an extremely minimal design that focuses on publish subscribe architecture and aims to maximize decentralization, and part of the way it achieves this is through a very small specification for database queries and a collaborative specification forum where developers argue all day long about proposals that they often disagree about needing to be standardized. There is a large number of mostly similar, Twitter/X style discussion clients, and a small number of niche clients that are aiming to support decentralized publishing, supporting distributed teams with software and document repositories, and some specializing in instant messaging.
+**Nostr** is an extremely minimal design that focuses on publish subscribe architecture and aims to maximize decentralization, and part of the way it achieves this is through a very small specification for database queries and a collaborative specification forum where developers argue all day long about proposals that they often disagree about needing to be standardized.
 
-**Bluesky** is a more centralized design, using a federated architecture with Bluesky, Inc. providing a primary aggregation point, through which a tree of federations feed up their user input , that users can tap at any level of the tree that suits them, and thereby protects the decentralization of access, while keeping the network together as a whole as much as possible. Its specification is more strict and complex, and the company that develops the protocol keeps fairly tight control over the specification. There is a large number of client applications for Bluesky, though their structure and format is more limited than Nostr as regards to the potential use cases, due to the federated distribution architecture.
+There is a large number of mostly similar, Twitter/X style discussion clients, and a small number of niche clients that are aiming to support decentralized publishing, supporting distributed teams with software and document repositories, and some specializing in instant messaging.
 
-**Farcaster** is a social network that is based on the idea of anchoring data sets on the Ethereum blockchain, while distributing the replicas of events across a mostly voluntary-run or sponsored IPFS based event data replicas. Its protocol design is simpler than Bluesky, but more rigid than Nostr, and as of writing this document, there is only one main application that can be used to access the data of the network.
+**Bluesky** is a more centralized design, using a federated architecture with Bluesky, Inc. providing a primary aggregation point, through which a tree of federations feed up their user input, that users can tap at any level of the tree that suits them, and thereby protects the decentralization of access, while keeping the network together as a whole as much as possible. 
+
+Its specification is more strict and complex, and the company that develops the protocol keeps fairly tight control over the specification.
+
+There is a large number of client applications for Bluesky, though their structure and format is more limited than Nostr as regards to the potential use cases, due to the federated distribution architecture.
+
+**Farcaster** is a social network that is based on the idea of anchoring data sets on the Ethereum blockchain, while distributing the replicas of events across a mostly voluntary-run or sponsored IPFS based event data replicas.
+
+Its protocol design is simpler than Bluesky, but more rigid than Nostr, and as of writing this document, there is only one main application that can be used to access the data of the network.
 
 ## Hoover Common Event Data Specification
 
