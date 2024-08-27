@@ -218,26 +218,6 @@ func EventToBundleItem(ev *event.T) (bundle *types.BundleItem, err error) {
 				}
 			}
 		}
-	case Block:
-		for i, t := range ev.Tags {
-			switch ev.Tags[i][0] {
-			case "p":
-				if len(t) > 1 {
-					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  J(Block, User, Id),
-						Value: t[1],
-					})
-				}
-			case "t":
-				if len(t) > 1 {
-					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  J(Block, Tag),
-						Value: t[1],
-					})
-				}
-			}
-		}
-
 	case Profile:
 		// remove data field in case it's empty
 		bundle.Data = ""
