@@ -90,7 +90,7 @@ var Firehose = &cli.Command{
 			}
 		}
 
-		fmt.Println("dialing: ", arg)
+		// fmt.Println("dialing: ", arg)
 		d := websocket.DefaultDialer
 		con, _, err := d.Dial(arg, http.Header{})
 		if err != nil {
