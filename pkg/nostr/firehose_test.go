@@ -3,6 +3,7 @@ package nostr
 import (
 	"context"
 	"fmt"
+	"sync"
 	"testing"
 
 	ao "github.com/Hubmakerlabs/hoover/pkg/arweave"
@@ -10,20 +11,14 @@ import (
 	"github.com/Hubmakerlabs/replicatr/pkg/interrupt"
 )
 
-var relays = []string{
-	"wss://purplepag.es",
-	"wss://njump.me",
-	"wss://relay.snort.social",
-	"wss://relay.damus.io",
-	"wss://relay.primal.net",
-}
-
 func TestFirehose(t *testing.T) {
 	c, cancel := context.WithCancel(context.Background())
 	interrupt.AddHandler(cancel)
-	Firehose(c, cancel, relays, func(bundle *types.BundleItem) (err error) {
-		fmt.Println()
-		ao.PrintBundleItem(bundle)
-		return
-	})
+	var wg sync.WaitGroup
+	Firehose(c, cancel, &wg, Relays,
+		func(bundle *types.BundleItem) (err error) {
+			ao.PrintBundleItem(bundle)
+			fmt.Println()
+			return
+		})
 }

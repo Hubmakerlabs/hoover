@@ -2,6 +2,7 @@ package nostr
 
 import (
 	"sort"
+	"sync"
 	"time"
 
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
@@ -14,6 +15,15 @@ import (
 	"github.com/Hubmakerlabs/replicatr/pkg/nostr/timestamp"
 	"github.com/nbd-wtf/go-nostr"
 )
+
+var Relays = []string{
+	"wss://purplepag.es",
+	"wss://njump.me",
+	"wss://relay.snort.social",
+	"wss://relay.damus.io",
+	"wss://relay.primal.net",
+	"wss://relay.nostr.band",
+}
 
 type sortId struct {
 	id string
@@ -30,9 +40,11 @@ func (s sortIds) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
 // them in arweave bundle items and runs a provided closure on them.
 //
 // If the closure returns an error, the Firehose halts and returns to the caller.
-func Firehose(c context.T, cancel context.F, relays []S,
+func Firehose(c context.T, cancel context.F, wg *sync.WaitGroup, relays []S,
 	fn func(bundle *types.BundleItem) (err error)) {
 
+	var ready bool
+	wg.Add(1)
 	pool := nostr.NewSimplePool(c)
 	stop := func() {
 		pool.Relays.Range(func(_ string, relay *nostr.Relay) bool {
@@ -62,6 +74,11 @@ func Firehose(c context.T, cancel context.F, relays []S,
 		if bundle == nil {
 			continue
 		}
+		if !ready {
+			ready = true
+			wg.Done()
+		}
+		wg.Wait()
 		if err = fn(bundle); err != nil {
 			return
 		}

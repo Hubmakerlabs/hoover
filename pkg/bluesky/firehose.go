@@ -1,9 +1,9 @@
 package bluesky
 
 import (
-	"fmt"
+	"sync"
+	"sync/atomic"
 
-	arweave "github.com/Hubmakerlabs/hoover/pkg/arweave"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
 	"github.com/Hubmakerlabs/replicatr/pkg/nostr/context"
 	"github.com/bluesky-social/indigo/events"
@@ -13,7 +13,12 @@ import (
 
 const SubReposURL = "wss://bsky.network/xrpc/com.atproto.sync.subscribeRepos"
 
-func Firehose(c context.T, cancel context.F, fn func(bundle *types.BundleItem) (err error)) {
+func Firehose(c context.T, cancel context.F, wg *sync.WaitGroup,
+	fn func(bundle *types.BundleItem) (err error)) {
+
+	wg.Add(1)
+	var ready atomic.Bool
+	ready.Store(false)
 	var conn *websocket.Conn
 	var err error
 	if conn, err = Connect(c); chk.E(err) {
@@ -21,8 +26,13 @@ func Firehose(c context.T, cancel context.F, fn func(bundle *types.BundleItem) (
 	}
 	rscb := &events.RepoStreamCallbacks{
 		RepoCommit: RepoCommit(c, cancel, func(bundle *types.BundleItem) (err error) {
-			fmt.Println()
-			arweave.PrintBundleItem(bundle)
+			if !ready.Load() {
+				ready.Store(true)
+				wg.Done()
+			}
+			if err = fn(bundle); err != nil {
+				return
+			}
 			return
 		}),
 		RepoHandle:    RepoHandle(),
