@@ -28,12 +28,18 @@ func GetNostrKindToBundle(k kind.T) (s string) {
 		s = Follow
 	case kind.Reaction:
 		s = Like
-	case kind.MuteList:
-		s = Block
 	case kind.ProfileMetadata:
 		s = Profile
 	}
 	return
+}
+
+var RelevantKinds = []int{
+	kind.TextNote.ToInt(), kind.LongFormContent.ToInt(),
+	kind.Reaction.ToInt(),
+	kind.Follows.ToInt(),
+	kind.Repost.ToInt(), kind.GenericRepost.ToInt(),
+	kind.ProfileMetadata.ToInt(),
 }
 
 // EventToBundleItem constructs a bundle from relevant nostr events.
@@ -55,6 +61,7 @@ func EventToBundleItem(ev *event.T) (bundle *types.BundleItem, err error) {
 		{Name: Timestamp, Value: strconv.FormatInt(ev.CreatedAt.I64(), 10)},
 		{Name: Signature, Value: ev.Sig},
 	}
+out:
 	switch k {
 	case Post:
 		for i, t := range ev.Tags {
@@ -223,7 +230,8 @@ func EventToBundleItem(ev *event.T) (bundle *types.BundleItem, err error) {
 		bundle.Data = ""
 		var prf ProfileMetadata
 		if err = json.Unmarshal(B(ev.Content), &prf); chk.E(err) {
-			return
+			log.I.F("%s", ev.Content)
+			break out
 		}
 		var hasContent bool
 		if prf.Name != "" {
@@ -265,12 +273,15 @@ func EventToBundleItem(ev *event.T) (bundle *types.BundleItem, err error) {
 				Value: prf.Website,
 			})
 		}
-		if prf.NIP05 != "" {
-			hasContent = true
-			bundle.Tags = append(bundle.Tags, types.Tag{
-				Name:  Verification,
-				Value: prf.NIP05,
-			})
+		if nip05, ok := prf.NIP05.(string); ok {
+			if nip05 != "" {
+				hasContent = true
+				bundle.Tags = append(bundle.Tags, types.Tag{
+					Name:  Verification,
+					Value: nip05,
+				})
+			}
+
 		}
 		if prf.LUD16 != "" {
 			hasContent = true
@@ -378,6 +389,6 @@ type ProfileMetadata struct {
 	Website     string `json:"website,omitempty"`
 	Picture     string `json:"picture,omitempty"`
 	Banner      string `json:"banner,omitempty"`
-	NIP05       string `json:"nip05,omitempty"`
+	NIP05       any    `json:"nip05,omitempty"`
 	LUD16       string `json:"lud16,omitempty"`
 }
