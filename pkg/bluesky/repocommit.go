@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/Hubmakerlabs/hoover/pkg"
-	arweave "github.com/Hubmakerlabs/hoover/pkg/arweave"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
 	"github.com/bluesky-social/indigo/api/atproto"
 	"github.com/bluesky-social/indigo/lex/util"
@@ -18,7 +17,8 @@ import (
 )
 
 func RepoCommit(ctx context.Context,
-	cancel context.CancelFunc) func(evt *atproto.SyncSubscribeRepos_Commit) (err error) {
+	cancel context.CancelFunc, fn func(bundle *types.BundleItem) (err error)) func(
+		evt *atproto.SyncSubscribeRepos_Commit) (err error) {
 	return func(evt *atproto.SyncSubscribeRepos_Commit) (err error) {
 		var rr *repo.Repo
 		if rr, err = repo.ReadRepoFromCar(ctx, bytes.NewReader(evt.Blocks)); chk.E(err) {
@@ -43,65 +43,58 @@ func RepoCommit(ctx context.Context,
 				case strings.HasPrefix(op.Path, Kinds(pkg.Post)):
 					var post *types.BundleItem
 					if post, err = FromBskyFeedPost(evt, op, rr, rec); chk.E(err) {
-						// normally would return but this shuts down the firehose processing
 						err = nil
 						continue
-						// return
 					}
-					_ = post
-					arweave.PrintBundleItem(post)
-					fmt.Println()
+					if err = fn(post); err != nil {
+						cancel()
+						return
+					}
 					case strings.HasPrefix(op.Path, Kinds(pkg.Like)):
 						var like *types.BundleItem
 						if like, err = FromBskyFeedLike(evt, op, rr, rec); err != nil {
-							// normally would return but this shuts down the firehose processing
 							err = nil
 							continue
-							// return
 						}
-						_ = like
-						arweave.PrintBundleItem(like)
-						fmt.Println()
+						if err = fn(like); err != nil {
+							cancel()
+							return
+						}
 					case strings.HasPrefix(op.Path, Kinds(pkg.Follow)):
 						var follow *types.BundleItem
 						if follow, err = FromBskyGraphFollow(evt, op, rr, rec); chk.E(err) {
-							// normally would return but this shuts down the firehose processing
-							// err = nil
-							// continue
+							err = nil
+							continue
+						}
+						if err = fn(follow); err != nil {
+							cancel()
 							return
 						}
-						_ = follow
-						arweave.PrintBundleItem(follow)
-						fmt.Println()
 					case strings.HasPrefix(op.Path, Kinds(pkg.Repost)):
 						var repost *types.BundleItem
 						if repost, err = FromBskyFeedRepost(evt, op, rr, rec); chk.E(err) {
-							// normally would return but this shuts down the firehose processing
-							// err = nil
-							// continue
+							err = nil
+							continue
+						}
+						if err = fn(repost); err != nil {
+							cancel()
 							return
 						}
-						_ = repost
-						arweave.PrintBundleItem(repost)
-						fmt.Println()
 					case strings.HasPrefix(op.Path, Kinds(pkg.Profile)):
 						var profile *types.BundleItem
 						if profile, err = FromBskyActorProfile(evt, op, rr, rec); chk.E(err) {
-							// normally would return but this shuts down the firehose processing
-							// err = nil
-							// continue
+							err = nil
+							continue
+						}
+						if err = fn(profile); err != nil {
+							cancel()
 							return
 						}
-						_ = profile
-						arweave.PrintBundleItem(profile)
-						fmt.Println()
 				}
 			default:
 				// log.I.Ln(ek)
 			}
 		}
-		// cancel()
-		_ = rr
 		return
 	}
 }
