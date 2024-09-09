@@ -2,7 +2,6 @@ package bluesky
 
 import (
 	"context"
-	"fmt"
 	"sync"
 	"testing"
 
@@ -17,7 +16,6 @@ func TestFirehose(t *testing.T) {
 	var wg sync.WaitGroup
 	Firehose(c, cancel, &wg, func(bundle *types.BundleItem) (err error) {
 		arweave.PrintBundleItem(bundle)
-		fmt.Println()
 		return
 	})
 }

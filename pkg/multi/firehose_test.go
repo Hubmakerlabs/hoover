@@ -19,7 +19,6 @@ func TestFirehose(t *testing.T) {
 	fmt.Println()
 	Firehose(c, cancel, &wg, nostr.Relays,func(bundle *types.BundleItem) (err error) {
 		arweave.PrintBundleItem(bundle)
-		fmt.Println()
 		return
 	})
 }

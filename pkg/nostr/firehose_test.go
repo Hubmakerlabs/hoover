@@ -2,7 +2,6 @@ package nostr
 
 import (
 	"context"
-	"fmt"
 	"sync"
 	"testing"
 
@@ -18,7 +17,6 @@ func TestFirehose(t *testing.T) {
 	Firehose(c, cancel, &wg, Relays,
 		func(bundle *types.BundleItem) (err error) {
 			ao.PrintBundleItem(bundle)
-			fmt.Println()
 			return
 		})
 }
