@@ -1,0 +1,6 @@
+{
+    "remote.SSH.remotePlatform": {
+      "default": "linux"
+    }
+  }
+  

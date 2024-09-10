@@ -34,5 +34,7 @@
 !bundleData
 !*.item
 !*.bin
+!*.js
 # ...even if they are in subdirectories
 !*/
+node_modules/
