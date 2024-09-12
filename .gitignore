@@ -8,6 +8,10 @@
 *
 # especially intellij things
 .idea
+# and vscode
+.vscode
+# and fucking nodejs
+*/node_modules
 # But not these files...
 !/.gitignore
 !*.go
