@@ -35,6 +35,8 @@ func TestEventToBundleItem(t *testing.T) {
 		if bundle==nil{
 			continue
 		}
+		// fmt.Println()
+		// fmt.Println(S(b))
 		fmt.Println()
 		ao.PrintBundleItem(bundle)
 		b = b[:0]
