@@ -1,5 +1,5 @@
 package uploader
 
-func Upload() {
-
+func Upload() (code int, err error) {
+	return
 }
