@@ -55,7 +55,8 @@ func Firehose(c context.T, cancel context.F, wg *sync.WaitGroup, relays []S,
 	}
 	defer stop()
 	var err error
-	ff := nostr.Filters{{Kinds: RelevantKinds}}
+	ts := nostr.Timestamp(timestamp.Now())
+	ff := nostr.Filters{{Kinds: RelevantKinds, Since: &ts}}
 	idMap := make(map[string]int64)
 	for evt := range pool.SubMany(c, relays, ff) {
 		var bundle *types.BundleItem

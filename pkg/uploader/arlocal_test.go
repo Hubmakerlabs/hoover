@@ -43,7 +43,7 @@ func Mint(endpoint, account string, amount int64, t *testing.T) (err error) {
 
 // BumpBalance checks that the balance is not low and adds winstons to it to bring it to a
 // decent amount.
-func BumpBalance(endpoint, address string, t *testing.T) {
+func BumpBalance(endpoint, address string, amount int64, t *testing.T) {
 	var err error
 	var bal int64
 	if bal, err = GetBalance(endpoint, address); err != nil {
@@ -52,7 +52,7 @@ func BumpBalance(endpoint, address string, t *testing.T) {
 	// do we need to mint some more?
 	if bal < 1000000 {
 		// load the wallet to a decent starting amount of winston
-		if err = Mint(endpoint, address, 1000000000-bal, t); err != nil {
+		if err = Mint(endpoint, address, amount-bal, t); err != nil {
 			t.Fatal(err)
 		}
 		// mine it

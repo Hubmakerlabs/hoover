@@ -21,7 +21,7 @@ func TestMultiFirehose(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	BumpBalance(arlocal, address, t)
+	BumpBalance(arlocal, address,10000000000, t)
 	c, cancel := context.WithCancel(context.Background())
 	interrupt.AddHandler(cancel)
 	go func() {
@@ -30,20 +30,44 @@ func TestMultiFirehose(t *testing.T) {
 	}()
 	var wg sync.WaitGroup
 	fmt.Println()
+	var speedFactor int64 = 1
+	var count byte
 	multi.Firehose(c, cancel, &wg, nostr.Relays, func(bundle *types.BundleItem) (err error) {
-		// var tx types.Transaction
-		if _, err = wallet.SendData([]byte(bundle.Data), bundle.Tags); err != nil {
-			// just continue because this is a test
+		var reward int64
+		reward, err = wallet.Client.GetTransactionPrice(len(bundle.Data), nil)
+		if err != nil {
+			// if he dies, he dies
 			return nil
 		}
-		Mine(arlocal, t)
+		rew := reward * (100 + speedFactor) / 100
+		if rew == 0 {
+			rew = 1000
+		}
+		tx := &types.Transaction{
+			Format:   2,
+			Target:   "",
+			Quantity: "0",
+			Tags:     utils.TagsEncode(bundle.Tags),
+			Data:     utils.Base64Encode([]byte(bundle.Data)),
+			DataSize: fmt.Sprintf("%d", len(bundle.Data)),
+			Reward:   fmt.Sprintf("%d", rew),
+		}
+		if _, err = wallet.SendTransaction(tx); err != nil {
+			// if he dies, he dies
+			t.Log(err)
+			return nil
+		}
+		count++
+		if count==0{
+			Mine(arlocal, t)
+		}
 		return
 	})
 }
 
 func TestUpload(t *testing.T) {
 	address, wallet, err := GetTestWallet(arlocal, t)
-	BumpBalance(arlocal, address, t)
+	BumpBalance(arlocal, address,100000000000, t)
 	b := make([]byte, 32)
 	if _, err = frand.Read(b); err != nil {
 		t.Fatal(err)
