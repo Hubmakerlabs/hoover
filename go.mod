@@ -116,6 +116,7 @@ require (
 	gorm.io/datatypes v1.2.1
 	gorm.io/driver/postgres v1.5.9
 	gorm.io/gorm v1.25.11
+	lukechampine.com/frand v1.4.2
 	nhooyr.io/websocket v1.8.11
 )
 
@@ -125,6 +126,7 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/internal v1.9.1 // indirect
 	github.com/DataDog/zstd v1.5.5 // indirect
 	github.com/RussellLuo/slidingwindow v0.0.0-20200528002341-535bb99d338b // indirect
+	github.com/aead/chacha20 v0.0.0-20180709150244-8b13a72661da // indirect
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.11 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.3.15 // indirect

@@ -52,6 +52,3 @@ node_modules/**
 **/node_modules
 **/node_modules/
 **/node_modules/**
-keyfile.json
-/keyfile.json
-**/keyfile.json

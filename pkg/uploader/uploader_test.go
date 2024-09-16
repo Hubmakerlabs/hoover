@@ -1,127 +1,84 @@
 package uploader
 
 import (
-	_ "embed"
+	"context"
 	"fmt"
-	"io"
-	"net/http"
-	"strconv"
+	"sync"
 	"testing"
+	"time"
+
+	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
+	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/utils"
+	"github.com/Hubmakerlabs/hoover/pkg/multi"
+	"github.com/Hubmakerlabs/hoover/pkg/nostr"
+	"github.com/Hubmakerlabs/replicatr/pkg/interrupt"
+	"github.com/davecgh/go-spew/spew"
+	"lukechampine.com/frand"
 )
 
-//go:embed keyfile.json
-var key []byte
-
-// this requires the use of https://github.com/textury/arlocal todo: maybe we can spawn it in a container?
-
-const arlocal = "http://localhost:1984"
-
-func GetBody(res *http.Response) (s string, err error) {
-	if res == nil {
-		return
-	}
-	if res.Body == nil {
-		return
-	}
-	defer res.Body.Close()
-	var body []byte
-	body, err = io.ReadAll(res.Body)
+func TestMultiFirehose(t *testing.T) {
+	address, wallet, err := GetTestWallet(arlocal, t)
 	if err != nil {
-		return
+		t.Fatal(err)
 	}
-	s = string(body)
-	return
-}
-
-func Mine(t *testing.T) (err error) {
-	var res *http.Response
-	res, err = http.Get(
-		"http://localhost:1984/mine")
-	if err != nil {
+	BumpBalance(arlocal, address, t)
+	c, cancel := context.WithCancel(context.Background())
+	interrupt.AddHandler(cancel)
+	go func() {
+		time.Sleep(time.Second * 10)
+		cancel()
+	}()
+	var wg sync.WaitGroup
+	fmt.Println()
+	multi.Firehose(c, cancel, &wg, nostr.Relays, func(bundle *types.BundleItem) (err error) {
+		// var tx types.Transaction
+		if _, err = wallet.SendData([]byte(bundle.Data), bundle.Tags); err != nil {
+			// just continue because this is a test
+			return nil
+		}
+		Mine(arlocal, t)
 		return
-	}
-	var body string
-	if body, err = GetBody(res); err != nil {
-		return
-	}
-	t.Log(body)
-	return
+	})
 }
 
 func TestUpload(t *testing.T) {
-	var err error
-	var res *http.Response
-	res, err = http.Get(
-		"http://localhost:1984/wallet/27xHJ0MNsBUKFIdOiQ3OlrZdDzSNfBPGnp6YVmWKKxU/balance")
-	if err != nil {
+	address, wallet, err := GetTestWallet(arlocal, t)
+	BumpBalance(arlocal, address, t)
+	b := make([]byte, 32)
+	if _, err = frand.Read(b); err != nil {
 		t.Fatal(err)
 	}
-	var body string
-	if body, err = GetBody(res); err != nil {
+	data := utils.Base64Encode(b)
+	spew.Dump(b, data)
+	var reward int64
+	if reward, err = wallet.Client.GetTransactionPrice(len(data), nil); err != nil {
 		t.Fatal(err)
 	}
-	var bal int64
-	t.Log(body)
-	bal, err = strconv.ParseInt(body, 10, 64)
-	// do we need to mint some more?
-	if bal < 10000 {
-		// load the wallet to a decent starting amount of winston
-		res, err = http.Get(
-			fmt.Sprintf("http://localhost:1984/mint"+
-				"/27xHJ0MNsBUKFIdOiQ3OlrZdDzSNfBPGnp6YVmWKKxU"+
-				"/%d", 1000000000-bal))
-		if err != nil {
-			t.Fatal(err)
-		}
-		if body, err = GetBody(res); err != nil {
-			t.Fatal(err)
-		}
-		t.Log(body)
-		// mine it
-		if err = Mine(t); err != nil {
-			t.Fatal(err)
-		}
+	var speedFactor int64
+	tx := &types.Transaction{
+		Format: 2,
+		ID:     "",
+		LastTx: "",
+		Owner:  "",
+		Tags: utils.TagsEncode([]types.Tag{{Name: "Name-Tag",
+			Value: "this is a test tag"}}),
+		Target:     "",
+		Quantity:   "0",
+		Data:       data,
+		DataReader: nil,
+		DataSize:   fmt.Sprintf("%d", len(data)),
+		DataRoot:   "",
+		Reward:     fmt.Sprintf("%d", reward*(100+speedFactor)/100),
+		Signature:  "",
+		Chunks:     nil,
 	}
-	// spew.Dump(res)
-	// t.Log(res)
-	// b := make([]byte, res.ContentLength)
-	// var n int
-	// if n, err = res.Body.Read(b);err!=nil {
-	// 	t.Fatal(err)
-	// }
-	// t.Log(string(b[:n]))
-	// var wallet *goar.Wallet
-	// if wallet, err = goar.NewWallet(key, arlocal); err != nil {
-	// 	t.Fatal(err)
-	// }
-	// data := utils.Base64Encode([]byte("this is test data"))
-	// spew.Dump(data)
-	// var reward int64
-	// if reward, err = wallet.Client.GetTransactionPrice(len(data), nil); err != nil {
-	// 	t.Fatal(err)
-	// }
-	// var speedFactor int64
-	// tx := &types.Transaction{
-	// 	Format: 2,
-	// 	ID:     "",
-	// 	LastTx: "",
-	// 	Owner:  "",
-	// 	Tags: utils.TagsEncode([]types.Tag{{Name: "Name-Tag",
-	// 		Value: "this is a test tag"}}),
-	// 	Target:     "",
-	// 	Quantity:   "0",
-	// 	Data:       data,
-	// 	DataReader: nil,
-	// 	DataSize:   fmt.Sprintf("%d", len(data)),
-	// 	DataRoot:   "",
-	// 	Reward:     fmt.Sprintf("%d", reward*(100+speedFactor)/100),
-	// 	Signature:  "",
-	// 	Chunks:     nil,
-	// }
-	// spew.Dump(tx)
-	// if *tx, err = wallet.SendTransaction(tx); err != nil {
-	// 	t.Fatal(err)
-	// }
+	spew.Dump(tx)
+	if *tx, err = wallet.SendTransaction(tx); err != nil {
+		t.Fatal(err)
+	}
+	if err = Mine(arlocal, t); err != nil {
+		t.Fatal(err)
+	}
 	//
 	// res, err = http.Get(
 	// 	"http://localhost:1984/mine")
