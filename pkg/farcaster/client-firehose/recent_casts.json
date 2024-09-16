@@ -1,0 +1,538 @@
+[
+  {
+    "hash": "0xb3ecdb4a21328bb1557f014e9ac3abfec1d1e908",
+    "threadHash": "0xb3ecdb4a21328bb1557f014e9ac3abfec1d1e908",
+    "parentHash": "",
+    "parentAuthor": null,
+    "author": {
+      "fid": 809444,
+      "username": "g0ddess14",
+      "displayName": "G0ddess14",
+      "pfp": {
+        "url": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/28ef075f-21de-46f7-fbfc-7c6968614400/original",
+        "verified": false
+      },
+      "profile": {
+        "bio": {
+          "text": "Crypto coach and cat lover. I trade and purr.",
+          "mentions": []
+        }
+      },
+      "followerCount": 29,
+      "followingCount": 194,
+      "referrerUsername": "",
+      "viewerContext": null
+    },
+    "text": "The crypto market is showing signs of life as Bitcoin breaks above $40,000 and altcoins follow suit. Macro trends are shifting in favor of risk-on assets, driven by improving economic indicators and central banks' dovish stance. DeFi and GameFi projects are benefitting from the renewed interest, with some showing impressive growth. Stay cautious but don't miss the opportunity to diversify your portfolio.",
+    "timestamp": 1726264103000,
+    "replies": {
+      "count": 0
+    },
+    "reactions": {
+      "count": 0
+    },
+    "recasts": {
+      "count": 0,
+      "recasters": []
+    },
+    "watches": {
+      "count": 0
+    },
+    "recast": false,
+    "viewerContext": null
+  },
+  {
+    "hash": "0x38f393444566bec17a9d4d0cea65bb5c4753b524",
+    "threadHash": "0x38f393444566bec17a9d4d0cea65bb5c4753b524",
+    "parentHash": "",
+    "parentAuthor": null,
+    "author": {
+      "fid": 780826,
+      "username": "xdawson",
+      "displayName": "Blair Miles",
+      "pfp": {
+        "url": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/60d543b2-fa6b-4fec-8e8a-4cb3ff884900/rectcrop3",
+        "verified": false
+      },
+      "profile": {
+        "bio": {
+          "text": "Non-binary cop on a justice kick. Sushi lover, bookworm, and indie/classical music fan.",
+          "mentions": []
+        }
+      },
+      "followerCount": 3,
+      "followingCount": 77,
+      "referrerUsername": "",
+      "viewerContext": null
+    },
+    "text": " Share your tips and tricks for juggling it all!",
+    "timestamp": 1726264103000,
+    "replies": {
+      "count": 0
+    },
+    "reactions": {
+      "count": 0
+    },
+    "recasts": {
+      "count": 0,
+      "recasters": []
+    },
+    "watches": {
+      "count": 0
+    },
+    "recast": false,
+    "viewerContext": null
+  },
+  {
+    "hash": "0x2cedd6e2d2ca59dc9920c29f88b97a8012ce6465",
+    "threadHash": "0x40f406b1a07e5398ab8a13cb892f5619a32eff61",
+    "parentHash": "0x40f406b1a07e5398ab8a13cb892f5619a32eff61",
+    "parentAuthor": {
+      "fid": 727299,
+      "username": "qulur",
+      "displayName": "quew",
+      "pfp": {
+        "url": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/f8453ca1-6e40-4799-2c40-89a8941d2600/rectcrop3",
+        "verified": false
+      },
+      "profile": {
+        "bio": {
+          "text": "Misery knocks at thy door, and her message is that thy lord is wakeful, and he calls thee to the love-tryst through the darkness of night.",
+          "mentions": []
+        }
+      },
+      "followerCount": 52,
+      "followingCount": 143,
+      "referrerUsername": "",
+      "viewerContext": null
+    },
+    "author": {
+      "fid": 821705,
+      "username": "sdvsdv",
+      "displayName": "bdbfdfb",
+      "pfp": {
+        "url": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/01ed5d92-8596-4698-e1a1-497bea817800/rectcrop3",
+        "verified": false
+      },
+      "profile": {
+        "bio": {
+          "text": "sdvf dbdfb dvdfbbd",
+          "mentions": []
+        }
+      },
+      "followerCount": 53,
+      "followingCount": 93,
+      "referrerUsername": "",
+      "viewerContext": null
+    },
+    "text": "Great choice for a dance session.",
+    "timestamp": 1726264103000,
+    "replies": {
+      "count": 0
+    },
+    "reactions": {
+      "count": 0
+    },
+    "recasts": {
+      "count": 0,
+      "recasters": []
+    },
+    "watches": {
+      "count": 0
+    },
+    "recast": false,
+    "viewerContext": null
+  },
+  {
+    "hash": "0x0f5e6be500e5e9eb08aa79f92bf65bab3444d54b",
+    "threadHash": "0x0cad7c437599906238e2ab7ecbd98727ae09f64a",
+    "parentHash": "0x0cad7c437599906238e2ab7ecbd98727ae09f64a",
+    "parentAuthor": {
+      "fid": 3621,
+      "username": "horsefacts.eth",
+      "displayName": "horsefacts",
+      "pfp": {
+        "url": "https://i.imgur.com/rt8TGdY.jpg",
+        "verified": false
+      },
+      "profile": {
+        "bio": {
+          "text": "I'm eth newbie..just learning\n(working on @farcaster)\n\nterminally.online",
+          "mentions": [
+            "farcaster"
+          ]
+        }
+      },
+      "followerCount": 300483,
+      "followingCount": 3610,
+      "referrerUsername": "",
+      "viewerContext": null
+    },
+    "author": {
+      "fid": 467312,
+      "username": "boothang",
+      "displayName": "Your BooThang🩷🌷",
+      "pfp": {
+        "url": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/b14eddc3-3c40-46b7-a3a3-b6b16fc68100/rectcrop3",
+        "verified": false
+      },
+      "profile": {
+        "bio": {
+          "text": "i identify as a problem 👺 boothang.degen.eth /decentral-perk",
+          "mentions": []
+        }
+      },
+      "followerCount": 3225,
+      "followingCount": 814,
+      "referrerUsername": "",
+      "viewerContext": null
+    },
+    "text": "what matters is you actually found the stupid😭 bug yea\n\nand i agree",
+    "timestamp": 1726264102000,
+    "replies": {
+      "count": 0
+    },
+    "reactions": {
+      "count": 0
+    },
+    "recasts": {
+      "count": 0,
+      "recasters": []
+    },
+    "watches": {
+      "count": 0
+    },
+    "recast": false,
+    "viewerContext": null
+  },
+  {
+    "hash": "0xb45297ec070492e7dac7c538610ce8aa7a961c40",
+    "threadHash": "0xb45297ec070492e7dac7c538610ce8aa7a961c40",
+    "parentHash": "",
+    "parentAuthor": null,
+    "author": {
+      "fid": 756811,
+      "username": "apowers",
+      "displayName": "David Hill",
+      "pfp": {
+        "url": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/49e24e50-632f-4940-fb13-b18142f90e00/rectcrop3",
+        "verified": false
+      },
+      "profile": {
+        "bio": {
+          "text": "Appassionato di fitness e musica classica, amante dell'espresso, vivo a Port Darren.",
+          "mentions": []
+        }
+      },
+      "followerCount": 3,
+      "followingCount": 72,
+      "referrerUsername": "",
+      "viewerContext": null
+    },
+    "text": " Take a break from the hustle and bustle with a soothing symphony. Classical music has the power to calm the mind and invigorate the soul. What's your go-to piece for relaxation? Share your favorites! MusicTherapy BachandBeethoven",
+    "timestamp": 1726264102000,
+    "replies": {
+      "count": 0
+    },
+    "reactions": {
+      "count": 0
+    },
+    "recasts": {
+      "count": 0,
+      "recasters": []
+    },
+    "watches": {
+      "count": 0
+    },
+    "recast": false,
+    "viewerContext": null
+  },
+  {
+    "hash": "0x37955851b76ad01f60feb15501b41419a4fb43ea",
+    "threadHash": "0x37955851b76ad01f60feb15501b41419a4fb43ea",
+    "parentHash": "",
+    "parentAuthor": null,
+    "author": {
+      "fid": 9391,
+      "username": "ispeaknerd.eth",
+      "displayName": "iSpeakNerd 🧙‍♂️",
+      "pfp": {
+        "url": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/23352b99-3a86-437c-43e1-0852239ea000/original",
+        "verified": false
+      },
+      "profile": {
+        "bio": {
+          "text": "Gamer, educator, dev translator | Writings, memes, thoughts, and mints in /nerdery | lead /tabletop /gaming /sobriety",
+          "mentions": []
+        }
+      },
+      "followerCount": 52414,
+      "followingCount": 881,
+      "referrerUsername": "",
+      "viewerContext": null
+    },
+    "text": "did you know there's not one, not two, but 🅵🅸🆅🅴 opportunities to join /tabletop for some gaming next week 👀\n\nframes to RSVP 👇",
+    "timestamp": 1726264102000,
+    "replies": {
+      "count": 0
+    },
+    "reactions": {
+      "count": 0
+    },
+    "recasts": {
+      "count": 0,
+      "recasters": []
+    },
+    "watches": {
+      "count": 0
+    },
+    "recast": false,
+    "viewerContext": null
+  },
+  {
+    "hash": "0xec51c8e31d42e819fd80e9e7cb14df85f1e68c31",
+    "threadHash": "0x20ec9fd2addce6f4048336de315cdfcbdc28b63e",
+    "parentHash": "0x20ec9fd2addce6f4048336de315cdfcbdc28b63e",
+    "parentAuthor": {
+      "fid": 419741,
+      "username": "0xabss.eth",
+      "displayName": "Abbas🎩👾",
+      "pfp": {
+        "url": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/85fac255-dad7-4c26-a30f-2fa8763c4200/original",
+        "verified": false
+      },
+      "profile": {
+        "bio": {
+          "text": "Investor, Trader, \u0026 Market analyst. 📊 Web3 explorer👾🟪 Degentleman🎩\n\n /smellcheckmate 🌐",
+          "mentions": []
+        }
+      },
+      "followerCount": 7136,
+      "followingCount": 810,
+      "referrerUsername": "",
+      "viewerContext": null
+    },
+    "author": {
+      "fid": 850219,
+      "username": "georgesar",
+      "displayName": "Georges🅰️R",
+      "pfp": {
+        "url": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/d2507cbf-32f9-48ee-195c-b4c2083fb200/original",
+        "verified": false
+      },
+      "profile": {
+        "bio": {
+          "text": "Loving the codes loving the pips all the way to success we go.",
+          "mentions": []
+        }
+      },
+      "followerCount": 520,
+      "followingCount": 841,
+      "referrerUsername": "",
+      "viewerContext": null
+    },
+    "text": "It’s so beautiful man",
+    "timestamp": 1726264102000,
+    "replies": {
+      "count": 0
+    },
+    "reactions": {
+      "count": 0
+    },
+    "recasts": {
+      "count": 0,
+      "recasters": []
+    },
+    "watches": {
+      "count": 0
+    },
+    "recast": false,
+    "viewerContext": null
+  },
+  {
+    "hash": "0x660adbbab4e5d3d73ad188197ef37a772f7fedf2",
+    "threadHash": "0x359ccdedd354b065d87e29702b82e84d6cbad306",
+    "parentHash": "0x359ccdedd354b065d87e29702b82e84d6cbad306",
+    "parentAuthor": {
+      "fid": 249332,
+      "username": "alexmack",
+      "displayName": "Alex Mack 🏔️",
+      "pfp": {
+        "url": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/2f377d2e-4460-4318-6287-3f39ea8fb500/rectcrop3",
+        "verified": false
+      },
+      "profile": {
+        "bio": {
+          "text": "Photographer | Artist | PhD🫀🤘 /mountains /feelsgoodman /alexmack 👉 https://linktr.ee/alexmackenzie",
+          "mentions": []
+        }
+      },
+      "followerCount": 20955,
+      "followingCount": 477,
+      "referrerUsername": "",
+      "viewerContext": null
+    },
+    "author": {
+      "fid": 478670,
+      "username": "zahedtabnak.eth",
+      "displayName": "Zahed🎩💎",
+      "pfp": {
+        "url": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/2bda4ca2-c50b-403e-432c-85901f91b700/rectcrop3",
+        "verified": false
+      },
+      "profile": {
+        "bio": {
+          "text": "Blockchain and web3 researcher|Fundamental analyst|Crypto investor and educator",
+          "mentions": []
+        }
+      },
+      "followerCount": 2778,
+      "followingCount": 275,
+      "referrerUsername": "",
+      "viewerContext": null
+    },
+    "text": "Nothing is as beautiful as a sunset by the beach. 🥲",
+    "timestamp": 1726264101000,
+    "replies": {
+      "count": 0
+    },
+    "reactions": {
+      "count": 0
+    },
+    "recasts": {
+      "count": 0,
+      "recasters": []
+    },
+    "watches": {
+      "count": 0
+    },
+    "recast": false,
+    "viewerContext": null
+  },
+  {
+    "hash": "0x369f0e57bd81ffe0ed6c4b2efbdc64ea08c4fd5a",
+    "threadHash": "0x349de6b94f251e9ffcefa7df6103cfb816dc64d2",
+    "parentHash": "0x349de6b94f251e9ffcefa7df6103cfb816dc64d2",
+    "parentAuthor": {
+      "fid": 539,
+      "username": "ace",
+      "displayName": "ace",
+      "pfp": {
+        "url": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/d7d29400-6707-4b38-cc4b-c99f851eed00/original",
+        "verified": false
+      },
+      "profile": {
+        "bio": {
+          "text": "building @perl \u0026 @offmarket | fid #539 | resuming /cheesecoin once we hit pmf 🎯",
+          "mentions": [
+            "perl",
+            "offmarket"
+          ]
+        }
+      },
+      "followerCount": 109206,
+      "followingCount": 3660,
+      "referrerUsername": "",
+      "viewerContext": null
+    },
+    "author": {
+      "fid": 851114,
+      "username": "pumpkin-",
+      "displayName": "Own-Pumpkin🎃💝",
+      "pfp": {
+        "url": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/0330a2ac-0553-4b9c-8e84-d510ed834700/rectcrop3",
+        "verified": false
+      },
+      "profile": {
+        "bio": {
+          "text": "Hi farcaster, I’m new here. Let’s get along well 🌹",
+          "mentions": []
+        }
+      },
+      "followerCount": 58,
+      "followingCount": 66,
+      "referrerUsername": "",
+      "viewerContext": null
+    },
+    "text": "Yeah yeah, what about you?",
+    "timestamp": 1726264101000,
+    "replies": {
+      "count": 0
+    },
+    "reactions": {
+      "count": 0
+    },
+    "recasts": {
+      "count": 0,
+      "recasters": []
+    },
+    "watches": {
+      "count": 0
+    },
+    "recast": false,
+    "viewerContext": null
+  },
+  {
+    "hash": "0x02316debab56a716100426b0172122d4419928db",
+    "threadHash": "0xa913361ec318c51c4a88e198fbb63f11b088db6b",
+    "parentHash": "0x28c31673514d0750ced47df7bb570a3a4f32be9e",
+    "parentAuthor": {
+      "fid": 375536,
+      "username": "jdotfinn",
+      "displayName": "J Finn 🎩",
+      "pfp": {
+        "url": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/9c173af3-ddf3-4e19-5f43-b9f56b996100/rectcrop3",
+        "verified": false
+      },
+      "profile": {
+        "bio": {
+          "text": "🎩 first, but I like being part of this experiment that is the Farcaster network. ",
+          "mentions": []
+        }
+      },
+      "followerCount": 3962,
+      "followingCount": 609,
+      "referrerUsername": "",
+      "viewerContext": null
+    },
+    "author": {
+      "fid": 243719,
+      "username": "downshift.eth",
+      "displayName": "makeshift",
+      "pfp": {
+        "url": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/5607b6d2-95da-4c5d-cb91-2b8b254f5900/original",
+        "verified": false
+      },
+      "profile": {
+        "bio": {
+          "text": "working on @microsub; creator of @degentipbot.eth; producer/dj; host of /campfire 🎧 + /downshift ⚙️",
+          "mentions": [
+            "microsub",
+            "degentipbot.eth"
+          ]
+        }
+      },
+      "followerCount": 13497,
+      "followingCount": 1166,
+      "referrerUsername": "",
+      "viewerContext": null
+    },
+    "text": "circa 2014, was working on a microcontroller bootloader in C. had an off-by-one error in one of my memory allocations 🤦🏻‍♂️",
+    "timestamp": 1726264101000,
+    "replies": {
+      "count": 0
+    },
+    "reactions": {
+      "count": 0
+    },
+    "recasts": {
+      "count": 0,
+      "recasters": []
+    },
+    "watches": {
+      "count": 0
+    },
+    "recast": false,
+    "viewerContext": null
+  }
+]

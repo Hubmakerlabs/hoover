@@ -2,4 +2,4 @@
 // sending them to Arweave AO.
 //
 // <insert more notes here>
-package farcaster
+package main
