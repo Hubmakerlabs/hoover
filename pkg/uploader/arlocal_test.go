@@ -3,6 +3,7 @@ package uploader
 import (
 	_ "embed"
 	"fmt"
+	"math/big"
 	"net/http"
 	"testing"
 
@@ -26,7 +27,7 @@ func Mine(endpoint string, t *testing.T) (err error) {
 	return
 }
 
-func Mint(endpoint, account string, amount int64, t *testing.T) (err error) {
+func Mint(endpoint, account string, amount *big.Int, t *testing.T) (err error) {
 	var res *http.Response
 	var body string
 	res, err = http.Get(fmt.Sprintf("%s/mint/%s/%d",
@@ -43,26 +44,23 @@ func Mint(endpoint, account string, amount int64, t *testing.T) (err error) {
 
 // BumpBalance checks that the balance is not low and adds winstons to it to bring it to a
 // decent amount.
-func BumpBalance(endpoint, address string, amount int64, t *testing.T) {
+func BumpBalance(endpoint, address string, amount *big.Int, t *testing.T) {
 	var err error
-	var bal int64
-	if bal, err = GetBalance(endpoint, address); err != nil {
+	// if bal, err = GetBalance(endpoint, address); err != nil {
+	// 	t.Fatal(err)
+	// }
+	// load the wallet to a decent starting amount of winston
+	if err = Mint(endpoint, address, amount, t); err != nil {
 		t.Fatal(err)
 	}
-	// do we need to mint some more?
-	if bal < 1000000 {
-		// load the wallet to a decent starting amount of winston
-		if err = Mint(endpoint, address, amount-bal, t); err != nil {
-			t.Fatal(err)
-		}
-		// mine it
-		if err = Mine(endpoint, t); err != nil {
-			t.Fatal(err)
-		}
+	// mine it
+	if err = Mine(endpoint, t); err != nil {
+		t.Fatal(err)
 	}
 }
 
-func GetTestWallet(endpoint string, t *testing.T) (address string, wallet *goar.Wallet, err error) {
+func GetTestWallet(endpoint string, t *testing.T) (address string, wallet *goar.Wallet,
+	err error) {
 	if wallet, err = goar.NewWallet(key, endpoint); err != nil {
 		t.Fatal(err)
 	}
