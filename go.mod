@@ -1,6 +1,8 @@
 module github.com/Hubmakerlabs/hoover
 
-go 1.22.5
+go 1.22.6
+
+toolchain go1.23.1
 
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.3.2
@@ -65,6 +67,7 @@ require (
 	github.com/jackpal/go-nat-pmp v1.0.2
 	github.com/jarcoal/httpmock v1.3.1
 	github.com/jedisct1/go-minisign v0.0.0-20230811132847-661be99b8267
+	github.com/juiceworks/hubble-grpc v0.0.0-20240814192421-47f78718872e
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/karalabe/usb v0.0.2
 	github.com/kylelemons/godebug v1.1.0
@@ -103,13 +106,14 @@ require (
 	github.com/whyrusleeping/cbor-gen v0.1.1-0.20240311221002-68b9f235c302
 	go.uber.org/atomic v1.11.0
 	go.uber.org/ratelimit v0.3.1
-	golang.org/x/crypto v0.25.0
+	golang.org/x/crypto v0.27.0
 	golang.org/x/exp v0.0.0-20240707233637-46b078467d37
-	golang.org/x/sync v0.7.0
-	golang.org/x/sys v0.22.0
-	golang.org/x/text v0.16.0
+	golang.org/x/sync v0.8.0
+	golang.org/x/sys v0.25.0
+	golang.org/x/text v0.18.0
 	golang.org/x/time v0.5.0
 	golang.org/x/tools v0.23.0
+	google.golang.org/grpc v1.66.2
 	gopkg.in/h2non/gentleman.v2 v2.0.5
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gopkg.in/yaml.v3 v3.0.1
@@ -302,9 +306,10 @@ require (
 	go.uber.org/zap v1.26.0 // indirect
 	golang.org/x/arch v0.8.0 // indirect
 	golang.org/x/mod v0.19.0 // indirect
-	golang.org/x/net v0.27.0 // indirect
-	golang.org/x/term v0.22.0 // indirect
+	golang.org/x/net v0.29.0 // indirect
+	golang.org/x/term v0.24.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240903143218-8af14fe29dc1 // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce // indirect
