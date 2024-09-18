@@ -20,11 +20,10 @@ import (
 var (
 	hubRpcEndpoints = []string{
 		"hoyt.farcaster.xyz:2283",
-		"hub-grpc.pinata.cloud:2281",
-		"hub.pinata.cloud:2281",
-
+		"hub-grpc.pinata.cloud",
 		"nemes.farcaster.xyz:2283",
 		"hub.farcaster.standardcrypto.vc:2283",
+		"hub.pinata.cloud",
 		"lamia.farcaster.xyz:2283",
 		"api.hub.wevm.dev",
 		"api.farcasthub.com:2283",
@@ -91,16 +90,22 @@ func main() {
 					log.Printf("failed to receive message: %v", err)
 					return
 				}
-				data := msg.GetMergeMessageBody().GetMessage().GetData()
-				// Write cast to JSONL file
-				eventJson, err := json.Marshal(data)
-				if err != nil {
-					log.Printf("failed to marshal event: %v", err)
-					continue
-				}
 
-				file.WriteString(string(eventJson) + "\n")
-				log.Println("New", data.GetType(), "added:", data.Body)
+				// Check if the message is a new cast
+				if data := msg.GetMergeMessageBody().GetMessage().GetData(); data.GetType() == pb.MessageType_MESSAGE_TYPE_CAST_ADD {
+					castBody := data.GetCastAddBody()
+
+					// Write cast to JSONL file
+					eventJson, err := json.Marshal(castBody)
+					if err != nil {
+						log.Printf("failed to marshal event: %v", err)
+						continue
+					}
+					file.WriteString(string(eventJson) + "\n")
+
+					// Print the cast to the console
+					log.Println("New cast added:", castBody.GetText())
+				}
 			}
 		}()
 
