@@ -19,14 +19,14 @@ import (
 
 var (
 	hubRpcEndpoints = []string{
-		"hoyt.farcaster.xyz:2283",
-		"hub-grpc.pinata.cloud",
-		"nemes.farcaster.xyz:2283",
 		"hub.farcaster.standardcrypto.vc:2283",
+		"hub-grpc.pinata.cloud",
+		"api.farcasthub.com:2283",
+		"nemes.farcaster.xyz:2283",
 		"hub.pinata.cloud",
 		"lamia.farcaster.xyz:2283",
+		"hoyt.farcaster.xyz:2283",
 		"api.hub.wevm.dev",
-		"api.farcasthub.com:2283",
 	}
 	currentEndpointIndex = 0
 	outputFilePath       = "output.jsonl"
