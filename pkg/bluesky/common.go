@@ -27,12 +27,13 @@ func GetCommon(bundle *types.BundleItem, rr *repo.Repo, createdAt Time, op Op,
 	if k == "" {
 		return fmt.Errorf("invalid Op.Path kind: '%s'", k)
 	}
+	ao.AppendTag(bundle, App, AppNameValue)
 	ao.AppendTag(bundle, Protocol, Bsky)
+	ao.AppendTag(bundle, Repository, evt.Repo)
 	ao.AppendTag(bundle, Kind, k)
 	ao.AppendTag(bundle, J(Event, Id), op.Cid.String())
 	ao.AppendTag(bundle, J(User, Id), rr.SignedCommit().Did)
 	ao.AppendTag(bundle, Timestamp, strconv.FormatInt(createdAt.Unix(), 10))
-	ao.AppendTag(bundle, Repository, evt.Repo)
 	ao.AppendTag(bundle, Path, op.Path)
 	ao.AppendTag(bundle, Signature, hex.EncodeToString(rr.SignedCommit().Sig))
 	return

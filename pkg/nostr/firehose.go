@@ -69,7 +69,7 @@ func Firehose(c context.T, cancel context.F, wg *sync.WaitGroup, relays []S,
 			continue
 		}
 		idMap[evt.ID] = time.Now().UnixMilli()
-		if bundle, err = EventToBundleItem(ev); chk.E(err) {
+		if bundle, err = EventToBundleItem(ev, evt.Relay.URL); chk.E(err) {
 			continue
 		}
 		if bundle == nil {

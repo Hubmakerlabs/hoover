@@ -46,7 +46,7 @@ var RelevantKinds = []int{
 //
 // If there is no error but the bundle returns nil the provided event is not relevant as per
 // GetNostrKindToBundle.
-func EventToBundleItem(ev *event.T) (bundle *types.BundleItem, err error) {
+func EventToBundleItem(ev *event.T, relay string) (bundle *types.BundleItem, err error) {
 	var k string
 	if k = GetNostrKindToBundle(ev.Kind); k == "" {
 		return
@@ -54,7 +54,9 @@ func EventToBundleItem(ev *event.T) (bundle *types.BundleItem, err error) {
 	bundle = &types.BundleItem{}
 	bundle.Data = ev.Content
 	bundle.Tags = []types.Tag{
+		{Name: App, Value: AppNameValue},
 		{Name: Protocol, Value: Nostr},
+		{Name: Repository, Value: relay},
 		{Name: Kind, Value: k},
 		{Name: J(Event, Id), Value: ev.ID.String()},
 		{Name: J(User, Id), Value: ev.PubKey},

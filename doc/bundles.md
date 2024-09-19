@@ -9,19 +9,14 @@
 
 ## Common
 
-1. `Protocol` - nostr/bluesky/farcaster
-
-2. `Event-ID` - protocol specific
-
-3. `User-ID` - protocol specific
-
-4. `Timestamp` - standardized to unix timestamp
-
-5. `Kind` - Kind identifiers are from the list below - `Post`/`Repost`/`Like`/`Follow`/`Block`/`Profile`
-
-6. `Path` - needed for bluesky (from the original bluesky repo for event)
-
-7. `Signature` - format different for each protocol, should verify to Event-ID
+1. `App` - `com.hubmakerlabs.hoover` 
+2. `Protocol` - nostr/bluesky/farcaster
+3. `Event-ID` - protocol specific
+4. `User-ID` - protocol specific
+5. `Timestamp` - standardized to unix timestamp
+6. `Kind` - Kind identifiers are from the list below - `Post`/`Repost`/`Like`/`Follow`/`Block`/`Profile`
+7. `Path` - needed for bluesky (from the original bluesky repo for event)
+8. `Signature` - format different for each protocol, should verify to Event-ID
 
 ## Event Data
 
@@ -31,10 +26,10 @@ Reference tags for media and URLs are recorded in the same order they are found 
 
 Kind: `Post`
 
-1. Post content is stored in the binary Data field
+1. Post content is stored in the bundle `Data` field
 2. `Richtext` - these need to be in nested bundles due to size
 3. `Image` - standard formatted URL with protocol, address and path.
-4. `Medi` - same as Image-#
+4. `Media` - same as Image-#
 5. `Links` - standard proto://address/path style, one per numbered entry
 6. `Embed` - identifiers of nested bundle related to URLs from the previous media references - the number represents the position in the nested bundle list, the URL will correspond to the reference tag from the previous items, and the data itself stored in the nested bundle Data field (optional)
 
@@ -68,13 +63,6 @@ Kind: `Follow`
 1. `Add` - boolean (true/false)
 2. `Follow-User-ID` - User is now/now not following this user
 
-### Block
-
-Kind: `Block`
-
-1. `Add` - boolean (true/false)
-2. `Block-User-ID` - User is now/now not following this user
-
 ### Profile
 
 Kind: `Profile`
@@ -100,10 +88,10 @@ This facility will be implemented after the textual data as the uploading of the
    2. `video/mp4`
    3. `image/png`
    4. ...
-2. `Origin` - this will generally be `bluesky` and will indicate that the URL can be found via a `bsky` protocol query. For general web service, this will be the protocol name `http` `https` `magnet` `arweave` etc.
-3. `URI` - the identifier that the protocol that stores the data will recognize how to fetch the data.
-4. `Size` - the size of the embedded data in bytes
-5. `Dimensions` - for images and videos, the pixels Horizontal by Vertical `HxV`
-6. `Duration` - For video and audio, the playback time in seconds
+3. `Origin` - this will generally be `bluesky` and will indicate that the URL can be found via a `bsky` protocol query. For general web service, this will be the protocol name `http` `https` `magnet` `arweave` etc.
+4. `URI` - the identifier that the protocol that stores the data will recognize how to fetch the data.
+5. `Size` - the size of the embedded data in bytes
+6. `Dimensions` - for images and videos, the pixels Horizontal by Vertical `HxV`
+7. `Duration` - For video and audio, the playback time in seconds
 
-The `Data` field of the bundle will contain the binary file itself.
+The `Data` field of the bundle will contain the binary file itself (not implemented in initial version)
