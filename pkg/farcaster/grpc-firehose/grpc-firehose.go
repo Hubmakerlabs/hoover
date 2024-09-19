@@ -115,7 +115,7 @@ func main() {
 					log.Printf("failed to receive message: %v", err)
 					return
 				}
-				data := msg.GetMergeMessageBody().GetMessage().GetData()
+				data := msg.GetMergeMessageBody().GetMessage()
 				// Write cast to JSONL file
 				eventJson, err := json.Marshal(data)
 				if err != nil {
@@ -124,7 +124,7 @@ func main() {
 				}
 
 				file.WriteString(string(eventJson) + "\n")
-				log.Println("New", data.GetType(), "added:", data.Body)
+				log.Println("New", data.GetData().GetType(), "added:", data.GetData().Body)
 			}
 		}()
 
