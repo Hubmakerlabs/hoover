@@ -12,6 +12,7 @@ import (
 	"syscall"
 	"time"
 
+	util "github.com/Hubmakerlabs/hoover/pkg/farcaster/go-grpc/util"
 	pb "github.com/juiceworks/hubble-grpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -116,10 +117,15 @@ func main() {
 					return
 				}
 				data := msg.GetMergeMessageBody().GetMessage()
-				// Write cast to JSONL file
-				eventJson, err := json.Marshal(data)
+				bundle, err := util.MessageToBundleItem(data)
 				if err != nil {
-					log.Printf("failed to marshal event: %v", err)
+					log.Printf("failed to convert message to bundle item: %v", err)
+					continue
+				}
+				// Write cast to JSONL file
+				eventJson, err := json.Marshal(bundle)
+				if err != nil {
+					log.Printf("failed to marshal bundle: %v", err)
 					continue
 				}
 
