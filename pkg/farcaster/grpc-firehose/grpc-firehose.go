@@ -18,28 +18,38 @@ import (
 )
 
 var (
-	hubRpcEndpoints = []string{
-		"hoyt.farcaster.xyz:2283",
-		"hub-grpc.pinata.cloud:2281",
-		"hub.pinata.cloud:2281",
-
-		"nemes.farcaster.xyz:2283",
-		"hub.farcaster.standardcrypto.vc:2283",
-		"lamia.farcaster.xyz:2283",
-		"api.hub.wevm.dev",
-		"api.farcasthub.com:2283",
+	hubRpcEndpoints = []struct {
+		url  string
+		port bool
+	}{
+		{"hub.farcaster.standardcrypto.vc", true},
+		{"hub.pinata.cloud", false},
+		{"hoyt.farcaster.xyz", true},
+		{"lamia.farcaster.xyz", true},
+		{"api.farcasthub.com", true},
+		{"nemes.farcaster.xyz", true},
+		{"api.hub.wevm.dev", false},
 	}
+	ports                = []string{"2281", "2282", "2283"}
 	currentEndpointIndex = 0
+	currentPortIndex     = 0
 	outputFilePath       = "output.jsonl"
 )
 
-func connectToHub() (*grpc.ClientConn, pb.HubServiceClient, error) {
+func connectToHub(url string, port string, is_port bool) (*grpc.ClientConn, pb.HubServiceClient, error) {
 	creds := credentials.NewTLS(&tls.Config{})
-	endpoint := hubRpcEndpoints[currentEndpointIndex]
-
-	conn, err := grpc.Dial(endpoint, grpc.WithTransportCredentials(creds))
-	if err != nil {
-		return nil, nil, fmt.Errorf("failed to connect to %s: %v", endpoint, err)
+	var conn *grpc.ClientConn
+	var err error
+	if is_port {
+		conn, err = grpc.NewClient(fmt.Sprintf("%s:%s", url, port), grpc.WithTransportCredentials(creds))
+		if err != nil {
+			return nil, nil, fmt.Errorf("failed to connect to %s:%s: %v", url, port, err)
+		}
+	} else {
+		conn, err = grpc.NewClient(url, grpc.WithTransportCredentials(creds))
+		if err != nil {
+			return nil, nil, fmt.Errorf("failed to connect to %s: %v", url, err)
+		}
 	}
 
 	client := pb.NewHubServiceClient(conn)
@@ -58,11 +68,16 @@ func main() {
 	defer file.Close()
 
 	for {
-		conn, client, err := connectToHub()
+		hub := hubRpcEndpoints[currentEndpointIndex]
+		conn, client, err := connectToHub(hub.url, ports[currentPortIndex], hub.port)
 		if err != nil {
 			log.Printf("%v", err)
-			currentEndpointIndex++
-			if currentEndpointIndex >= len(hubRpcEndpoints) {
+			if hub.port && currentPortIndex < len(ports) {
+				currentPortIndex++
+			} else if currentEndpointIndex < len(hubRpcEndpoints) {
+				currentEndpointIndex++
+				currentPortIndex = 0
+			} else {
 				log.Println("All connection attempts failed. Exiting.")
 				return
 			}
@@ -80,6 +95,15 @@ func main() {
 		stream, err := client.Subscribe(ctx, &pb.SubscribeRequest{EventTypes: evts})
 		if err != nil {
 			log.Printf("failed to subscribe: %v", err)
+			if hub.port && currentPortIndex < len(ports) {
+				currentPortIndex++
+			} else if currentEndpointIndex < len(hubRpcEndpoints) {
+				currentEndpointIndex++
+				currentPortIndex = 0
+			} else {
+				log.Println("All connection attempts failed. Exiting.")
+				return
+			}
 			continue
 		}
 
