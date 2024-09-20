@@ -52,16 +52,18 @@ func EventToBundleItem(ev *event.T, relay string) (bundle *types.BundleItem, err
 		return
 	}
 	bundle = &types.BundleItem{}
-	bundle.Data = ev.Content
+	// bundle.Data = ev.Content
+	data := ao.NewEventData(ev.Content)
 	bundle.Tags = []types.Tag{
-		{Name: App, Value: AppNameValue},
-		{Name: Protocol, Value: Nostr},
-		{Name: Repository, Value: relay},
-		{Name: Kind, Value: k},
-		{Name: J(Event, Id), Value: ev.ID.String()},
-		{Name: J(User, Id), Value: ev.PubKey},
-		{Name: Timestamp, Value: strconv.FormatInt(ev.CreatedAt.I64(), 10)},
-		{Name: Signature, Value: ev.Sig},
+		{J(App, Name), AppNameValue},
+		{J(App, Version), AppVersion},
+		{Protocol, Nostr},
+		{Repository, relay},
+		{Kind, k},
+		{J(Event, Id), ev.ID.String()},
+		{J(User, Id), ev.PubKey},
+		{Timestamp, strconv.FormatInt(ev.CreatedAt.I64(), 10)},
+		{Signature, ev.Sig},
 	}
 out:
 	switch k {
@@ -70,24 +72,26 @@ out:
 			switch ev.Tags[i][0] {
 			case "e":
 				if len(t) > 1 {
-					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  J(Reply, Parent, Id),
-						Value: t[1],
-					})
+					// reply parent/roots need to be in the tags
+					if len(t) > 3 {
+						// it probably has a reply relation specifier
+						switch t[3] {
+						case "root":
+							ao.AppendTag(bundle, J(Reply, Root, Id), t[1])
+						case "reply":
+							ao.AppendTag(bundle, J(Reply, Parent, Id), t[1])
+						}
+					} else {
+						ao.AppendTag(bundle, J(Reply, Parent, Id), t[1])
+					}
 				}
 			case "p":
 				if len(t) > 1 {
-					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  Mention,
-						Value: t[1],
-					})
+					data.Append(Mention, t[1])
 				}
 			case "t":
 				if len(t) > 1 {
-					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  Hashtag,
-						Value: t[1],
-					})
+					data.Append(Hashtag, t[1])
 				}
 			case "proxy":
 				if len(t) > 1 {
@@ -96,8 +100,8 @@ out:
 					if len(t) > 2 {
 						sauce = t[2]
 					}
-					ao.AppendTag(bundle, J(Source), sauce)
-					ao.AppendTag(bundle, J(Source, Uri), uri)
+					data.Append(J(Source), sauce)
+					data.Append(J(Source, Uri), uri)
 				}
 			case "emoji":
 				if len(t) > 1 {
@@ -106,33 +110,22 @@ out:
 					if len(t) > 2 {
 						sauce = t[2]
 					}
-					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  Emoji,
-						Value: fmt.Sprintf("%s,%s", uri, sauce),
-					})
+					data.Append(Emoji, fmt.Sprintf("%s,%s", uri, sauce))
 				}
 			case "content-warning":
 				var desc S
 				if len(t) > 1 {
 					desc = t[1]
 				}
-				bundle.Tags = append(bundle.Tags, types.Tag{
-					Name:  ContentWarning,
-					Value: desc,
-				})
+				// these also need to be indexable i think
+				ao.AppendTag(bundle, ContentWarning, desc)
 			case "l":
 				if len(t) > 1 {
-					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  Label,
-						Value: t[1],
-					})
+					data.Append(Label, t[1])
 				}
 			case "L":
 				if len(t) > 1 {
-					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  J(Label, Namespace),
-						Value: t[1],
-					})
+					data.Append(J(Label, Namespace), t[1])
 				}
 			}
 		}
@@ -141,10 +134,7 @@ out:
 			switch ev.Tags[i][0] {
 			case "e":
 				if len(t) > 1 {
-					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  J(Repost, Event, Id),
-						Value: t[1],
-					})
+					ao.AppendTag(bundle, J(Repost, Event, Id), t[1])
 				}
 			case "proxy":
 				if len(t) > 1 {
@@ -153,29 +143,20 @@ out:
 					if len(t) > 2 {
 						sauce = t[2]
 					}
-					ao.AppendTag(bundle, J(Source), sauce)
-					ao.AppendTag(bundle, J(Source, Uri), uri)
+					data.Append(J(Source), sauce)
+					data.Append(J(Source, Uri), uri)
 				}
 			case "p":
 				if len(t) > 1 {
-					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  Mention,
-						Value: t[1],
-					})
+					data.Append(Mention, t[1])
 				}
 			case "l":
 				if len(t) > 1 {
-					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  Label,
-						Value: t[1],
-					})
+					data.Append(Label, t[1])
 				}
 			case "L":
 				if len(t) > 1 {
-					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  J(Label, Namespace),
-						Value: t[1],
-					})
+					data.Append(J(Label, Namespace), t[1])
 				}
 			}
 		}
@@ -184,17 +165,12 @@ out:
 			switch ev.Tags[i][0] {
 			case "e":
 				if len(t) > 1 {
-					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  J(Like, Event, Id),
-						Value: t[1],
-					})
+					// likes need to also be in the tags
+					ao.AppendTag(bundle, J(Like, Event, Id), t[1])
 				}
 			case "p":
 				if len(t) > 1 {
-					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  Mention,
-						Value: t[1],
-					})
+					data.Append(Mention, t[1])
 				}
 			case "proxy":
 				if len(t) > 1 {
@@ -203,27 +179,23 @@ out:
 					if len(t) > 2 {
 						sauce = t[2]
 					}
-					ao.AppendTag(bundle, J(Source), sauce)
-					ao.AppendTag(bundle, J(Source, Uri), uri)
+					data.Append(J(Source), sauce)
+					data.Append(J(Source, Uri), uri)
 				}
 			}
 		}
 	case Follow:
+		// we don't need the content field of follow events
+		data.Content = ""
 		for i, t := range ev.Tags {
 			switch ev.Tags[i][0] {
 			case "p":
 				if len(t) > 1 {
-					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  J(Follow, User, Id),
-						Value: t[1],
-					})
+					data.Append(J(Follow, User, Id), t[1])
 				}
 			case "t":
 				if len(t) > 1 {
-					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  J(Follow, Tag),
-						Value: t[1],
-					})
+					data.Append(J(Follow, Tag), t[1])
 				}
 			}
 		}
@@ -235,86 +207,46 @@ out:
 			log.I.F("%s", ev.Content)
 			break out
 		}
-		var hasContent bool
 		if prf.Name != "" {
-			hasContent = true
-			bundle.Tags = append(bundle.Tags, types.Tag{
-				Name:  J(User, Name),
-				Value: prf.Name,
-			})
+			data.Append(J(User, Name),
+				prf.Name)
 		}
 		if prf.DisplayName != "" {
-			hasContent = true
-			bundle.Tags = append(bundle.Tags, types.Tag{
-				Name:  J(Display, Name),
-				Value: prf.DisplayName,
-			})
+			data.Append(J(Display, Name), prf.DisplayName)
 		}
 		if prf.About != "" {
-			hasContent = true
-			bundle.Data = prf.About
+			data.Append(Bio, prf.About)
 		}
 		if prf.Picture != "" {
-			hasContent = true
-			bundle.Tags = append(bundle.Tags, types.Tag{
-				Name:  J(Avatar, Image),
-				Value: prf.Picture,
-			})
+			data.Append(J(Avatar, Image), prf.Picture)
 		}
 		if prf.Banner != "" {
-			hasContent = true
-			bundle.Tags = append(bundle.Tags, types.Tag{
-				Name:  J(Banner, Image),
-				Value: prf.Banner,
-			})
+			data.Append(J(Banner, Image), prf.Banner)
 		}
 		if prf.Website != "" {
-			hasContent = true
-			bundle.Tags = append(bundle.Tags, types.Tag{
-				Name:  Website,
-				Value: prf.Website,
-			})
+			data.Append(Website, prf.Website)
 		}
 		if nip05, ok := prf.NIP05.(string); ok {
 			if nip05 != "" {
-				hasContent = true
-				bundle.Tags = append(bundle.Tags, types.Tag{
-					Name:  Verification,
-					Value: nip05,
-				})
+				data.Append(Verification, nip05)
 			}
-
 		}
 		if prf.LUD16 != "" {
-			hasContent = true
-			bundle.Tags = append(bundle.Tags, types.Tag{
-				Name:  J(Payment, Address),
-				Value: prf.LUD16,
-			})
+			data.Append(J(Payment, Address), prf.LUD16)
 		}
 		for i, t := range ev.Tags {
-			hasContent = true
 			switch ev.Tags[i][0] {
 			case "e":
 				if len(t) > 1 {
-					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  J(Reply, Parent, Id),
-						Value: t[1],
-					})
+					data.Append(J(Reply, Parent, Id), t[1])
 				}
 			case "p":
 				if len(t) > 1 {
-					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  Mention,
-						Value: t[1],
-					})
+					data.Append(Mention, t[1])
 				}
 			case "t":
 				if len(t) > 1 {
-					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  Hashtag,
-						Value: t[1],
-					})
+					data.Append(Hashtag, t[1])
 				}
 			case "proxy":
 				if len(t) > 1 {
@@ -323,10 +255,7 @@ out:
 					if len(t) > 2 {
 						sauce = t[2]
 					}
-					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  Source,
-						Value: fmt.Sprintf("%s,%s", sauce, uri),
-					})
+					data.Append(Source, fmt.Sprintf("%s,%s", sauce, uri))
 				}
 			case "emoji":
 				if len(t) > 1 {
@@ -335,52 +264,32 @@ out:
 					if len(t) > 2 {
 						sauce = t[2]
 					}
-					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  Emoji,
-						Value: fmt.Sprintf("%s,%s", uri, sauce),
-					})
+					data.Append(Emoji, fmt.Sprintf("%s,%s", uri, sauce))
 				}
 			case "content-warning":
 				var desc S
 				if len(t) > 1 {
 					desc = t[1]
 				}
-				bundle.Tags = append(bundle.Tags, types.Tag{
-					Name:  ContentWarning,
-					Value: desc,
-				})
+				ao.AppendTag(bundle, ContentWarning, desc)
 			case "l":
 				if len(t) > 1 {
-					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  Label,
-						Value: t[1],
-					})
+					data.Append(Label, t[1])
 				}
 			case "L":
 				if len(t) > 1 {
-					bundle.Tags = append(bundle.Tags, types.Tag{
-						Name:  J(Label, Namespace),
-						Value: t[1],
-					})
+					data.Append(J(Label, Namespace), t[1])
 				}
 			}
 		}
-		if !hasContent {
-			bundle = nil
-			return
-		}
 	}
-	// for _, tt := range ev.Tags {
-	// 	// tags are prefixed by a hash symbol so they don't conflict with the
-	// 	// above standard event names
-	// 	name := "#" + tt[0]
-	// 	var b B
-	// 	if b, err = json.Marshal(tt[1:]); chk.E(err) {
-	// 		return
-	// 	}
-	// 	bundle.Tags = append(bundle.Tags,
-	// 		types.Tag{Name: name, Value: string(b)})
-	// }
+	// put the ao.EventData into JSON form and place in the bundle.Data field
+	var b []byte
+	b, err = json.Marshal(data)
+	if err != nil {
+		return
+	}
+	bundle.Data = string(b)
 	return
 }
 

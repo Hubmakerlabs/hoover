@@ -27,7 +27,8 @@ func GetCommon(bundle *types.BundleItem, rr *repo.Repo, createdAt Time, op Op,
 	if k == "" {
 		return fmt.Errorf("invalid Op.Path kind: '%s'", k)
 	}
-	ao.AppendTag(bundle, App, AppNameValue)
+
+	ao.AppendTag(bundle, J(App, Name), AppNameValue)
 	ao.AppendTag(bundle, Protocol, Bsky)
 	ao.AppendTag(bundle, Repository, evt.Repo)
 	ao.AppendTag(bundle, Kind, k)

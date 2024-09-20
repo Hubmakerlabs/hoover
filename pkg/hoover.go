@@ -26,7 +26,9 @@ func J(s ...any) string {
 
 var (
 	App          = "App"
+	Version      = "Version"
 	AppNameValue = "com.hubmakerlabs.hoover"
+	AppVersion   = "v0.1.0"
 	Un           = "Un" // todo for future use for delete/unfollow/unblock/unlike
 	Id           = "Id"
 	Event        = "Event"
@@ -93,6 +95,7 @@ var (
 	Thumb          = "Thumb"
 
 	// Profiles
+	Bio          = "Bio"
 	Name         = "Name"
 	Display      = "Display"
 	Avatar       = "Avatar"

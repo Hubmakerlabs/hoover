@@ -33,6 +33,9 @@
 !bundleData
 !*.item
 !*.bin
+!*.example
+!*.html
+
 # ...even if they are in subdirectories
 !*/
 .vscode

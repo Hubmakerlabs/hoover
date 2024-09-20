@@ -45,6 +45,8 @@ func TestMultiFirehose(t *testing.T) {
 		}
 	}()
 	multi.Firehose(c, cancel, &wg, nostr.Relays, func(bundle *types.BundleItem) (err error) {
+		t.Log(bundle.Tags)
+		t.Log(bundle.Data)
 		tx := &types.Transaction{
 			Format:   2,
 			Target:   "",
@@ -58,7 +60,7 @@ func TestMultiFirehose(t *testing.T) {
 			sum += len(tx.Tags[i].Name) + len(tx.Tags[i].Value)
 		}
 		var reward int64
-		reward, err = wallet.Client.GetTransactionPrice(len(bundle.Data)+sum, nil)
+		reward, err = wallet.Client.GetTransactionPrice(len(bundle.Data), nil)
 		if err != nil {
 			// if he dies, he dies
 			return nil
@@ -68,7 +70,7 @@ func TestMultiFirehose(t *testing.T) {
 			rew = 1000
 		}
 		tx.Reward = fmt.Sprintf("%d", rew)
-		t.Log("data", len(bundle.Data)+sum, "reward", tx.Reward)
+		t.Log("tags data", sum, "data", len(bundle.Data), "reward", tx.Reward)
 		if _, err = wallet.SendTransaction(tx); err != nil {
 			// we need to add more winstons to pay for this probably
 			BumpBalance(arlocal, address, balanceTarget, t)
