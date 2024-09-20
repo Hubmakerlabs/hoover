@@ -3,10 +3,12 @@ package bluesky
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 
 	"github.com/Hubmakerlabs/hoover/pkg"
+	ao "github.com/Hubmakerlabs/hoover/pkg/arweave"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
 	"github.com/bluesky-social/indigo/api/atproto"
 	"github.com/bluesky-social/indigo/lex/util"
@@ -18,12 +20,14 @@ import (
 
 func RepoCommit(ctx context.Context,
 	cancel context.CancelFunc, fn func(bundle *types.BundleItem) (err error)) func(
-		evt *atproto.SyncSubscribeRepos_Commit) (err error) {
+	evt *atproto.SyncSubscribeRepos_Commit) (err error) {
 	return func(evt *atproto.SyncSubscribeRepos_Commit) (err error) {
 		var rr *repo.Repo
 		if rr, err = repo.ReadRepoFromCar(ctx, bytes.NewReader(evt.Blocks)); chk.E(err) {
 			return
 		}
+		var bundle *types.BundleItem
+		data := &ao.EventData{}
 		for _, op := range evt.Ops {
 			ek := repomgr.EventKind(op.Action)
 			switch ek {
@@ -41,58 +45,49 @@ func RepoCommit(ctx context.Context,
 				}
 				switch {
 				case strings.HasPrefix(op.Path, Kinds(pkg.Post)):
-					var post *types.BundleItem
-					if post, err = FromBskyFeedPost(evt, op, rr, rec); chk.E(err) {
+					if bundle, err = FromBskyFeedPost(evt, op, rr, rec, data); chk.E(err) {
 						err = nil
 						continue
 					}
-					if err = fn(post); err != nil {
-						cancel()
-						return
+				case strings.HasPrefix(op.Path, Kinds(pkg.Like)):
+					if bundle, err = FromBskyFeedLike(evt, op, rr, rec, data); err != nil {
+						err = nil
+						continue
 					}
-					case strings.HasPrefix(op.Path, Kinds(pkg.Like)):
-						var like *types.BundleItem
-						if like, err = FromBskyFeedLike(evt, op, rr, rec); err != nil {
-							err = nil
-							continue
-						}
-						if err = fn(like); err != nil {
-							cancel()
-							return
-						}
-					case strings.HasPrefix(op.Path, Kinds(pkg.Follow)):
-						var follow *types.BundleItem
-						if follow, err = FromBskyGraphFollow(evt, op, rr, rec); chk.E(err) {
-							err = nil
-							continue
-						}
-						if err = fn(follow); err != nil {
-							cancel()
-							return
-						}
-					case strings.HasPrefix(op.Path, Kinds(pkg.Repost)):
-						var repost *types.BundleItem
-						if repost, err = FromBskyFeedRepost(evt, op, rr, rec); chk.E(err) {
-							err = nil
-							continue
-						}
-						if err = fn(repost); err != nil {
-							cancel()
-							return
-						}
-					case strings.HasPrefix(op.Path, Kinds(pkg.Profile)):
-						var profile *types.BundleItem
-						if profile, err = FromBskyActorProfile(evt, op, rr, rec); chk.E(err) {
-							err = nil
-							continue
-						}
-						if err = fn(profile); err != nil {
-							cancel()
-							return
-						}
+				case strings.HasPrefix(op.Path, Kinds(pkg.Follow)):
+					if bundle, err = FromBskyGraphFollow(evt, op, rr, rec); chk.E(err) {
+						err = nil
+						continue
+					}
+				case strings.HasPrefix(op.Path, Kinds(pkg.Repost)):
+					if bundle, err = FromBskyFeedRepost(evt, op, rr, rec, data); chk.E(err) {
+						err = nil
+						continue
+					}
+				case strings.HasPrefix(op.Path, Kinds(pkg.Profile)):
+					if bundle, err = FromBskyActorProfile(evt, op, rr, rec, data); chk.E(err) {
+						err = nil
+						continue
+					}
 				}
 			default:
 				// log.I.Ln(ek)
+			}
+		}
+		if bundle == nil {
+			return
+		}
+		if data.Content != "" || data.EventTags != nil {
+			// put the ao.EventData into JSON form and place in the bundle.Data field
+			var b []byte
+			b, err = json.Marshal(data)
+			if err != nil {
+				return
+			}
+			bundle.Data = string(b)
+			if err = fn(bundle); err != nil {
+				cancel()
+				return
 			}
 		}
 		return
