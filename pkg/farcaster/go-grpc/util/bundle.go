@@ -13,12 +13,13 @@ func BundlerKind(msg *pb.MessageData) (s string) {
 	// Get the type of the message
 	switch msg.GetType() {
 	case pb.MessageType_MESSAGE_TYPE_CAST_ADD:
-		if msg.GetCastAddBody().GetText() == "" && msg.GetCastAddBody().GetParent() != nil {
-			return Repost
-		}
 		return Post
 	case pb.MessageType_MESSAGE_TYPE_REACTION_ADD:
-		return Like
+		if msg.GetReactionBody().GetType() == pb.ReactionType_REACTION_TYPE_RECAST {
+			return Repost
+		} else {
+			return Like
+		}
 	case pb.MessageType_MESSAGE_TYPE_LINK_ADD:
 		return Follow
 	case pb.MessageType_MESSAGE_TYPE_USER_DATA_ADD:
