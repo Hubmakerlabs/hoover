@@ -33,6 +33,9 @@
 !bundleData
 !*.item
 !*.bin
+!*.example
+!*.html
+
 # ...even if they are in subdirectories
 !*/
 .vscode
@@ -52,6 +55,3 @@ node_modules/**
 **/node_modules
 **/node_modules/
 **/node_modules/**
-keyfile.json
-/keyfile.json
-**/keyfile.json

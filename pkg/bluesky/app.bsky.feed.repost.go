@@ -30,7 +30,8 @@ import (
 // }
 
 // FromBskyFeedRepost is
-func FromBskyFeedRepost(evt Ev, op Op, rr Repo, rec Rec) (bundle BundleItem, err error) {
+func FromBskyFeedRepost(evt Ev, op Op, rr Repo, rec Rec, data *ao.EventData) (bundle BundleItem,
+	err error) {
 	var createdAt time.Time
 	var to any
 	if to, createdAt, err = UnmarshalEvent(evt, rec, &bsky.FeedRepost{}); chk.E(err) {
@@ -50,7 +51,7 @@ func FromBskyFeedRepost(evt Ev, op Op, rr Repo, rec Rec) (bundle BundleItem, err
 		return
 	}
 	ao.AppendTag(bundle, J(Repost, Event, Id), repost.Subject.Cid)
-	ao.AppendTag(bundle, J(Repost, Event, Uri), repost.Subject.Uri)
+	data.Append(J(Repost, Event, Uri), repost.Subject.Uri)
 	return
 }
 

@@ -60,7 +60,8 @@ import (
 // }
 
 // FromBskyActorProfile is
-func FromBskyActorProfile(evt Ev, op Op, rr Repo, rec Rec) (bundle BundleItem, err error) {
+func FromBskyActorProfile(evt Ev, op Op, rr Repo, rec Rec,
+	data *ao.EventData) (bundle BundleItem, err error) {
 	var createdAt time.Time
 	var to any
 	if to, createdAt, err = UnmarshalEvent(evt, rec, &bsky.ActorProfile{}); chk.E(err) {
@@ -80,16 +81,16 @@ func FromBskyActorProfile(evt Ev, op Op, rr Repo, rec Rec) (bundle BundleItem, e
 		return
 	}
 	if profile.DisplayName != nil && *profile.DisplayName != "" {
-		ao.AppendTag(bundle, J(Display, Name), *profile.DisplayName)
+		data.Append(J(Display, Name), *profile.DisplayName)
 	}
 	if profile.Description != nil {
-		bundle.Data = *profile.Description
+		data.Append(Bio, *profile.Description)
 	}
 	if profile.Avatar != nil {
-		AppendLexBlobTags(bundle, J(Avatar, Image), profile.Avatar)
+		AppendLexBlobTags(data, J(Avatar, Image), profile.Avatar)
 	}
 	if profile.Banner != nil {
-		AppendLexBlobTags(bundle, J(Banner, Image), profile.Banner)
+		AppendLexBlobTags(data, J(Banner, Image), profile.Banner)
 	}
 	return
 }

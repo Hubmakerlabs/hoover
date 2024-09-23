@@ -25,18 +25,24 @@ func J(s ...any) string {
 // Common
 
 var (
-	Un         = "Un" // todo for future use for delete/unfollow/unblock/unlike
-	Id         = "Id"
-	Event      = "Event"
-	Protocol   = "Protocol"
-	User       = "User"
-	Timestamp  = "Timestamp"
-	Kind       = "Kind"
-	Repository = "Repository"
-	Path       = "Path"
-	Signature  = "Signature"
-	Label      = "Label"
-	Namespace  = "Namespace"
+	App          = "App"
+	Version      = "Version"
+	AppNameValue = "com.hubmakerlabs.hoover"
+	AppVersion   = "v0.1.0"
+	Un           = "Un" // todo for future use for delete/unfollow/unblock/unlike
+	Id           = "Id"
+	Event        = "Event"
+	Protocol     = "Protocol"
+	User         = "User"
+	Unix         = "Unix"
+	Time         = "Time"
+	Timestamp    = "Timestamp"
+	Kind         = "Kind"
+	Repository   = "Repository"
+	Path         = "Path"
+	Signature    = "Signature"
+	Label        = "Label"
+	Namespace    = "Namespace"
 )
 
 var (
@@ -91,6 +97,7 @@ var (
 	Thumb          = "Thumb"
 
 	// Profiles
+	Bio          = "Bio"
 	Name         = "Name"
 	Display      = "Display"
 	Avatar       = "Avatar"

@@ -23,6 +23,28 @@ var Relays = []string{
 	"wss://relay.damus.io",
 	"wss://relay.primal.net",
 	"wss://relay.nostr.band",
+	"wss://nostr-pub.wellorder.net",
+	"wss://relay.nostr.net",
+	"wss://nostr.lu.ke",
+	"wss://nostr.at",
+	"wss://e.nos.lol",
+	"wss://nostr.lopp.social",
+	"wss://nostr.vulpem.com",
+	"wss://relay.nostr.bg",
+	"wss://wot.utxo.one",
+	"wss://nostrelites.org",
+	"wss://wot.nostr.party",
+	"wss://wot.sovbit.host",
+	"wss://wot.girino.org",
+	"wss://relay.lnau.net",
+	"wss://wot.siamstr.com",
+	"wss://wot.sudocarlos.com",
+	"wss://relay.otherstuff.fyi",
+	"wss://relay.lexingtonbitcoin.org",
+	"wss://wot.azzamo.net",
+	"wss://wot.swarmstr.com",
+	"wss://zap.watch",
+	"wss://satsage.xyz",
 }
 
 type sortId struct {
@@ -55,7 +77,8 @@ func Firehose(c context.T, cancel context.F, wg *sync.WaitGroup, relays []S,
 	}
 	defer stop()
 	var err error
-	ff := nostr.Filters{{Kinds: RelevantKinds}}
+	ts := nostr.Timestamp(timestamp.Now())
+	ff := nostr.Filters{{Kinds: RelevantKinds, Since: &ts}}
 	idMap := make(map[string]int64)
 	for evt := range pool.SubMany(c, relays, ff) {
 		var bundle *types.BundleItem
@@ -68,7 +91,7 @@ func Firehose(c context.T, cancel context.F, wg *sync.WaitGroup, relays []S,
 			continue
 		}
 		idMap[evt.ID] = time.Now().UnixMilli()
-		if bundle, err = EventToBundleItem(ev); chk.E(err) {
+		if bundle, err = EventToBundleItem(ev, evt.Relay.URL); chk.E(err) {
 			continue
 		}
 		if bundle == nil {
