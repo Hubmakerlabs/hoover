@@ -26,10 +26,10 @@ func TestMultiFirehose(t *testing.T) {
 	BumpBalance(arlocal, address, balanceTarget, t)
 	c, cancel := context.WithCancel(context.Background())
 	interrupt.AddHandler(cancel)
-	go func() {
-		time.Sleep(time.Second * 30)
-		cancel()
-	}()
+	// go func() {
+	// 	time.Sleep(time.Second * 30)
+	// 	cancel()
+	// }()
 	var wg sync.WaitGroup
 	fmt.Println()
 	var speedFactor int64 = 1
