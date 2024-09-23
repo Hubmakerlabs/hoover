@@ -4,7 +4,6 @@ package bluesky
 
 import (
 	"sync"
-	"time"
 
 	. "github.com/Hubmakerlabs/hoover/pkg"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
@@ -17,7 +16,6 @@ import (
 
 type (
 	Repo       = *repo.Repo
-	Time       = time.Time
 	Op         = *atproto.SyncSubscribeRepos_RepoOp
 	Ev         = *atproto.SyncSubscribeRepos_Commit
 	Rec        = typegen.CBORMarshaler

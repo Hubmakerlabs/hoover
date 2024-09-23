@@ -34,6 +34,8 @@ var (
 	Event        = "Event"
 	Protocol     = "Protocol"
 	User         = "User"
+	Unix         = "Unix"
+	Time         = "Time"
 	Timestamp    = "Timestamp"
 	Kind         = "Kind"
 	Repository   = "Repository"

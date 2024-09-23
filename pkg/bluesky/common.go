@@ -17,7 +17,7 @@ import (
 	"github.com/bluesky-social/indigo/util"
 )
 
-func GetCommon(bundle *types.BundleItem, rr *repo.Repo, createdAt Time, op Op,
+func GetCommon(bundle *types.BundleItem, rr *repo.Repo, createdAt time.Time, op Op,
 	evt Ev) (err error) {
 	split := strings.Split(op.Path, "/")
 	if len(split) < 1 {
@@ -29,19 +29,20 @@ func GetCommon(bundle *types.BundleItem, rr *repo.Repo, createdAt Time, op Op,
 	}
 
 	ao.AppendTag(bundle, J(App, Name), AppNameValue)
+	ao.AppendTag(bundle, J(App, Version), AppVersion)
 	ao.AppendTag(bundle, Protocol, Bsky)
 	ao.AppendTag(bundle, Repository, evt.Repo)
 	ao.AppendTag(bundle, Kind, k)
 	ao.AppendTag(bundle, J(Event, Id), op.Cid.String())
 	ao.AppendTag(bundle, J(User, Id), rr.SignedCommit().Did)
-	ao.AppendTag(bundle, Timestamp, strconv.FormatInt(createdAt.Unix(), 10))
+	ao.AppendTag(bundle, J(Unix, Time), strconv.FormatInt(createdAt.Unix(), 10))
 	ao.AppendTag(bundle, Path, op.Path)
 	ao.AppendTag(bundle, Signature, hex.EncodeToString(rr.SignedCommit().Sig))
 	return
 }
 
 // UnmarshalEvent accepts a bsky commit event and a record type, and the concrete type
-func UnmarshalEvent(evt Ev, rec Rec, to any) (decoded any, createdAt Time, err error) {
+func UnmarshalEvent(evt Ev, rec Rec, to any) (decoded any, createdAt time.Time, err error) {
 	if rec == nil {
 		err = errorf.E("nil record, cannot unmarshal")
 		return

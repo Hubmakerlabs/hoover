@@ -62,7 +62,7 @@ func EventToBundleItem(ev *event.T, relay string) (bundle *types.BundleItem, err
 		{Kind, k},
 		{J(Event, Id), ev.ID.String()},
 		{J(User, Id), ev.PubKey},
-		{Timestamp, strconv.FormatInt(ev.CreatedAt.I64(), 10)},
+		{J(Unix, Time), strconv.FormatInt(ev.CreatedAt.I64(), 10)},
 		{Signature, ev.Sig},
 	}
 out:
