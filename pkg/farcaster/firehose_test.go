@@ -45,6 +45,6 @@ func TestFirehose(t *testing.T) {
 	}
 
 	// Simulate running for 10 seconds and then stop
-	time.Sleep(20 * time.Second)
+	time.Sleep(30 * time.Second)
 	cancel() // Cancel the context to stop the Firehose
 }
