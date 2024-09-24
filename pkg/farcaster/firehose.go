@@ -16,8 +16,8 @@ import (
 
 var (
 	hubRpcEndpoints = []struct {
-		url  string
-		port bool
+		url        string
+		needs_port bool
 	}{
 		{"hub.farcaster.standardcrypto.vc", true},
 		{"hub.pinata.cloud", false},
@@ -69,13 +69,13 @@ func manageHashCapacity(hash string, seenPosts *sync.Map) {
 
 // subscribeToHub listens for messages from the given hub and sends them to the provided channel
 func subscribeToHub(ctx context.Context, hub struct {
-	url  string
-	port bool
+	url        string
+	needs_port bool
 }, port string, bundleStream chan<- *types.BundleItem, seenPosts *sync.Map, sem chan struct{}, wg *sync.WaitGroup, remainingHubs *sync.Map, connLock *sync.Mutex) {
 	defer wg.Done()
 	defer func() { <-sem }()
 
-	conn, client, err := connectToHub(hub.url, port, hub.port)
+	conn, client, err := connectToHub(hub.url, port, hub.needs_port)
 	if err != nil {
 		log.Printf("Failed to connect to hub %s:%s - %v", hub.url, port, err)
 		replaceFailedConnection(ctx, bundleStream, seenPosts, sem, wg, remainingHubs, connLock)
@@ -126,16 +126,20 @@ func replaceFailedConnection(ctx context.Context, bundleStream chan<- *types.Bun
 
 	// Find next available hub and port combination
 	var found bool
-	remainingHubs.Range(func(key, value interface{}) bool {
-		hub := key.(string)
+	remainingHubs.Range(func(key any, value interface{}) bool {
+
+		hub := key.(struct {
+			url        string
+			needs_port bool
+		})
 		port := value.(string)
 
 		// Start a new subscription
 		wg.Add(1)
 		go subscribeToHub(ctx, struct {
-			url  string
-			port bool
-		}{url: hub, port: true}, port, bundleStream, seenPosts, sem, wg, remainingHubs, connLock)
+			url        string
+			needs_port bool
+		}{url: hub.url, needs_port: hub.needs_port}, port, bundleStream, seenPosts, sem, wg, remainingHubs, connLock)
 
 		remainingHubs.Delete(key)
 		found = true
@@ -157,7 +161,11 @@ func Firehose(ctx context.Context, bundleStream chan<- *types.BundleItem) error 
 
 	for _, hub := range hubRpcEndpoints {
 		for _, port := range ports {
-			remainingHubs.Store(fmt.Sprintf(hub.url), port)
+			if hub.needs_port {
+				remainingHubs.Store(hub, port)
+			} else if _, ok := remainingHubs.Load(hub); !ok {
+				remainingHubs.Store(hub, port)
+			}
 		}
 	}
 
