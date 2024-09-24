@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	outputFilePath = "output.jsonl"
+	outputFilePath = "bundled.jsonl"
 )
 
 func TestFirehose(t *testing.T) {
@@ -33,7 +33,7 @@ func TestFirehose(t *testing.T) {
 	// Start the Firehose to stream BundleItems
 	go Firehose(ctx, bundleStream)
 
-	// Consume the stream and print to console (or handle as needed)
+	// Consume the stream and print to console and save to bundled.jsonl
 	for bundle := range bundleStream {
 		eventJson, err := json.Marshal(bundle)
 		if err != nil {
@@ -45,6 +45,6 @@ func TestFirehose(t *testing.T) {
 	}
 
 	// Simulate running for 10 seconds and then stop
-	time.Sleep(10 * time.Second)
+	time.Sleep(20 * time.Second)
 	cancel() // Cancel the context to stop the Firehose
 }
