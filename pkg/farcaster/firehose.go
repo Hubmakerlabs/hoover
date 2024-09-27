@@ -31,6 +31,7 @@ var (
 	maxHashCount    = 5000 // Maximum number of hashes to keep in memory
 	hashesOrder     = make([]string, 0, maxHashCount)
 	hashesOrderLock sync.Mutex
+	cancel_global   context.F
 )
 
 // connectToHub establishes a connection to the specified Farcaster hub
@@ -71,14 +72,14 @@ func manageHashCapacity(hash string, seenPosts *sync.Map) {
 func subscribeToHub(ctx context.T, hub struct {
 	url        string
 	needs_port bool
-}, port string, bundleStream chan<- *types.BundleItem, seenPosts *sync.Map, sem chan struct{}, wg *sync.WaitGroup, remainingHubs *sync.Map, connLock *sync.Mutex) {
+}, port string, bundleStream chan<- *types.BundleItem, seenPosts *sync.Map, sem chan struct{}, wg *sync.WaitGroup, remainingHubs *sync.Map) {
 	defer wg.Done()
 	defer func() { <-sem }()
 
 	conn, client, err := connectToHub(hub.url, port, hub.needs_port)
 	if err != nil {
 		log.Printf("Failed to connect to hub %s:%s - %v", hub.url, port, err)
-		replaceFailedConnection(ctx, bundleStream, seenPosts, sem, wg, remainingHubs, connLock)
+		replaceFailedConnection(ctx, bundleStream, seenPosts, sem, wg, remainingHubs)
 		return
 	}
 	defer conn.Close()
@@ -88,39 +89,47 @@ func subscribeToHub(ctx context.T, hub struct {
 	stream, err := client.Subscribe(ctx, &pb.SubscribeRequest{EventTypes: evts})
 	if err != nil {
 		log.Printf("Failed to subscribe to hub %s:%s - %v", hub.url, port, err)
-		replaceFailedConnection(ctx, bundleStream, seenPosts, sem, wg, remainingHubs, connLock)
+		replaceFailedConnection(ctx, bundleStream, seenPosts, sem, wg, remainingHubs)
 		return
 	}
 
 	for {
-		msg, err := stream.Recv()
-		if err != nil {
-			log.Printf("Failed to receive message from hub %s:%s - %v", hub.url, port, err)
-			replaceFailedConnection(ctx, bundleStream, seenPosts, sem, wg, remainingHubs, connLock)
+		select {
+		case <-ctx.Done():
+			wg.Done()
+			close(bundleStream)
+			cancel_global()
 			return
-		}
-		message := msg.GetMergeMessageBody().GetMessage()
-		hash := hex.EncodeToString(message.GetHash())
+		default:
+			msg, err := stream.Recv()
+			if err != nil {
+				log.Printf("Failed to receive message from hub %s:%s - %v", hub.url, port, err)
+				replaceFailedConnection(ctx, bundleStream, seenPosts, sem, wg, remainingHubs)
+				return
+			}
+			message := msg.GetMergeMessageBody().GetMessage()
+			hash := hex.EncodeToString(message.GetHash())
 
-		// Check if the post has already been seen
-		if _, loaded := seenPosts.LoadOrStore(hash, true); loaded {
-			continue
-		}
+			// Check if the post has already been seen
+			if _, loaded := seenPosts.LoadOrStore(hash, true); loaded {
+				continue
+			}
 
-		// Manage the capacity of the seenPosts map
-		manageHashCapacity(hash, seenPosts)
+			// Manage the capacity of the seenPosts map
+			manageHashCapacity(hash, seenPosts)
 
-		bundle, err := MessageToBundleItem(message)
-		if err != nil {
-			log.Printf("Failed to convert message to bundle item: %v", err)
-			continue
+			bundle, err := MessageToBundleItem(message)
+			if err != nil {
+				log.Printf("Failed to convert message to bundle item: %v", err)
+				continue
+			}
+			bundleStream <- bundle
 		}
-		bundleStream <- bundle
 	}
 }
 
 // replaceFailedConnection replaces a failed connection with a new one from the remaining pool
-func replaceFailedConnection(ctx context.T, bundleStream chan<- *types.BundleItem, seenPosts *sync.Map, sem chan struct{}, wg *sync.WaitGroup, remainingHubs *sync.Map, connLock *sync.Mutex) {
+func replaceFailedConnection(ctx context.T, bundleStream chan<- *types.BundleItem, seenPosts *sync.Map, sem chan struct{}, wg *sync.WaitGroup, remainingHubs *sync.Map) {
 
 	var remainingHubsEmpty bool
 	remainingHubs.Range(func(key, value interface{}) bool {
@@ -129,7 +138,7 @@ func replaceFailedConnection(ctx context.T, bundleStream chan<- *types.BundleIte
 	})
 
 	if remainingHubsEmpty {
-		connLock.Lock()
+		// connLock.Lock()
 		for _, hub := range hubRpcEndpoints {
 			for _, port := range ports {
 				if hub.needs_port {
@@ -139,11 +148,11 @@ func replaceFailedConnection(ctx context.T, bundleStream chan<- *types.BundleIte
 				}
 			}
 		}
-		connLock.Unlock()
+		// connLock.Unlock()
 	}
 
-	connLock.Lock()
-	defer connLock.Unlock()
+	// connLock.Lock()
+	// defer connLock.Unlock()
 
 	var found bool
 	remainingHubs.Range(func(key any, value interface{}) bool {
@@ -154,7 +163,7 @@ func replaceFailedConnection(ctx context.T, bundleStream chan<- *types.BundleIte
 		port := value.(string)
 
 		wg.Add(1)
-		go subscribeToHub(ctx, hub, port, bundleStream, seenPosts, sem, wg, remainingHubs, connLock)
+		go subscribeToHub(ctx, hub, port, bundleStream, seenPosts, sem, wg, remainingHubs)
 
 		remainingHubs.Delete(key)
 		found = true
@@ -175,9 +184,8 @@ func Firehose(ctx context.T, cancel context.F, wg_parent *sync.WaitGroup,
 	seenPosts := &sync.Map{}
 	sem := make(chan struct{}, 3)
 	remainingHubs := &sync.Map{}
-	connLock := &sync.Mutex{}
 	bundleStream := make(chan *types.BundleItem)
-	processWG := &sync.WaitGroup{}
+	cancel_global = cancel
 
 	for _, hub := range hubRpcEndpoints {
 		for _, port := range ports {
@@ -193,37 +201,8 @@ func Firehose(ctx context.T, cancel context.F, wg_parent *sync.WaitGroup,
 	for i := 0; i < 3; i++ {
 		sem <- struct{}{}
 		wg.Add(1)
-		go replaceFailedConnection(ctx, bundleStream, seenPosts, sem, &wg, remainingHubs, connLock)
+		go replaceFailedConnection(ctx, bundleStream, seenPosts, sem, &wg, remainingHubs)
 	}
-
-	processWG.Add(1)
-	go func() {
-		defer processWG.Done()
-		for bundle := range bundleStream {
-			if !ready {
-				ready = true
-				wg_parent.Done()
-			}
-			wg_parent.Wait()
-			func() {
-				defer func() {
-					if r := recover(); r != nil {
-						log.Printf("Recovered from panic in fn: %v", r)
-					}
-				}()
-				select {
-				case <-ctx.Done():
-					close(bundleStream)
-					cancel()
-					return
-				default:
-					if err := fn(bundle); err != nil {
-						log.Printf("Error processing bundle: %v", err)
-					}
-				}
-			}()
-		}
-	}()
 
 	// Close the bundleStream when all subscriptions are done
 	go func() {
@@ -232,6 +211,29 @@ func Firehose(ctx context.T, cancel context.F, wg_parent *sync.WaitGroup,
 		cancel()
 	}()
 
-	// Wait for the stream processing to finish
-	processWG.Wait()
+	for bundle := range bundleStream {
+		if !ready {
+			ready = true
+			wg_parent.Done()
+		}
+		wg_parent.Wait()
+		func() {
+			defer func() {
+				if r := recover(); r != nil {
+					log.Printf("Recovered from panic in fn: %v", r)
+				}
+			}()
+			select {
+			case <-ctx.Done():
+				close(bundleStream)
+				cancel()
+				return
+			default:
+				if err := fn(bundle); err != nil {
+					log.Printf("Error processing bundle: %v", err)
+				}
+			}
+		}()
+	}
+
 }
