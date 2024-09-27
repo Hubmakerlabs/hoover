@@ -13,9 +13,14 @@ import (
 
 func TestFirehose(t *testing.T) {
 	c, cancel := context.WithCancel(context.Background())
-	interrupt.AddHandler(cancel)
+	interrupt.AddHandler(func() {
+		cancel()
+	})
 	go func() {
-		time.Sleep(time.Second * 15)
+		select {
+		case <-c.Done():
+		case <-time.After(time.Second * 10):
+		}
 		cancel()
 	}()
 	var wg sync.WaitGroup
