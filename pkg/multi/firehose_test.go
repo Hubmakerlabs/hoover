@@ -17,12 +17,12 @@ func TestFirehose(t *testing.T) {
 	c, cancel := context.WithCancel(context.Background())
 	interrupt.AddHandler(cancel)
 	go func() {
-		time.Sleep(time.Second*5)
+		time.Sleep(time.Second * 15)
 		cancel()
 	}()
 	var wg sync.WaitGroup
 	fmt.Println()
-	Firehose(c, cancel, &wg, nostr.Relays,func(bundle *types.BundleItem) (err error) {
+	Firehose(c, cancel, &wg, nostr.Relays, func(bundle *types.BundleItem) (err error) {
 		arweave.PrintBundleItem(bundle)
 		return
 	})

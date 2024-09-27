@@ -44,7 +44,8 @@ func MessageToBundleItem(msg *pb.Message) (bundle *types.BundleItem, err error) 
 		{Name: Kind, Value: k},
 		{Name: J(Event, Id), Value: hex.EncodeToString(msg.GetHash())},
 		{Name: J(User, Id), Value: fmt.Sprintf("%d", msg.GetData().GetFid())},
-		{Name: Timestamp, Value: fmt.Sprintf("%d", msg.GetData().GetTimestamp())},
+		{Name: Timestamp, Value: fmt.Sprintf("%d",
+			int64(msg.GetData().GetTimestamp())+1609459200)}, // offset from 2021-01-10T00:00
 		{Name: Signature, Value: hex.EncodeToString(msg.GetSignature())},
 	}
 	switch k {
@@ -70,68 +71,83 @@ func MessageToBundleItem(msg *pb.Message) (bundle *types.BundleItem, err error) 
 		parent := msg.GetData().GetCastAddBody().GetParent()
 		if parent != nil {
 			if x, ok := parent.(*pb.CastAddBody_ParentCastId); ok {
-				data.Append(J(Reply, Parent, Id), x.ParentCastId.String())
-			} else {
-				data.Append(J(Reply, Parent, Uri), parent.(*pb.CastAddBody_ParentUrl).ParentUrl)
+				fid := x.ParentCastId.Fid
+				hash := x.ParentCastId.Hash
+				ao.AppendTag(bundle, J(Reply, Parent, Id), fmt.Sprintf("%0x", hash))
+				ao.AppendTag(bundle, J(Reply, Parent, User, Id), fmt.Sprintf("%d", fid))
 			}
-		}
-		mentions_positions := msg.GetData().GetCastAddBody().GetMentionsPositions()
-		if mentions_positions != nil {
-			if len(mentions_positions) == 1 {
-				data.Append(J(Mention, Start), strconv.FormatUint(uint64(mentions_positions[0]), 10))
-			} else {
-				for i := range mentions_positions {
-					mention_position := mentions_positions[i]
-					data.Append(J(Mention, i, Start), strconv.FormatUint(uint64(mention_position), 10))
+			if x, ok := parent.(*pb.CastAddBody_ParentUrl); ok {
+				ao.AppendTag(bundle, J(Reply, Parent, Uri), x.ParentUrl)
+			}
+			mentions_positions := msg.GetData().GetCastAddBody().GetMentionsPositions()
+			if mentions_positions != nil {
+				if len(mentions_positions) == 1 {
+					data.Append(J(Mention, Start),
+						strconv.FormatUint(uint64(mentions_positions[0]), 10))
+				} else {
+					for i := range mentions_positions {
+						mention_position := mentions_positions[i]
+						data.Append(J(Mention, i, Start),
+							strconv.FormatUint(uint64(mention_position), 10))
+					}
+				}
+
+			}
+			embeds := msg.GetData().GetCastAddBody().GetEmbeds()
+			for i := range embeds {
+				if embeds[i].GetUrl() != "" {
+					data.Append(J(Embed, Uri), embeds[i].GetUrl())
+				} else {
+					fid := fmt.Sprintf("%d", embeds[i].GetCastId().Fid)
+					hash := fmt.Sprintf("%0x", embeds[i].GetCastId().Hash)
+					data.Append(J(Embed, User, Id), fid)
+					data.Append(J(Embed, Event, Id), hash)
 				}
 			}
-
 		}
-		embeds := msg.GetData().GetCastAddBody().GetEmbeds()
-		for i := range embeds {
-			if embeds[i].GetUrl() != "" {
-				data.Append(J(Embed, Uri), embeds[i].GetUrl())
-			} else {
-				data.Append(J(Embed, Id), embeds[i].GetCastId().String())
-			}
-		}
-
 	case Repost:
 		target := msg.GetData().GetReactionBody().GetTarget()
 		if x, ok := target.(*pb.ReactionBody_TargetCastId); ok {
-			target_id := x.TargetCastId.String()
-			data = ao.NewEventData(target_id)
-			ao.AppendTag(bundle, J(Repost, Event, Id), target_id)
+			targetFid := x.TargetCastId.Fid
+			targetHash := x.TargetCastId.Hash
+			ao.AppendTag(bundle, J(Repost, Event, Id),
+				fmt.Sprintf("%0x", targetHash))
+			ao.AppendTag(bundle, J(Repost, User, Id),
+				fmt.Sprintf("%d", targetFid))
 		} else {
 			target_url := target.(*pb.ReactionBody_TargetUrl).TargetUrl
-			data = ao.NewEventData(target_url)
+			// data = ao.NewEventData(target_url)
 			ao.AppendTag(bundle, J(Repost, Event, Uri), target_url)
 		}
 	case Like:
 		target := msg.GetData().GetReactionBody().GetTarget()
 		if x, ok := target.(*pb.ReactionBody_TargetCastId); ok {
-			target_id := x.TargetCastId.String()
-			data = ao.NewEventData(target_id)
-			ao.AppendTag(bundle, J(Like, Event, Id), target_id)
+			targetFid := x.TargetCastId.Fid
+			targetHash := x.TargetCastId.Hash
+			ao.AppendTag(bundle, J(Like, Event, Id),
+				fmt.Sprintf("%0x", targetHash))
+			ao.AppendTag(bundle, J(Like, User, Id), fmt.Sprint(targetFid))
 		} else {
 			target_url := target.(*pb.ReactionBody_TargetUrl).TargetUrl
-			data = ao.NewEventData(target_url)
+			// data = ao.NewEventData(target_url)
 			ao.AppendTag(bundle, J(Like, Event, Uri), target_url)
 		}
 
 	case Follow:
-		follow_id := strconv.FormatUint(msg.GetData().GetLinkBody().GetTargetFid(), 10)
-		data = ao.NewEventData(follow_id)
+		follow_id := fmt.Sprintf("%d", msg.GetData().GetLinkBody().GetTargetFid())
+		// data = ao.NewEventData(follow_id)
 		ao.AppendTag(bundle, J(Follow, User, Id), follow_id)
 	case Profile:
 		data = ao.NewEventData(msg.GetData().GetUserDataBody().GetValue())
 	}
-	// put the ao.EventData into JSON form and place in the bundle.Data field
-	var b []byte
-	b, err = json.Marshal(data)
-	if err != nil {
-		return
+	if data != nil && (data.Content != "" || len(data.EventTags) > 0) {
+		// put the ao.EventData into JSON form and place in the bundle.Data field
+		var b []byte
+		b, err = json.Marshal(data)
+		if err != nil {
+			return
+		}
+		bundle.Data = string(b)
 	}
-	bundle.Data = string(b)
 	return
 }

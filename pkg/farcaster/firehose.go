@@ -34,12 +34,14 @@ var (
 )
 
 // connectToHub establishes a connection to the specified Farcaster hub
-func connectToHub(url string, port string, isPort bool) (*grpc.ClientConn, pb.HubServiceClient, error) {
+func connectToHub(url string, port string, isPort bool) (*grpc.ClientConn, pb.HubServiceClient,
+	error) {
 	creds := credentials.NewTLS(&tls.Config{})
 	var conn *grpc.ClientConn
 	var err error
 	if isPort {
-		conn, err = grpc.NewClient(fmt.Sprintf("%s:%s", url, port), grpc.WithTransportCredentials(creds))
+		conn, err = grpc.NewClient(fmt.Sprintf("%s:%s", url, port),
+			grpc.WithTransportCredentials(creds))
 		if err != nil {
 			return nil, nil, fmt.Errorf("failed to connect to %s:%s: %v", url, port, err)
 		}
@@ -71,7 +73,8 @@ func manageHashCapacity(hash string, seenPosts *sync.Map) {
 func subscribeToHub(ctx context.T, hub struct {
 	url        string
 	needs_port bool
-}, port string, bundleStream chan<- *types.BundleItem, seenPosts *sync.Map, sem chan struct{}, wg *sync.WaitGroup, remainingHubs *sync.Map, connLock *sync.Mutex) {
+}, port string, bundleStream chan<- *types.BundleItem, seenPosts *sync.Map, sem chan struct{},
+	wg *sync.WaitGroup, remainingHubs *sync.Map, connLock *sync.Mutex) {
 	defer wg.Done()
 	defer func() { <-sem }()
 
@@ -96,7 +99,8 @@ func subscribeToHub(ctx context.T, hub struct {
 		msg, err := stream.Recv()
 		if err != nil {
 			log.Printf("Failed to receive message from hub %s:%s - %v", hub.url, port, err)
-			replaceFailedConnection(ctx, bundleStream, seenPosts, sem, wg, remainingHubs, connLock)
+			replaceFailedConnection(ctx, bundleStream, seenPosts, sem, wg, remainingHubs,
+				connLock)
 			return
 		}
 		message := msg.GetMergeMessageBody().GetMessage()
@@ -120,7 +124,9 @@ func subscribeToHub(ctx context.T, hub struct {
 }
 
 // replaceFailedConnection replaces a failed connection with a new one from the remaining pool
-func replaceFailedConnection(ctx context.T, bundleStream chan<- *types.BundleItem, seenPosts *sync.Map, sem chan struct{}, wg *sync.WaitGroup, remainingHubs *sync.Map, connLock *sync.Mutex) {
+func replaceFailedConnection(ctx context.T, bundleStream chan<- *types.BundleItem,
+	seenPosts *sync.Map, sem chan struct{}, wg *sync.WaitGroup, remainingHubs *sync.Map,
+	connLock *sync.Mutex) {
 
 	var remainingHubsEmpty bool
 	remainingHubs.Range(func(key, value interface{}) bool {
@@ -154,7 +160,8 @@ func replaceFailedConnection(ctx context.T, bundleStream chan<- *types.BundleIte
 		port := value.(string)
 
 		wg.Add(1)
-		go subscribeToHub(ctx, hub, port, bundleStream, seenPosts, sem, wg, remainingHubs, connLock)
+		go subscribeToHub(ctx, hub, port, bundleStream, seenPosts, sem, wg, remainingHubs,
+			connLock)
 
 		remainingHubs.Delete(key)
 		found = true
@@ -193,7 +200,8 @@ func Firehose(ctx context.T, cancel context.F, wg_parent *sync.WaitGroup,
 	for i := 0; i < 3; i++ {
 		sem <- struct{}{}
 		wg.Add(1)
-		go replaceFailedConnection(ctx, bundleStream, seenPosts, sem, &wg, remainingHubs, connLock)
+		go replaceFailedConnection(ctx, bundleStream, seenPosts, sem, &wg, remainingHubs,
+			connLock)
 	}
 
 	processWG.Add(1)
