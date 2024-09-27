@@ -1,7 +1,6 @@
 package farcaster
 
 import (
-	"context"
 	"crypto/tls"
 	"encoding/hex"
 	"fmt"
@@ -9,6 +8,7 @@ import (
 	"sync"
 
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
+	"github.com/Hubmakerlabs/replicatr/pkg/nostr/context"
 	pb "github.com/juiceworks/hubble-grpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -68,7 +68,7 @@ func manageHashCapacity(hash string, seenPosts *sync.Map) {
 }
 
 // subscribeToHub listens for messages from the given hub and sends them to the provided channel
-func subscribeToHub(ctx context.Context, hub struct {
+func subscribeToHub(ctx context.T, hub struct {
 	url        string
 	needs_port bool
 }, port string, bundleStream chan<- *types.BundleItem, seenPosts *sync.Map, sem chan struct{}, wg *sync.WaitGroup, remainingHubs *sync.Map, connLock *sync.Mutex) {
@@ -120,26 +120,41 @@ func subscribeToHub(ctx context.Context, hub struct {
 }
 
 // replaceFailedConnection replaces a failed connection with a new one from the remaining pool
-func replaceFailedConnection(ctx context.Context, bundleStream chan<- *types.BundleItem, seenPosts *sync.Map, sem chan struct{}, wg *sync.WaitGroup, remainingHubs *sync.Map, connLock *sync.Mutex) {
+func replaceFailedConnection(ctx context.T, bundleStream chan<- *types.BundleItem, seenPosts *sync.Map, sem chan struct{}, wg *sync.WaitGroup, remainingHubs *sync.Map, connLock *sync.Mutex) {
+
+	var remainingHubsEmpty bool
+	remainingHubs.Range(func(key, value interface{}) bool {
+		remainingHubsEmpty = false
+		return false
+	})
+
+	if remainingHubsEmpty {
+		connLock.Lock()
+		for _, hub := range hubRpcEndpoints {
+			for _, port := range ports {
+				if hub.needs_port {
+					remainingHubs.Store(hub, port)
+				} else if _, ok := remainingHubs.Load(hub); !ok {
+					remainingHubs.Store(hub, port)
+				}
+			}
+		}
+		connLock.Unlock()
+	}
+
 	connLock.Lock()
 	defer connLock.Unlock()
 
-	// Find next available hub and port combination
 	var found bool
 	remainingHubs.Range(func(key any, value interface{}) bool {
-
 		hub := key.(struct {
 			url        string
 			needs_port bool
 		})
 		port := value.(string)
 
-		// Start a new subscription
 		wg.Add(1)
-		go subscribeToHub(ctx, struct {
-			url        string
-			needs_port bool
-		}{url: hub.url, needs_port: hub.needs_port}, port, bundleStream, seenPosts, sem, wg, remainingHubs, connLock)
+		go subscribeToHub(ctx, hub, port, bundleStream, seenPosts, sem, wg, remainingHubs, connLock)
 
 		remainingHubs.Delete(key)
 		found = true
@@ -152,12 +167,17 @@ func replaceFailedConnection(ctx context.Context, bundleStream chan<- *types.Bun
 }
 
 // Firehose function connects to multiple hubs concurrently and streams BundleItems
-func Firehose(ctx context.Context, bundleStream chan<- *types.BundleItem) error {
+func Firehose(ctx context.T, cancel context.F, wg_parent *sync.WaitGroup,
+	fn func(bundle *types.BundleItem) (err error)) {
+	wg_parent.Add(1)
+	var ready bool
 	var wg sync.WaitGroup
 	seenPosts := &sync.Map{}
 	sem := make(chan struct{}, 3)
 	remainingHubs := &sync.Map{}
 	connLock := &sync.Mutex{}
+	bundleStream := make(chan *types.BundleItem)
+	processWG := &sync.WaitGroup{}
 
 	for _, hub := range hubRpcEndpoints {
 		for _, port := range ports {
@@ -176,10 +196,42 @@ func Firehose(ctx context.Context, bundleStream chan<- *types.BundleItem) error 
 		go replaceFailedConnection(ctx, bundleStream, seenPosts, sem, &wg, remainingHubs, connLock)
 	}
 
+	processWG.Add(1)
+	go func() {
+		defer processWG.Done()
+		for bundle := range bundleStream {
+			if !ready {
+				ready = true
+				wg_parent.Done()
+			}
+			wg_parent.Wait()
+			func() {
+				defer func() {
+					if r := recover(); r != nil {
+						log.Printf("Recovered from panic in fn: %v", r)
+					}
+				}()
+				select {
+				case <-ctx.Done():
+					close(bundleStream)
+					cancel()
+					return
+				default:
+					if err := fn(bundle); err != nil {
+						log.Printf("Error processing bundle: %v", err)
+					}
+				}
+			}()
+		}
+	}()
+
+	// Close the bundleStream when all subscriptions are done
 	go func() {
 		wg.Wait()
 		close(bundleStream)
+		cancel()
 	}()
 
-	return nil
+	// Wait for the stream processing to finish
+	processWG.Wait()
 }
