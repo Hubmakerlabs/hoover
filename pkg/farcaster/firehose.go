@@ -75,8 +75,11 @@ func subscribeToHub(ctx context.T, hub struct {
 	needs_port bool
 }, port string, bundleStream chan<- *types.BundleItem, seenPosts *sync.Map, sem chan struct{}, wg *sync.WaitGroup, remainingHubs *sync.Map) {
 	defer wg.Done()
+	wg.Add(1)
 	defer func() { <-sem }()
-
+	if !firstSub {
+		firstSub = true
+	}
 	conn, client, err := connectToHub(hub.url, port, hub.needs_port)
 	if err != nil {
 		log.Printf("Failed to connect to hub %s:%s - %v", hub.url, port, err)
@@ -97,8 +100,8 @@ func subscribeToHub(ctx context.T, hub struct {
 	for {
 		select {
 		case <-ctx.Done():
-			wg.Done()
 			close(bundleStream)
+			close(sem)
 			cancel_global()
 			return
 		default:
@@ -131,52 +134,51 @@ func subscribeToHub(ctx context.T, hub struct {
 
 // replaceFailedConnection replaces a failed connection with a new one from the remaining pool
 func replaceFailedConnection(ctx context.T, bundleStream chan<- *types.BundleItem, seenPosts *sync.Map, sem chan struct{}, wg *sync.WaitGroup, remainingHubs *sync.Map) {
+	select {
+	case <-ctx.Done():
+		close(bundleStream)
+		close(sem)
+		cancel_global()
+		return
+	default:
+		var remainingHubsEmpty bool
+		remainingHubs.Range(func(key, value interface{}) bool {
+			remainingHubsEmpty = false
+			return false
+		})
 
-	var remainingHubsEmpty bool
-	remainingHubs.Range(func(key, value interface{}) bool {
-		remainingHubsEmpty = false
-		return false
-	})
-
-	if remainingHubsEmpty {
-		// connLock.Lock()
-		for _, hub := range hubRpcEndpoints {
-			for _, port := range ports {
-				if hub.needs_port {
-					remainingHubs.Store(hub, port)
-				} else if _, ok := remainingHubs.Load(hub); !ok {
-					remainingHubs.Store(hub, port)
+		if remainingHubsEmpty {
+			for _, hub := range hubRpcEndpoints {
+				for _, port := range ports {
+					if hub.needs_port {
+						remainingHubs.Store(hub, port)
+					} else if _, ok := remainingHubs.Load(hub); !ok {
+						remainingHubs.Store(hub, port)
+					}
 				}
 			}
 		}
-		// connLock.Unlock()
-	}
+		var found bool
 
-	// connLock.Lock()
-	// defer connLock.Unlock()
+		remainingHubs.Range(func(key any, value interface{}) bool {
+			hub := key.(struct {
+				url        string
+				needs_port bool
+			})
+			port := value.(string)
 
-	var found bool
-	remainingHubs.Range(func(key any, value interface{}) bool {
-		hub := key.(struct {
-			url        string
-			needs_port bool
+			go subscribeToHub(ctx, hub, port, bundleStream, seenPosts, sem, wg, remainingHubs)
+
+			remainingHubs.Delete(key)
+			found = true
+			return false
+
 		})
-		port := value.(string)
-
-		wg.Add(1)
-		if !firstSub {
-			firstSub = true
+		if !found {
+			<-sem
 		}
-		go subscribeToHub(ctx, hub, port, bundleStream, seenPosts, sem, wg, remainingHubs)
-
-		remainingHubs.Delete(key)
-		found = true
-		return false
-	})
-
-	if !found {
-		<-sem
 	}
+
 }
 
 // Firehose function connects to multiple hubs concurrently and streams BundleItems
@@ -234,6 +236,7 @@ func Firehose(ctx context.T, cancel context.F, wg_parent *sync.WaitGroup,
 			select {
 			case <-ctx.Done():
 				close(bundleStream)
+				close(sem)
 				cancel()
 				return
 			default:

@@ -14,7 +14,7 @@ func TestFirehose(t *testing.T) {
 	c, cancel := context.WithCancel(context.Background())
 	interrupt.AddHandler(cancel)
 	// go func() {
-	// 	time.Sleep(time.Second * 15)
+	// 	time.Sleep(time.Second)
 	// 	cancel()
 	// }()
 	var wg sync.WaitGroup
