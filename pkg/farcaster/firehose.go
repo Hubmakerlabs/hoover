@@ -73,17 +73,16 @@ func manageHashCapacity(hash string, seenPosts *sync.Map) {
 func subscribeToHub(ctx context.T, hub struct {
 	url        string
 	needs_port bool
-}, port string, bundleStream chan<- *types.BundleItem, seenPosts *sync.Map, sem chan struct{}, wg *sync.WaitGroup, remainingHubs *sync.Map) {
+}, port string, bundleStream chan<- *types.BundleItem, seenPosts *sync.Map, wg *sync.WaitGroup, remainingHubs *sync.Map) {
 	defer wg.Done()
 	wg.Add(1)
-	defer func() { <-sem }()
 	if !firstSub {
 		firstSub = true
 	}
 	conn, client, err := connectToHub(hub.url, port, hub.needs_port)
 	if err != nil {
 		log.Printf("Failed to connect to hub %s:%s - %v", hub.url, port, err)
-		replaceFailedConnection(ctx, bundleStream, seenPosts, sem, wg, remainingHubs)
+		replaceFailedConnection(ctx, bundleStream, seenPosts, wg, remainingHubs)
 		return
 	}
 	defer conn.Close()
@@ -93,7 +92,7 @@ func subscribeToHub(ctx context.T, hub struct {
 	stream, err := client.Subscribe(ctx, &pb.SubscribeRequest{EventTypes: evts})
 	if err != nil {
 		log.Printf("Failed to subscribe to hub %s:%s - %v", hub.url, port, err)
-		replaceFailedConnection(ctx, bundleStream, seenPosts, sem, wg, remainingHubs)
+		replaceFailedConnection(ctx, bundleStream, seenPosts, wg, remainingHubs)
 		return
 	}
 
@@ -101,14 +100,13 @@ func subscribeToHub(ctx context.T, hub struct {
 		select {
 		case <-ctx.Done():
 			close(bundleStream)
-			close(sem)
 			cancel_global()
 			return
 		default:
 			msg, err := stream.Recv()
 			if err != nil {
 				log.Printf("Failed to receive message from hub %s:%s - %v", hub.url, port, err)
-				replaceFailedConnection(ctx, bundleStream, seenPosts, sem, wg, remainingHubs)
+				replaceFailedConnection(ctx, bundleStream, seenPosts, wg, remainingHubs)
 				return
 			}
 			message := msg.GetMergeMessageBody().GetMessage()
@@ -133,11 +131,10 @@ func subscribeToHub(ctx context.T, hub struct {
 }
 
 // replaceFailedConnection replaces a failed connection with a new one from the remaining pool
-func replaceFailedConnection(ctx context.T, bundleStream chan<- *types.BundleItem, seenPosts *sync.Map, sem chan struct{}, wg *sync.WaitGroup, remainingHubs *sync.Map) {
+func replaceFailedConnection(ctx context.T, bundleStream chan<- *types.BundleItem, seenPosts *sync.Map, wg *sync.WaitGroup, remainingHubs *sync.Map) {
 	select {
 	case <-ctx.Done():
 		close(bundleStream)
-		close(sem)
 		cancel_global()
 		return
 	default:
@@ -158,7 +155,6 @@ func replaceFailedConnection(ctx context.T, bundleStream chan<- *types.BundleIte
 				}
 			}
 		}
-		var found bool
 
 		remainingHubs.Range(func(key any, value interface{}) bool {
 			hub := key.(struct {
@@ -167,16 +163,12 @@ func replaceFailedConnection(ctx context.T, bundleStream chan<- *types.BundleIte
 			})
 			port := value.(string)
 
-			go subscribeToHub(ctx, hub, port, bundleStream, seenPosts, sem, wg, remainingHubs)
+			go subscribeToHub(ctx, hub, port, bundleStream, seenPosts, wg, remainingHubs)
 
 			remainingHubs.Delete(key)
-			found = true
 			return false
 
 		})
-		if !found {
-			<-sem
-		}
 	}
 
 }
@@ -188,7 +180,6 @@ func Firehose(ctx context.T, cancel context.F, wg_parent *sync.WaitGroup,
 	var ready bool
 	var wg sync.WaitGroup
 	seenPosts := &sync.Map{}
-	sem := make(chan struct{}, 3)
 	remainingHubs := &sync.Map{}
 	bundleStream := make(chan *types.BundleItem)
 	cancel_global = cancel
@@ -205,8 +196,8 @@ func Firehose(ctx context.T, cancel context.F, wg_parent *sync.WaitGroup,
 
 	// Start initial three connections
 	for i := 0; i < 3; i++ {
-		sem <- struct{}{}
-		go replaceFailedConnection(ctx, bundleStream, seenPosts, sem, &wg, remainingHubs)
+
+		go replaceFailedConnection(ctx, bundleStream, seenPosts, &wg, remainingHubs)
 	}
 
 	// Close the bundleStream when all subscriptions are done
@@ -236,7 +227,6 @@ func Firehose(ctx context.T, cancel context.F, wg_parent *sync.WaitGroup,
 			select {
 			case <-ctx.Done():
 				close(bundleStream)
-				close(sem)
 				cancel()
 				return
 			default:
