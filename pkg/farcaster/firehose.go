@@ -200,7 +200,6 @@ func Firehose(ctx context.T, cancel context.F, wg_parent *sync.WaitGroup,
 	// Start initial three connections
 	for i := 0; i < 3; i++ {
 		sem <- struct{}{}
-		wg.Add(1)
 		go replaceFailedConnection(ctx, bundleStream, seenPosts, sem, &wg, remainingHubs)
 	}
 
