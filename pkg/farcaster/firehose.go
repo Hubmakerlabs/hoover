@@ -240,7 +240,12 @@ func Firehose(ctx context.T, cancel context.F, wg_parent *sync.WaitGroup,
 				cancel()
 				return
 			default:
-				if err := fn(bundle); err != nil {
+				if fn == nil {
+					fmt.Println("No function provided. Printing bundle:")
+					fmt.Println(bundle)
+				} else if bundle == nil {
+					log.Printf("Bundle is nil")
+				} else if err := fn(bundle); err != nil {
 					log.Printf("Error processing bundle: %v", err)
 				}
 			}
