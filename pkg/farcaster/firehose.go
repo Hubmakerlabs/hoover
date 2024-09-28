@@ -32,6 +32,7 @@ var (
 	hashesOrder     = make([]string, 0, maxHashCount)
 	hashesOrderLock sync.Mutex
 	cancel_global   context.F
+	firstSub        = false
 )
 
 // connectToHub establishes a connection to the specified Farcaster hub
@@ -163,6 +164,9 @@ func replaceFailedConnection(ctx context.T, bundleStream chan<- *types.BundleIte
 		port := value.(string)
 
 		wg.Add(1)
+		if !firstSub {
+			firstSub = true
+		}
 		go subscribeToHub(ctx, hub, port, bundleStream, seenPosts, sem, wg, remainingHubs)
 
 		remainingHubs.Delete(key)
@@ -204,11 +208,16 @@ func Firehose(ctx context.T, cancel context.F, wg_parent *sync.WaitGroup,
 	}
 
 	// Close the bundleStream when all subscriptions are done
-	go func() {
-		wg.Wait()
-		close(bundleStream)
-		cancel()
-	}()
+	for {
+		if firstSub {
+			go func() {
+				wg.Wait()
+				close(bundleStream)
+				cancel()
+			}()
+			break
+		}
+	}
 
 	for bundle := range bundleStream {
 		if !ready {
