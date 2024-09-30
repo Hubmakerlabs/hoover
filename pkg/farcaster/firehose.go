@@ -15,19 +15,29 @@ import (
 )
 
 var (
-	hubRpcEndpoints = []struct {
-		url        string
-		needs_port bool
-	}{
-		{"hub.farcaster.standardcrypto.vc", true},
-		{"hub.pinata.cloud", false},
-		{"hoyt.farcaster.xyz", true},
-		{"lamia.farcaster.xyz", true},
-		{"api.farcasthub.com", true},
-		{"nemes.farcaster.xyz", true},
-		{"api.hub.wevm.dev", false},
-	}
-	ports           = []string{"2281", "2282", "2283"}
+	urls = []string{"hub.farcaster.standardcrypto.vc:2281",
+		"hub.farcaster.standardcrypto.vc:2282",
+		"hub.farcaster.standardcrypto.vc:2283",
+		"hub.pinata.cloud",
+		"hoyt.farcaster.xyz:2281",
+		"hoyt.farcaster.xyz:2282",
+		"hoyt.farcaster.xyz:2283",
+		"lamia.farcaster.xyz:2281",
+		"lamia.farcaster.xyz:2282",
+		"lamia.farcaster.xyz:2283",
+		"api.farcasthub.com:2281",
+		"api.farcasthub.com:2282",
+		"api.farcasthub.com:2283",
+		"nemes.farcaster.xyz:2281",
+		"nemes.farcaster.xyz:2282",
+		"nemes.farcaster.xyz:2283",
+		"api.hub.wevm.dev"}
+	totalUrls = len(urls)
+	currUrl   = struct {
+		curr int
+		mu   sync.Mutex
+	}{curr: 0}
+
 	maxHashCount    = 5000 // Maximum number of hashes to keep in memory
 	hashesOrder     = make([]string, 0, maxHashCount)
 	hashesOrderLock sync.Mutex
@@ -36,20 +46,13 @@ var (
 )
 
 // connectToHub establishes a connection to the specified Farcaster hub
-func connectToHub(url string, port string, isPort bool) (*grpc.ClientConn, pb.HubServiceClient, error) {
+func connectToHub(url string) (*grpc.ClientConn, pb.HubServiceClient, error) {
 	creds := credentials.NewTLS(&tls.Config{})
 	var conn *grpc.ClientConn
 	var err error
-	if isPort {
-		conn, err = grpc.NewClient(fmt.Sprintf("%s:%s", url, port), grpc.WithTransportCredentials(creds))
-		if err != nil {
-			return nil, nil, fmt.Errorf("failed to connect to %s:%s: %v", url, port, err)
-		}
-	} else {
-		conn, err = grpc.NewClient(url, grpc.WithTransportCredentials(creds))
-		if err != nil {
-			return nil, nil, fmt.Errorf("failed to connect to %s: %v", url, err)
-		}
+	conn, err = grpc.NewClient(url, grpc.WithTransportCredentials(creds))
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to connect to %s: %v", url, err)
 	}
 
 	client := pb.NewHubServiceClient(conn)
@@ -70,19 +73,16 @@ func manageHashCapacity(hash string, seenPosts *sync.Map) {
 }
 
 // subscribeToHub listens for messages from the given hub and sends them to the provided channel
-func subscribeToHub(ctx context.T, hub struct {
-	url        string
-	needs_port bool
-}, port string, bundleStream chan<- *types.BundleItem, seenPosts *sync.Map, wg *sync.WaitGroup, remainingHubs *sync.Map) {
+func subscribeToHub(ctx context.T, url string, bundleStream chan<- *types.BundleItem, seenPosts *sync.Map, wg *sync.WaitGroup) {
 	defer wg.Done()
 	wg.Add(1)
 	if !firstSub {
 		firstSub = true
 	}
-	conn, client, err := connectToHub(hub.url, port, hub.needs_port)
+	conn, client, err := connectToHub(url)
 	if err != nil {
-		log.Printf("Failed to connect to hub %s:%s - %v", hub.url, port, err)
-		replaceFailedConnection(ctx, bundleStream, seenPosts, wg, remainingHubs)
+		log.Printf("Failed to connect to hub %s - %v", url, err)
+		replaceFailedConnection(ctx, bundleStream, seenPosts, wg)
 		return
 	}
 	defer conn.Close()
@@ -91,22 +91,21 @@ func subscribeToHub(ctx context.T, hub struct {
 	evts := []pb.HubEventType{pb.HubEventType_HUB_EVENT_TYPE_MERGE_MESSAGE}
 	stream, err := client.Subscribe(ctx, &pb.SubscribeRequest{EventTypes: evts})
 	if err != nil {
-		log.Printf("Failed to subscribe to hub %s:%s - %v", hub.url, port, err)
-		replaceFailedConnection(ctx, bundleStream, seenPosts, wg, remainingHubs)
+		log.Printf("Failed to subscribe to hub %s - %v", url, err)
+		replaceFailedConnection(ctx, bundleStream, seenPosts, wg)
 		return
 	}
 
 	for {
 		select {
 		case <-ctx.Done():
-			close(bundleStream)
 			cancel_global()
 			return
 		default:
 			msg, err := stream.Recv()
 			if err != nil {
-				log.Printf("Failed to receive message from hub %s:%s - %v", hub.url, port, err)
-				replaceFailedConnection(ctx, bundleStream, seenPosts, wg, remainingHubs)
+				log.Printf("Failed to receive message from hub %s - %v", url, err)
+				replaceFailedConnection(ctx, bundleStream, seenPosts, wg)
 				return
 			}
 			message := msg.GetMergeMessageBody().GetMessage()
@@ -131,44 +130,18 @@ func subscribeToHub(ctx context.T, hub struct {
 }
 
 // replaceFailedConnection replaces a failed connection with a new one from the remaining pool
-func replaceFailedConnection(ctx context.T, bundleStream chan<- *types.BundleItem, seenPosts *sync.Map, wg *sync.WaitGroup, remainingHubs *sync.Map) {
+func replaceFailedConnection(ctx context.T, bundleStream chan<- *types.BundleItem, seenPosts *sync.Map, wg *sync.WaitGroup) {
 	select {
 	case <-ctx.Done():
-		close(bundleStream)
 		cancel_global()
 		return
 	default:
-		var remainingHubsEmpty bool
-		remainingHubs.Range(func(key, value interface{}) bool {
-			remainingHubsEmpty = false
-			return false
-		})
 
-		if remainingHubsEmpty {
-			for _, hub := range hubRpcEndpoints {
-				for _, port := range ports {
-					if hub.needs_port {
-						remainingHubs.Store(hub, port)
-					} else if _, ok := remainingHubs.Load(hub); !ok {
-						remainingHubs.Store(hub, port)
-					}
-				}
-			}
-		}
+		currUrl.mu.Lock()
+		defer currUrl.mu.Unlock()
+		go subscribeToHub(ctx, urls[currUrl.curr], bundleStream, seenPosts, wg)
+		currUrl.curr = (currUrl.curr + 1) % totalUrls
 
-		remainingHubs.Range(func(key any, value interface{}) bool {
-			hub := key.(struct {
-				url        string
-				needs_port bool
-			})
-			port := value.(string)
-
-			go subscribeToHub(ctx, hub, port, bundleStream, seenPosts, wg, remainingHubs)
-
-			remainingHubs.Delete(key)
-			return false
-
-		})
 	}
 
 }
@@ -180,24 +153,13 @@ func Firehose(ctx context.T, cancel context.F, wg_parent *sync.WaitGroup,
 	var ready bool
 	var wg sync.WaitGroup
 	seenPosts := &sync.Map{}
-	remainingHubs := &sync.Map{}
 	bundleStream := make(chan *types.BundleItem)
 	cancel_global = cancel
-
-	for _, hub := range hubRpcEndpoints {
-		for _, port := range ports {
-			if hub.needs_port {
-				remainingHubs.Store(hub, port)
-			} else if _, ok := remainingHubs.Load(hub); !ok {
-				remainingHubs.Store(hub, port)
-			}
-		}
-	}
 
 	// Start initial three connections
 	for i := 0; i < 3; i++ {
 
-		go replaceFailedConnection(ctx, bundleStream, seenPosts, &wg, remainingHubs)
+		go replaceFailedConnection(ctx, bundleStream, seenPosts, &wg)
 	}
 
 	// Close the bundleStream when all subscriptions are done
@@ -219,14 +181,8 @@ func Firehose(ctx context.T, cancel context.F, wg_parent *sync.WaitGroup,
 		}
 		wg_parent.Wait()
 		func() {
-			defer func() {
-				if r := recover(); r != nil {
-					log.Printf("Recovered from panic in fn: %v", r)
-				}
-			}()
 			select {
 			case <-ctx.Done():
-				close(bundleStream)
 				cancel()
 				return
 			default:
