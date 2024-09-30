@@ -181,11 +181,6 @@ func Firehose(ctx context.T, cancel context.F, wg_parent *sync.WaitGroup,
 		}
 		wg_parent.Wait()
 		func() {
-			defer func() {
-				if r := recover(); r != nil {
-					log.Printf("Recovered from panic in fn: %v", r)
-				}
-			}()
 			select {
 			case <-ctx.Done():
 				cancel()
