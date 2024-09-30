@@ -4,7 +4,6 @@ import (
 	"context"
 	"sync"
 	"testing"
-	"time"
 
 	arweave "github.com/Hubmakerlabs/hoover/pkg/arweave"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
@@ -13,16 +12,11 @@ import (
 
 func TestFirehose(t *testing.T) {
 	c, cancel := context.WithCancel(context.Background())
-	interrupt.AddHandler(func() {
-		cancel()
-	})
-	go func() {
-		select {
-		case <-c.Done():
-		case <-time.After(time.Second * 10):
-		}
-		cancel()
-	}()
+	interrupt.AddHandler(cancel)
+	// go func() {
+	// 	time.Sleep(time.Second)
+	// 	cancel()
+	// }()
 	var wg sync.WaitGroup
 	Firehose(c, cancel, &wg, func(bundle *types.BundleItem) (err error) {
 		arweave.PrintBundleItem(bundle)
