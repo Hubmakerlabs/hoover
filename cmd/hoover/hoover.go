@@ -18,7 +18,6 @@ import (
 	"github.com/Hubmakerlabs/replicatr/pkg/apputil"
 	"github.com/Hubmakerlabs/replicatr/pkg/interrupt"
 	"github.com/Hubmakerlabs/replicatr/pkg/slog"
-	"github.com/davecgh/go-spew/spew"
 	"go-simpler.org/env"
 )
 
@@ -195,7 +194,7 @@ func main() {
 				sum += len(tx.Tags[i].Name) + len(tx.Tags[i].Value)
 			}
 			var reward int64
-			if reward, err = wallet.Client.GetTransactionPrice(len(bundle.Data),
+			if reward, err = wallet.Client.GetTransactionPrice(len(bundle.Data)+sum,
 				nil); chk.E(err) {
 				cancel()
 				wg.Wait()
@@ -205,7 +204,7 @@ func main() {
 				rew = 1000
 			}
 			tx.Reward = fmt.Sprintf("%d", rew)
-			spew.Dump(tx)
+			// spew.Dump(tx)
 			if _, err = wallet.SendTransaction(tx); err != nil {
 				// try again or? this can mean the wallet is out of funds, this will trigger a
 				// shutdown for now to prevent pointless retries.
