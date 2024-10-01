@@ -17,6 +17,8 @@ import (
 	"github.com/Hubmakerlabs/hoover/pkg/multi"
 	"github.com/Hubmakerlabs/replicatr/pkg/apputil"
 	"github.com/Hubmakerlabs/replicatr/pkg/interrupt"
+	"github.com/Hubmakerlabs/replicatr/pkg/slog"
+	"github.com/davecgh/go-spew/spew"
 	"go-simpler.org/env"
 )
 
@@ -24,7 +26,7 @@ type Config struct {
 	AppName          string   `env:"APP_NAME" default:"hoover"`
 	Root             string   `env:"ROOT_DIR" usage:"root path for all other path configurations (defaults OS user home if empty)"`
 	Profile          string   `env:"PROFILE" default:".hoover" usage:"name of directory in root path to store state data and database"`
-	WalletFile       string   `env:"WALLET_FILE" usage:"full path of wallet file to use for uploading to arweave"`
+	WalletFile       string   `env:"WALLET_FILE" default:"keyfile.json" usage:"full path of wallet file to use for uploading to arweave"`
 	SpeedFactor      float32  `env:"SPEED_FACTOR" default:"1" usage:"change priority of bundle uploads by this ratio"`
 	ArweaveGateways  []string `env:"ARWEAVE_GATEWAYS" usage:""`
 	NostrRelays      []string `env:"NOSTR_RELAYS" usage:"nostr relays, comma separated, in standard format 'wss://example.com', ports and insecure ws:// also permissible"`
@@ -37,7 +39,7 @@ ROOT_DIR=
 PROFILE=.hoover
 WALLET_FILE=keyfile.json
 SPEED_FACTOR=1
-ARWEAVE_GATEWAYS=localhost:1984
+ARWEAVE_GATEWAYS=http://localhost:1984
 NOSTR_RELAYS=wss://purplepag.es,wss://njump.me,wss://relay.snort.social,wss://relay.damus.io,wss://relay.primal.net,wss://relay.nostr.band,wss://nostr-pub.wellorder.net,wss://relay.nostr.net,wss://nostr.lu.ke,wss://nostr.at,wss://e.nos.lol,wss://nostr.lopp.social,wss://nostr.vulpem.com,wss://relay.nostr.bg,wss://wot.utxo.one,wss://nostrelites.org,wss://wot.nostr.party,wss://wot.sovbit.host,wss://wot.girino.org,wss://relay.lnau.net,wss://wot.siamstr.com,wss://wot.sudocarlos.com,wss://relay.otherstuff.fyi,wss://relay.lexingtonbitcoin.org,wss://wot.azzamo.net,wss://wot.swarmstr.com,wss://zap.watch,wss://satsage.xyz
 FARCASTER_HUBS=hub.pinata.cloud,api.hub.wevm.dev,hoyt.farcaster.xyz:2283,lamia.farcaster.xyz:2283,api.farcasthub.com:2283,nemes.farcaster.xyz:2283,hub.farcaster.standardcrypto.vc:2281,hoyt.farcaster.xyz:2281,lamia.farcaster.xyz:2281,api.farcasthub.com:2281,nemes.farcaster.xyz:2281,hub.farcaster.standardcrypto.vc:2282,hoyt.farcaster.xyz:2282,lamia.farcaster.xyz:2282,api.farcasthub.com:2282,nemes.farcaster.xyz:2282,hub.farcaster.standardcrypto.vc:2283,
 BLUESKY_ENDPOINTS=wss://bsky.network/xrpc/com.atproto.sync.subscribeRepos
@@ -150,6 +152,7 @@ func GetWallet(walletFile, endpoint string) (address string, wallet *goar.Wallet
 }
 
 func main() {
+	slog.SetLogLevel(slog.Info)
 	var err error
 	var cfg *Config
 	if cfg, err = NewConfig(); err != nil || HelpRequested() {
@@ -160,7 +163,7 @@ func main() {
 		os.Exit(0)
 	}
 	if !FileExists(cfg.WalletFile) {
-		fmt.Fprintf(os.Stderr, "ERROR: wallet json file %s not found\n", cfg.WalletFile)
+		fmt.Fprintf(os.Stderr, "ERROR: wallet json file `%s` not found\n", cfg.WalletFile)
 		PrintHelp(cfg, os.Stderr)
 		os.Exit(1)
 	}
@@ -171,6 +174,7 @@ func main() {
 			continue
 		}
 		// successfully loaded wallet for provided gateway, continue
+		log.I.F("uploading to arweave gateway %s using wallet address %s", gateway, address)
 		break
 	}
 	c, cancel := context.WithCancel(context.Background())
@@ -191,23 +195,25 @@ func main() {
 				sum += len(tx.Tags[i].Name) + len(tx.Tags[i].Value)
 			}
 			var reward int64
-			reward, err = wallet.Client.GetTransactionPrice(len(bundle.Data), nil)
-			if err != nil {
-				// todo: this may mean the gateway is unhappy?
-				return nil
+			if reward, err = wallet.Client.GetTransactionPrice(len(bundle.Data),
+				nil); chk.E(err) {
+				cancel()
+				wg.Wait()
 			}
 			rew := int(float32(reward) * (100 + cfg.SpeedFactor) / 100)
 			if rew == 0 {
 				rew = 1000
 			}
 			tx.Reward = fmt.Sprintf("%d", rew)
+			spew.Dump(tx)
 			if _, err = wallet.SendTransaction(tx); err != nil {
 				// try again or? this can mean the wallet is out of funds, this will trigger a
 				// shutdown for now to prevent pointless retries.
-				fmt.Fprintf(os.Stderr,
+				log.E.F(
 					"ERROR: %s - you may need to add funds to your arweave wallet %s",
 					err.Error(), address)
-				os.Exit(1)
+				cancel()
+				wg.Wait()
 			}
 			return
 		})

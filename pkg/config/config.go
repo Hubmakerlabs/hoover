@@ -1,7 +1,6 @@
 package config
 
 import (
-	"log"
 	"os"
 	"strings"
 )
@@ -19,16 +18,12 @@ func GetEnv(path string) (env Env, err error) {
 		return
 	}
 	lines := strings.Split(string(s), "\n")
-	for i, line := range lines {
+	for _, line := range lines {
 		if len(line) == 0 {
 			continue
 		}
 		line = strings.TrimSpace(line)
-		split := strings.Split(line, "=")
-		if len(split) != 2 {
-			log.Printf("invalid line %d in config %s:\n%s", i, path, line)
-			continue
-		}
+		split := strings.SplitN(line, "=", 2)
 		env[strings.TrimSpace(split[0])] = strings.TrimSpace(split[1])
 	}
 	return
