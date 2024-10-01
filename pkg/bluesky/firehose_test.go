@@ -19,7 +19,7 @@ func TestFirehose(t *testing.T) {
 		cancel()
 	}()
 	var wg sync.WaitGroup
-	Firehose(c, cancel, &wg, func(bundle *types.BundleItem) (err error) {
+	Firehose(c, cancel, &wg, Urls, func(bundle *types.BundleItem) (err error) {
 		arweave.PrintBundleItem(bundle)
 		return
 	})

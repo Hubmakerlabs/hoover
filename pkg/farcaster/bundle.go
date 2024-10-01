@@ -40,6 +40,8 @@ func MessageToBundleItem(msg *pb.Message) (bundle *types.BundleItem, err error) 
 	bundle = &types.BundleItem{}
 	var data *ao.EventData
 	bundle.Tags = []types.Tag{
+		{Name: J(App, Name), Value: AppNameValue},
+		{Name: J(App, Version), Value: AppVersion},
 		{Name: Protocol, Value: Farcaster},
 		{Name: Kind, Value: k},
 		{Name: J(Event, Id), Value: hex.EncodeToString(msg.GetHash())},

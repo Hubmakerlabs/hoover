@@ -15,6 +15,8 @@ import (
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/utils"
+	"github.com/Hubmakerlabs/hoover/pkg/bluesky"
+	"github.com/Hubmakerlabs/hoover/pkg/farcaster"
 	"github.com/Hubmakerlabs/hoover/pkg/multi"
 	"github.com/Hubmakerlabs/hoover/pkg/nostr"
 	"github.com/Hubmakerlabs/replicatr/pkg/interrupt"
@@ -47,40 +49,42 @@ func main() {
 			}
 		}
 	}()
-	multi.Firehose(c, cancel, &wg, nostr.Relays, func(bundle *types.BundleItem) (err error) {
-		tx := &types.Transaction{
-			Format:   2,
-			Target:   "",
-			Quantity: "0",
-			Tags:     utils.TagsEncode(bundle.Tags),
-			Data:     utils.Base64Encode([]byte(bundle.Data)),
-			DataSize: fmt.Sprintf("%d", len(bundle.Data)),
-		}
-		var sum int
-		for i := range tx.Tags {
-			sum += len(tx.Tags[i].Name) + len(tx.Tags[i].Value)
-		}
-		var reward int64
-		reward, err = wallet.Client.GetTransactionPrice(len(bundle.Data), nil)
-		if err != nil {
-			// if he dies, he dies
-			return nil
-		}
-		rew := reward * (100 + speedFactor) / 100
-		if rew == 0 {
-			rew = 1000
-		}
-		tx.Reward = fmt.Sprintf("%d", rew)
-		if _, err = wallet.SendTransaction(tx); err != nil {
-			// we need to add more winstons to pay for this probably
-			BumpBalance(arlocal, address, balanceTarget)
-			if _, err = wallet.SendTransaction(tx); err != nil {
+	multi.Firehose(c, cancel, &wg, nostr.Relays, bluesky.Urls, farcaster.Urls,
+
+		func(bundle *types.BundleItem) (err error) {
+			tx := &types.Transaction{
+				Format:   2,
+				Target:   "",
+				Quantity: "0",
+				Tags:     utils.TagsEncode(bundle.Tags),
+				Data:     utils.Base64Encode([]byte(bundle.Data)),
+				DataSize: fmt.Sprintf("%d", len(bundle.Data)),
+			}
+			var sum int
+			for i := range tx.Tags {
+				sum += len(tx.Tags[i].Name) + len(tx.Tags[i].Value)
+			}
+			var reward int64
+			reward, err = wallet.Client.GetTransactionPrice(len(bundle.Data), nil)
+			if err != nil {
 				// if he dies, he dies
 				return nil
 			}
-		}
-		return
-	})
+			rew := reward * (100 + speedFactor) / 100
+			if rew == 0 {
+				rew = 1000
+			}
+			tx.Reward = fmt.Sprintf("%d", rew)
+			if _, err = wallet.SendTransaction(tx); err != nil {
+				// we need to add more winstons to pay for this probably
+				BumpBalance(arlocal, address, balanceTarget)
+				if _, err = wallet.SendTransaction(tx); err != nil {
+					// if he dies, he dies
+					return nil
+				}
+			}
+			return
+		})
 }
 
 //go:embed keyfile.json

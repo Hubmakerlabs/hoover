@@ -13,7 +13,11 @@ import (
 
 const SubReposURL = "wss://bsky.network/xrpc/com.atproto.sync.subscribeRepos"
 
-func Firehose(c context.T, cancel context.F, wg *sync.WaitGroup,
+var Urls = []string{
+	SubReposURL,
+}
+
+func Firehose(c context.T, cancel context.F, wg *sync.WaitGroup, endpoints []string,
 	fn func(bundle *types.BundleItem) (err error)) {
 
 	wg.Add(1)
@@ -21,7 +25,16 @@ func Firehose(c context.T, cancel context.F, wg *sync.WaitGroup,
 	ready.Store(false)
 	var conn *websocket.Conn
 	var err error
-	if conn, err = Connect(c); chk.E(err) {
+	for _, endpoint := range endpoints {
+		if conn, err = Connect(c, endpoint); chk.E(err) {
+			continue
+		}
+		// if it worked, continue
+		break
+		// todo: we only actually use the main bluesky inc. one here and never see
+		//  problems with it but what if it actually ever did stop being VC funded???
+	}
+	if err != nil {
 		return
 	}
 	rscb := &events.RepoStreamCallbacks{

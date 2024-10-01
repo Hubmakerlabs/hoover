@@ -15,24 +15,26 @@ import (
 )
 
 var (
-	urls = []string{"hub.farcaster.standardcrypto.vc:2281",
-		"hub.farcaster.standardcrypto.vc:2282",
-		"hub.farcaster.standardcrypto.vc:2283",
+	Urls = []string{
 		"hub.pinata.cloud",
-		"hoyt.farcaster.xyz:2281",
-		"hoyt.farcaster.xyz:2282",
+		"api.hub.wevm.dev",
 		"hoyt.farcaster.xyz:2283",
-		"lamia.farcaster.xyz:2281",
-		"lamia.farcaster.xyz:2282",
 		"lamia.farcaster.xyz:2283",
-		"api.farcasthub.com:2281",
-		"api.farcasthub.com:2282",
 		"api.farcasthub.com:2283",
-		"nemes.farcaster.xyz:2281",
-		"nemes.farcaster.xyz:2282",
 		"nemes.farcaster.xyz:2283",
-		"api.hub.wevm.dev"}
-	totalUrls = len(urls)
+		"hub.farcaster.standardcrypto.vc:2281",
+		"hoyt.farcaster.xyz:2281",
+		"lamia.farcaster.xyz:2281",
+		"api.farcasthub.com:2281",
+		"nemes.farcaster.xyz:2281",
+		"hub.farcaster.standardcrypto.vc:2282",
+		"hoyt.farcaster.xyz:2282",
+		"lamia.farcaster.xyz:2282",
+		"api.farcasthub.com:2282",
+		"nemes.farcaster.xyz:2282",
+		"hub.farcaster.standardcrypto.vc:2283",
+	}
+	totalUrls = len(Urls)
 	currUrl   = struct {
 		curr int
 		mu   sync.Mutex
@@ -73,7 +75,8 @@ func manageHashCapacity(hash string, seenPosts *sync.Map) {
 }
 
 // subscribeToHub listens for messages from the given hub and sends them to the provided channel
-func subscribeToHub(ctx context.T, url string, bundleStream chan<- *types.BundleItem, seenPosts *sync.Map, wg *sync.WaitGroup) {
+func subscribeToHub(ctx context.T, url string, bundleStream chan<- *types.BundleItem,
+	seenPosts *sync.Map, wg *sync.WaitGroup, endpoints []string) {
 	defer wg.Done()
 	wg.Add(1)
 	if !firstSub {
@@ -82,7 +85,7 @@ func subscribeToHub(ctx context.T, url string, bundleStream chan<- *types.Bundle
 	conn, client, err := connectToHub(url)
 	if err != nil {
 		log.Printf("Failed to connect to hub %s - %v", url, err)
-		replaceFailedConnection(ctx, bundleStream, seenPosts, wg)
+		replaceFailedConnection(ctx, bundleStream, seenPosts, wg, endpoints)
 		return
 	}
 	defer conn.Close()
@@ -92,7 +95,7 @@ func subscribeToHub(ctx context.T, url string, bundleStream chan<- *types.Bundle
 	stream, err := client.Subscribe(ctx, &pb.SubscribeRequest{EventTypes: evts})
 	if err != nil {
 		log.Printf("Failed to subscribe to hub %s - %v", url, err)
-		replaceFailedConnection(ctx, bundleStream, seenPosts, wg)
+		replaceFailedConnection(ctx, bundleStream, seenPosts, wg, endpoints)
 		return
 	}
 
@@ -105,7 +108,7 @@ func subscribeToHub(ctx context.T, url string, bundleStream chan<- *types.Bundle
 			msg, err := stream.Recv()
 			if err != nil {
 				log.Printf("Failed to receive message from hub %s - %v", url, err)
-				replaceFailedConnection(ctx, bundleStream, seenPosts, wg)
+				replaceFailedConnection(ctx, bundleStream, seenPosts, wg, endpoints)
 				return
 			}
 			message := msg.GetMergeMessageBody().GetMessage()
@@ -130,7 +133,8 @@ func subscribeToHub(ctx context.T, url string, bundleStream chan<- *types.Bundle
 }
 
 // replaceFailedConnection replaces a failed connection with a new one from the remaining pool
-func replaceFailedConnection(ctx context.T, bundleStream chan<- *types.BundleItem, seenPosts *sync.Map, wg *sync.WaitGroup) {
+func replaceFailedConnection(ctx context.T, bundleStream chan<- *types.BundleItem,
+	seenPosts *sync.Map, wg *sync.WaitGroup, endpoints []string) {
 	select {
 	case <-ctx.Done():
 		cancel_global()
@@ -139,16 +143,21 @@ func replaceFailedConnection(ctx context.T, bundleStream chan<- *types.BundleIte
 
 		currUrl.mu.Lock()
 		defer currUrl.mu.Unlock()
-		go subscribeToHub(ctx, urls[currUrl.curr], bundleStream, seenPosts, wg)
-		currUrl.curr = (currUrl.curr + 1) % totalUrls
+		go subscribeToHub(ctx, endpoints[currUrl.curr], bundleStream, seenPosts, wg, endpoints)
+		currUrl.curr = (currUrl.curr + 1) % len(endpoints)
 
 	}
 
 }
 
 // Firehose function connects to multiple hubs concurrently and streams BundleItems
-func Firehose(ctx context.T, cancel context.F, wg_parent *sync.WaitGroup,
-	fn func(bundle *types.BundleItem) (err error)) {
+func Firehose(
+	ctx context.T,
+	cancel context.F,
+	wg_parent *sync.WaitGroup,
+	endpoints []string,
+	fn func(bundle *types.BundleItem) (err error),
+) {
 	wg_parent.Add(1)
 	var ready bool
 	var wg sync.WaitGroup
@@ -158,8 +167,7 @@ func Firehose(ctx context.T, cancel context.F, wg_parent *sync.WaitGroup,
 
 	// Start initial three connections
 	for i := 0; i < 3; i++ {
-
-		go replaceFailedConnection(ctx, bundleStream, seenPosts, &wg)
+		go replaceFailedConnection(ctx, bundleStream, seenPosts, &wg, endpoints)
 	}
 
 	// Close the bundleStream when all subscriptions are done
