@@ -37,4 +37,4 @@ appears at the end of the top row for each event.
 The primary purpose is to create a simple baseline example that shows the key elements of
 building a basic viewer for Hoover events, without becoming excessively complex and costing more
 time in development, and fulfilling the requirements as specified in
-the [milestone document](./milestones.md).
+the [milestone document](../milestones.md).

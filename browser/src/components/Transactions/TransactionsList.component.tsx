@@ -66,7 +66,6 @@ export const TransactionsList = () => {
 	return (
 		<>
 			<Stack gap={2} py={4} alignItems="center" justifyContent="flex-start">
-				<Typography variant="h3">Transactions</Typography>
 				{data?.data.transactions.edges.map(edge => (
 					<TransactionCard key={edge.node.id} edge={edge} />
 				))}

@@ -5,9 +5,9 @@ import { isTxValid } from '@/lib/utils';
 import Typography from '@mui/material/Typography';
 import Skeleton from '@mui/material/Skeleton';
 import Stack from '@mui/material/Stack';
-import Divider from '@mui/material/Divider';
+// import Divider from '@mui/material/Divider';
 import Tooltip from '@mui/material/Tooltip';
-import Box from '@mui/material/Box';
+// import Box from '@mui/material/Box';
 import { useTheme } from '@mui/material/styles';
 
 export const TransactionCard = ({ edge }: { edge: Edge }) => {
@@ -35,11 +35,11 @@ export const TransactionCard = ({ edge }: { edge: Edge }) => {
 						whiteSpace: 'nowrap'
 					}}
 				>
-					Tx: <b>{edge.node.id}</b>
+					{/*Event-ID: <b>{edge.node.id}</b>*/}
 				</Typography>
 				{isTxValid(edge) && (
 					<Tooltip title="Verified">
-						<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
 							<path
 								d="m8.38 12 2.41 2.42 4.83-4.84"
 								stroke={theme.palette.success.main}
@@ -69,7 +69,7 @@ export const TransactionCard = ({ edge }: { edge: Edge }) => {
 						width: '100%'
 					}}
 				>
-					Owner: <b>{edge.node.owner.address || '-'}</b>
+					{/*User-Id: <b>{edge.node.owner.address || '-'}</b>*/}
 				</Typography>
 				<Typography
 					variant="body1"
@@ -81,15 +81,14 @@ export const TransactionCard = ({ edge }: { edge: Edge }) => {
 						width: '100%'
 					}}
 				>
-					Recipient: <b>{edge.node.recipient || '-'}</b>
 				</Typography>
-				<Divider flexItem sx={{ my: 1 }} />
+				{/*<Divider flexItem sx={{ my: 1 }} />*/}
 				{edge.node.tags
 					.filter(tag => tag.name !== 'App-Name' && tag.name !== 'App-Version')
 					.map(tag => (
 						<TxTag key={tag.name + '-' + tag.value} tag={tag} />
 					))}
-				<Divider flexItem sx={{ my: 1 }} />
+				{/*<Divider flexItem sx={{ my: 1 }} />*/}
 				<TxData id={edge.node.id} />
 			</Stack>
 		</Stack>
@@ -122,8 +121,7 @@ const TxData = ({ id }: { id: string }) => {
 	const { data, isLoading, error } = useQuery({
 		queryKey: ['transaction', id],
 		queryFn: async () => {
-			const arweave = Arweave.init({
-				host: '127.0.0.1',
+			const arweave = Arweave.init({				host: '127.0.0.1',
 				port: 1984,
 				protocol: 'http'
 			});
@@ -142,7 +140,7 @@ const TxData = ({ id }: { id: string }) => {
 	if (error) {
 		return (
 			<Typography variant="body1" color="error.main">
-				Error loading TX data: <b>{error.message}</b>
+				{/*Error loading TX data: <b>{error.message}</b>*/}
 			</Typography>
 		);
 	}
@@ -156,24 +154,25 @@ const TxData = ({ id }: { id: string }) => {
 						wordBreak: 'break-all'
 					}}
 				>
-					Content: <b>{data.Content}</b>
+					<b>Content:</b>
+					<div>{data.Content}</div>
 				</Typography>
 			)}
-			<Box
-				component="pre"
-				sx={{
-					textAlign: 'left',
-					overflowY: 'auto',
-					whiteSpace: 'pre-wrap',
-					width: '95%',
-					maxHeight: 200,
-					padding: 2,
-					borderRadius: 1,
-					backgroundColor: 'primary.main'
-				}}
-			>
-				{JSON.stringify(data, null, 2)}
-			</Box>
+			{/*<Box*/}
+			{/*	component="pre"*/}
+			{/*	sx={{*/}
+			{/*		textAlign: 'left',*/}
+			{/*		overflowY: 'auto',*/}
+			{/*		whiteSpace: 'pre-wrap',*/}
+			{/*		width: '95%',*/}
+			{/*		maxHeight: 200,*/}
+			{/*		padding: 2,*/}
+			{/*		borderRadius: 1,*/}
+			{/*		backgroundColor: 'primary.main'*/}
+			{/*	}}*/}
+			{/*>*/}
+			{/*	{JSON.stringify(data, null, 2)}*/}
+			{/*</Box>*/}
 		</>
 	);
 };

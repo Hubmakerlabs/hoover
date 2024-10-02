@@ -23,40 +23,48 @@ func Firehose(c context.T, cancel context.F, wg *sync.WaitGroup, endpoints []str
 	wg.Add(1)
 	var ready atomic.Bool
 	ready.Store(false)
-	var conn *websocket.Conn
-	var err error
-	for _, endpoint := range endpoints {
-		if conn, err = Connect(c, endpoint); chk.E(err) {
-			continue
-		}
-		// if it worked, continue
-		break
-		// todo: we only actually use the main bluesky inc. one here and never see
-		//  problems with it but what if it actually ever did stop being VC funded???
-	}
-	if err != nil {
-		return
-	}
-	rscb := &events.RepoStreamCallbacks{
-		RepoCommit: RepoCommit(c, cancel, func(bundle *types.BundleItem) (err error) {
-			if !ready.Load() {
-				ready.Store(true)
-				wg.Done()
-			}
-			if err = fn(bundle); err != nil {
-				return
-			}
+	for {
+		select {
+		case <-c.Done():
 			return
-		}),
-		RepoHandle:    RepoHandle(),
-		RepoInfo:      RepoInfo(),
-		RepoMigrate:   RepoMigrate(),
-		RepoTombstone: RepoTombstone(),
-		LabelLabels:   LabelLabels(),
-		LabelInfo:     LabelInfo(),
-	}
-	seqScheduler := sequential.NewScheduler(conn.RemoteAddr().String(), rscb.EventHandler)
-	if err = events.HandleRepoStream(c, conn, seqScheduler); chk.E(err) {
-		return
+		default:
+			var conn *websocket.Conn
+			var err error
+			for _, endpoint := range endpoints {
+				if conn, err = Connect(c, endpoint); chk.E(err) {
+					continue
+				}
+				// if it worked, continue
+				break
+				// todo: we only actually use the main bluesky inc. one here and never see
+				//  problems with it but what if it actually ever did stop being VC funded???
+			}
+			if err != nil {
+				continue
+			}
+			rscb := &events.RepoStreamCallbacks{
+				RepoCommit: RepoCommit(c, cancel, func(bundle *types.BundleItem) (err error) {
+					if !ready.Load() {
+						ready.Store(true)
+						wg.Done()
+					}
+					if err = fn(bundle); chk.E(err) {
+						return nil
+					}
+					return
+				}),
+				RepoHandle:    RepoHandle(),
+				RepoInfo:      RepoInfo(),
+				RepoMigrate:   RepoMigrate(),
+				RepoTombstone: RepoTombstone(),
+				LabelLabels:   LabelLabels(),
+				LabelInfo:     LabelInfo(),
+			}
+			seqScheduler := sequential.NewScheduler(conn.RemoteAddr().String(),
+				rscb.EventHandler)
+			if err = events.HandleRepoStream(c, conn, seqScheduler); chk.E(err) {
+				continue
+			}
+		}
 	}
 }
