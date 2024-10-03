@@ -72,7 +72,7 @@ This could be fixed for a future version if there is a need for this extra data,
 
 - `Reply-Root-Id`
 
-  This designates the original post (OP) that this post part of the post thread tree.
+  This designates the original post (OP) that this post part of the post thread tree. Older events may not have this field, which makes it more complex to derive a post graph for a given original post.
 
 - `Reply-Parent-Id`
 
