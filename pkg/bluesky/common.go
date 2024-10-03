@@ -63,6 +63,11 @@ func UnmarshalEvent(evt Ev, rec Rec, to any) (decoded any, createdAt time.Time, 
 	return to, createdAt, nil
 }
 
+func AppendLexBlobTagsWithoutRef(data *ao.EventData, prefix string, img *lexutil.LexBlob) {
+	data.Append(J(prefix, Mimetype), img.MimeType)
+	data.Append(J(prefix, Size), strconv.FormatInt(img.Size, 10))
+}
+
 func AppendLexBlobTags(data *ao.EventData, prefix string, img *lexutil.LexBlob) {
 	data.Append(J(prefix, Ref), img.Ref.String())
 	data.Append(J(prefix, Mimetype), img.MimeType)

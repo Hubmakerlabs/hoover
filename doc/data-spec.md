@@ -4,6 +4,16 @@ The Hoover is a social media protocol data aggregator that pulls a small subset 
 
 The purpose of this application is to aggregate these disparate social media databases and allow them to be integrated into Arweave applications. It is a possible future use case where the data that can be generated to put into the Hoover data set could also generate events to send out to the respective social networks and create a full bridge between them all.
 
+## Explorer
+
+The explorer is a simple one page browser that loads the latest transactions created by the Hoover found in an arweave gateway and displays them, with the ability to step backwards in the history to earlier events.
+
+Its output is extremely rudimentary, and some of the non-searchable fields, contained in JSON data alongside the content field of the event data, is not displayed.
+
+The purpose of the Explorer is to demonstrate a simple GraphQL based search for Hoover data and shows a checkmark symbol on Nostr events that have valid User-Id/Event-Id/Signature data.
+
+Note that as mentioned previously, there are some fields that can be omitted from the event data and full reversal of the conversion cannot currently be achieved to enable full authentication of the data. This could be the subject of later work... for Bluesky especially it is complex. One possibility is to sub-bundle the raw event data, which would be a very simple change, however, this also means a lot more data per event.
+
 ## Common Data Format and Conventions
 
 There is 5 types of events that the Hoover extracts from:
@@ -66,9 +76,11 @@ Note also that even though in most cases much of the extra data for each event k
 
 This could be fixed for a future version if there is a need for this extra data, or to act secondarily as a backing store for a protocol service using Arweave as a shared data store, but was built this way primarily as a minimally complete data set for Arweave applications presenting the data sourced externally.
 
-### Kind `Post`
+## Event Specific Data
 
-#### Nostr
+In this section, we show under the *Kind* heading the common elements that can appear, and then under each of the protocol subheadings, the specifics of other extra data that may be found.
+
+### Kind `Post`
 
 - `Reply-Root-Id`
 
@@ -78,20 +90,35 @@ This could be fixed for a future version if there is a need for this extra data,
 
   This designates the immediate previous post that this event is a reply to.
 
-- `Content-Warning` 
-
-  Can additionally contain a description of the type of content, otherwise empty.
-
-In the data field also there can be:
+#### Nostr
 
 - `Mention`, `Hashtag` - other user's public keys, hashtags
+- `Mention-Event-Id` - when the `Content` contains a reference to another event, usually encoded as a `nip-19` Bech32 entity in the content field.
 - `Source` - external source where content originated (for bridges republishing into nostr)
 - `Emoji` - these additionally require acquiring the emoji definition event type in most cases
 - `Label`, `Label-Namespace` - labels and label namespaces used in protocol in an indexable form (omitted from main tags due to potential data size for now, also, Nostr has an independent labelling protocol).
+- `Content-Warning` - can additionally contain a description of the type of content (possibly, of the `Bio` or just a general NSFW type of content being posted), otherwise the value is empty.
+- `Label` and `Label-Namespace` are optional fields that are used to associate the post with categories both abstract and more concrete.
+
+Note we don't currently deal with the `d` tag of events which is used to associate a chain of events as being `parameterized replaceable` events that can be selected and searched for via the `kind:user-id:d-tag`
+
+> [Code location](https://github.com/Hubmakerlabs/hoover/blob/master/pkg/nostr/nostr.go) of implementation.
 
 #### Bluesky
 
+- `Reply-Root-Uri` - a protocol structured URI for the reply root (original post)
+- `Reply-Parent-Uri` - a protocol structured URI for the reply parent (for threaded viewing to be a branch under the parent)
+- `Embed-Record-Uri` - a reference to an external event other than the reply thread as a URI (this is the bluesky name for the encoded version)
+- `Mention-Event-Id` - the bluesky base32 encoding of mentioned event, will appear directly following the `Embed-Record-Id` which is the same thing as the same named object in the Nostr version.
+- `Embed-Image` - which appears as a series of numbered items containing subfields with the same numbering prefix so they are easily associated. There is numerous fields that inclued `Ref` (URL), `Mimetype`, `Size`, `Aspect`, and an `Alt` description text, usually these are stored separately on the Bluesky server but we do not fetch or cache them as they are full sized media files, referred to usually by `at://` protocol prefixes.
+- `Embed-Record` prefixed fields which contain similar things as `Embed-Image` but usually will refer to video or audio media and can include links to thumbnails, descriptions and titles. 
+- `Embed-External` which is like `Embed-Record` but where the URI's are not from atproto `at://`.
+- `Entities` - which are references to text within the `Content` field such as full versions of URLs, which are ellipsised in the Content field.
+- `Richtext` - more numbered fields which are references to external resources found in the `Content` field, which again are usually ellipsised. *[ Ed: Yes! this makes rendering their events more needlessly complex.]* - these also include hashtags.
+- `Language` - which contains a standard 2 letter ISO language code such as `en` or `jp` or `cn` etc.
+- `Hashtag` - numbered fields (if more than one) that contain usually a hashtag text
 
+> [Code location](https://github.com/Hubmakerlabs/hoover/blob/master/pkg/bluesky/app.bsky.feed.post.go) of implementation.
 
 #### Farcaster
 
@@ -99,13 +126,11 @@ In the data field also there can be:
 
 ### Kind `Repost`
 
-#### Nostr
-
 - `Repost-Event-Id`
 
   This designates the event that a user is making visible to their followers.
 
-In the data field there can also be:
+#### Nostr
 
 - `Source` - designates a name of the protocol source, currently mainly this refers to Mastodon via the Mostr bridge relays.
 - `Source-Uri` - can encode a protocol specific Uniform Resource Identifier that can be used to search for the original event from the source.
@@ -114,7 +139,7 @@ In the data field there can also be:
 
 #### Bluesky
 
-
+- `Repost-Event-Uri` - is the Bluesky protocol URI referring to the `Repost-Event-Id` on protocol.
 
 #### Farcaster
 
@@ -122,13 +147,13 @@ In the data field there can also be:
 
 ### Kind `Like`
 
-#### Nostr
-
 - `Like-Event-Id`
 
   The `Event-Id` of the event being responded to.
 
-The content field can contain a symbol, usually a `+` or `-` or arbitrary Unicode emojis or the names of emojis created in emoji events by the publisher of the Like event.
+#### Nostr
+
+The content field can contain a symbol, usually a `+` or `-` or arbitrary Unicode emojis or the names of emojis created in emoji events by the publisher of the Like event, in this form: `:emojiname:`.
 
 In addition, there can also be:
 
@@ -138,13 +163,16 @@ In addition, there can also be:
 
 #### Bluesky
 
-
+- `Like-Path` - a protocol specific path referring to the `Like-Event-Id`
+- `Mention` - refers to the `User-Id` who created the event being liked.
 
 #### Farcaster
 
 
 
 ### Kind `Follow`
+
+- `Follow-User-Id` - the on-protocol identity of the user being followed.
 
 #### Nostr
 
@@ -157,7 +185,7 @@ The data field of the bundle can contain the following two items in lists:
 
 #### Bluesky
 
-
+No specific protocol tags for this event, except just to note that Bluesky follows contain just one, and we have not implemented the unfollow event, which would be sourced from the delete events streme in Bluesky.
 
 #### Farcaster
 
@@ -165,22 +193,23 @@ The data field of the bundle can contain the following two items in lists:
 
 ### Kind `Profile`
 
-#### Nostr
-
 - `User-Name`
 
-
+The user-name, usually a short handle containing no spaces, protocols may not have them.
 
 - `Display-Name`
 
-
+The name that the user wants to be displayed along with their content.
 
 - `Avatar-Image`
 
-
+A URL referring to an image that should be used as the users avatar image.
 
 - `Banner-Image`
 
+A URL referring to an image that should be shown as a background at the top of their profile page.
+
+#### Nostr
 
 - `Content-Warning`
 
@@ -188,10 +217,10 @@ The data field of the bundle can contain the following two items in lists:
 
 Additional fields which are placed in the data field of the bundle:
 
-- `Bio`
-- `Website`
-- `Verification`
-- `Payment-Address`
+- `Bio` - an arbitrary length text field that can contain nostr protocol references to other users, events, and hash tags
+- `Website` - usually a URL for a website the user wants to advertise, often the profile of github or other external social network.
+- `Verification` - for Nostr this means a [nip-05](https://github.com/nostr-protocol/nips/blob/master/05.md) `user@example.com`
+- `Payment-Address` - currently this is primarily a `user@example.com` lightning network payment address in the LUD16 format.
 
 And a number of fields that refer to items mentioned in the `Bio` field:
 
@@ -203,18 +232,16 @@ And a number of fields that refer to items mentioned in the `Bio` field:
 
 #### Bluesky
 
-
+Bluesky does not have `User-Name` and the `Avatar-Image` and `Banner-Image` are inside data field tags under `Avatar-Image` and `Avatar-Banner` - this is due to the 
 
 #### Farcaster
 
 
 
-## Explorer
+## Notes
 
-The explorer is a simple one page browser that loads the latest transactions created by the Hoover found in an arweave gateway and displays them, with the ability to step backwards in the history to earlier events.
+### Verification and Bridging
 
-Its output is extremely rudimentary, and some of the non-searchable fields, contained in JSON data alongside the content field of the event data, is not displayed.
+Currently there is no direct mechanism for reversing the bundling process, some data is omitted and especially with Bluesky the data format is very complex.
 
-The purpose of the Explorer is to demonstrate a simple GraphQL based search for Hoover data and shows a checkmark symbol on Nostr events that have valid User-Id/Event-Id/Signature data.
-
-Note that as mentioned previously, there are some fields that can be omitted from the event data and full reversal of the conversion cannot currently be achieved to enable full authentication of the data. This could be the subject of later work... for Bluesky especially it is complex. One possibility is to sub-bundle the raw event data, which would be a very simple change, however, this also means a lot more data per event.
+Some options for solving this problem include extending the data specification with a full bidirectional transformation matrix, or alternatively, sub-bundling the native raw event data, with the idea that one can be used for most simple on-chain applications where the extra data can be used for more complex data bridging.

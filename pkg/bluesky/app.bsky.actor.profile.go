@@ -81,15 +81,17 @@ func FromBskyActorProfile(evt Ev, op Op, rr Repo, rec Rec,
 		return
 	}
 	if profile.DisplayName != nil && *profile.DisplayName != "" {
-		data.Append(J(Display, Name), *profile.DisplayName)
+		ao.AppendTag(bundle, J(Display, Name), *profile.DisplayName)
 	}
 	if profile.Description != nil {
 		data.Append(Bio, *profile.Description)
 	}
 	if profile.Avatar != nil {
+		ao.AppendTag(bundle, J(Avatar, Image), profile.Avatar.Ref.String())
 		AppendLexBlobTags(data, J(Avatar, Image), profile.Avatar)
 	}
 	if profile.Banner != nil {
+		ao.AppendTag(bundle, J(Banner, Image), profile.Banner.Ref.String())
 		AppendLexBlobTags(data, J(Banner, Image), profile.Banner)
 	}
 	return

@@ -10,7 +10,7 @@
 
 Work completed during August and September 2024
 
-#### Authors
+## Authors
 
 David Vennik <me@mleku.dev> - Nostr and Bluesky Aggregation and Arweave test harness and uploader
 
