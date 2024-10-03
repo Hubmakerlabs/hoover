@@ -46,29 +46,25 @@ func MessageToBundleItem(msg *pb.Message) (bundle *types.BundleItem, err error) 
 		{Name: Kind, Value: k},
 		{Name: J(Event, Id), Value: hex.EncodeToString(msg.GetHash())},
 		{Name: J(User, Id), Value: fmt.Sprintf("%d", msg.GetData().GetFid())},
-		{Name: Timestamp, Value: fmt.Sprintf("%d",
+		{Name: J(Unix, Time), Value: fmt.Sprintf("%d",
 			int64(msg.GetData().GetTimestamp())+1609459200)}, // offset from 2021-01-10T00:00
 		{Name: Signature, Value: hex.EncodeToString(msg.GetSignature())},
 	}
+
 	switch k {
 	case Post:
 		data = ao.NewEventData(msg.GetData().GetCastAddBody().GetText())
 		embeds_deprecated := msg.GetData().GetCastAddBody().GetEmbedsDeprecated()
 		for i := range embeds_deprecated {
 			embed := embeds_deprecated[i]
-			ao.AppendTag(bundle, J(Embed, Uri), embed)
+			data.Append(J(Embed, Uri), embed)
 		}
 		mentions := msg.GetData().GetCastAddBody().GetMentions()
 		if mentions != nil {
-			if len(mentions) == 1 {
-				data.Append(J(Mention), strconv.FormatUint(mentions[0], 10))
-			} else {
-				for i := range mentions {
-					mention := mentions[i]
-					data.Append(J(Mention, i), strconv.FormatUint(mention, 10))
-				}
+			for i := range mentions {
+				mention := mentions[i]
+				data.Append(Mention, strconv.FormatUint(mention, 10))
 			}
-
 		}
 		parent := msg.GetData().GetCastAddBody().GetParent()
 		if parent != nil {
@@ -76,7 +72,7 @@ func MessageToBundleItem(msg *pb.Message) (bundle *types.BundleItem, err error) 
 				fid := x.ParentCastId.Fid
 				hash := x.ParentCastId.Hash
 				ao.AppendTag(bundle, J(Reply, Parent, Id), fmt.Sprintf("%0x", hash))
-				ao.AppendTag(bundle, J(Reply, Parent, User, Id), fmt.Sprintf("%d", fid))
+				data.Append(J(Reply, Parent, User, Id), fmt.Sprintf("%d", fid))
 			}
 			if x, ok := parent.(*pb.CastAddBody_ParentUrl); ok {
 				ao.AppendTag(bundle, J(Reply, Parent, Uri), x.ParentUrl)
@@ -98,15 +94,16 @@ func MessageToBundleItem(msg *pb.Message) (bundle *types.BundleItem, err error) 
 			embeds := msg.GetData().GetCastAddBody().GetEmbeds()
 			for i := range embeds {
 				if embeds[i].GetUrl() != "" {
-					data.Append(J(Embed, Uri), embeds[i].GetUrl())
+					data.Append(J(Embed, i, Uri), embeds[i].GetUrl())
 				} else {
 					fid := fmt.Sprintf("%d", embeds[i].GetCastId().Fid)
 					hash := fmt.Sprintf("%0x", embeds[i].GetCastId().Hash)
-					data.Append(J(Embed, User, Id), fid)
-					data.Append(J(Embed, Event, Id), hash)
+					data.Append(J(Embed, i, User, Id), fid)
+					data.Append(J(Embed, i, Event, Id), hash)
 				}
 			}
 		}
+
 	case Repost:
 		target := msg.GetData().GetReactionBody().GetTarget()
 		if x, ok := target.(*pb.ReactionBody_TargetCastId); ok {
@@ -114,13 +111,13 @@ func MessageToBundleItem(msg *pb.Message) (bundle *types.BundleItem, err error) 
 			targetHash := x.TargetCastId.Hash
 			ao.AppendTag(bundle, J(Repost, Event, Id),
 				fmt.Sprintf("%0x", targetHash))
-			ao.AppendTag(bundle, J(Repost, User, Id),
+			data.Append(J(Repost, User, Id),
 				fmt.Sprintf("%d", targetFid))
 		} else {
 			target_url := target.(*pb.ReactionBody_TargetUrl).TargetUrl
-			// data = ao.NewEventData(target_url)
-			ao.AppendTag(bundle, J(Repost, Event, Uri), target_url)
+			data.Append(J(Repost, Event, Uri), target_url)
 		}
+
 	case Like:
 		target := msg.GetData().GetReactionBody().GetTarget()
 		if x, ok := target.(*pb.ReactionBody_TargetCastId); ok {
@@ -128,20 +125,20 @@ func MessageToBundleItem(msg *pb.Message) (bundle *types.BundleItem, err error) 
 			targetHash := x.TargetCastId.Hash
 			ao.AppendTag(bundle, J(Like, Event, Id),
 				fmt.Sprintf("%0x", targetHash))
-			ao.AppendTag(bundle, J(Like, User, Id), fmt.Sprint(targetFid))
+			data.Append(J(Like, User, Id), fmt.Sprint(targetFid))
 		} else {
 			target_url := target.(*pb.ReactionBody_TargetUrl).TargetUrl
-			// data = ao.NewEventData(target_url)
-			ao.AppendTag(bundle, J(Like, Event, Uri), target_url)
+			data.Append(J(Like, Event, Uri), target_url)
 		}
 
 	case Follow:
 		follow_id := fmt.Sprintf("%d", msg.GetData().GetLinkBody().GetTargetFid())
-		// data = ao.NewEventData(follow_id)
 		ao.AppendTag(bundle, J(Follow, User, Id), follow_id)
+
 	case Profile:
 		data = ao.NewEventData(msg.GetData().GetUserDataBody().GetValue())
 	}
+
 	if data != nil && (data.Content != "" || len(data.EventTags) > 0) {
 		// put the ao.EventData into JSON form and place in the bundle.Data field
 		var b []byte

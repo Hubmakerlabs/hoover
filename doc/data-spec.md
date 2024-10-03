@@ -122,7 +122,15 @@ Note we don't currently deal with the `d` tag of events which is used to associa
 
 #### Farcaster
 
+Farcaster does not use `Reply-Root-Id` so there is a bit more work searching for the complete tree of a discussion thread.
 
+- `Embed-Uri` - references to external media
+- `Mention` - references to users mentioned in a post, the following two fields designate the location and this field designates the mentioned `User-Id`. This field is numbered as in `Mention-X` if there is more than one.
+- `Mention-X-Start` and `Mention-X-End` marks the positions in the `Content` field where the mentions are found, the number part is absent if there is only one.
+- `Reply-Parent-User-Id` - the `User-Id` of the parent event of a reply `Post`
+- `Reply-Parent-Uri` - the URI of the reply post, if present.
+- `Embed-X-Uri` marks external references to eternal objects.
+- `Embed-X-User-Id` and `Embed-X-Event-Id` designates an internal reference to another event, as with most Farcaster event references the `User-Id` is usually provided alongside the `Event-Id` (though probably redundant since the IDs are hashes).
 
 ### Kind `Repost`
 
@@ -137,13 +145,18 @@ Note we don't currently deal with the `d` tag of events which is used to associa
 - `Mention` - reposts can tag a user in relation to the repost to specifically notify them.
 - `Label`, `Label-Namespace` - labels and label namespaces used in protocol in an indexable form (omitted from main tags due to potential data size for now.
 
+> [Code location](https://github.com/Hubmakerlabs/hoover/blob/master/pkg/nostr/nostr.go) of implementation.
+
 #### Bluesky
 
 - `Repost-Event-Uri` - is the Bluesky protocol URI referring to the `Repost-Event-Id` on protocol.
 
 #### Farcaster
 
+It can be that Farcaster does not have the `Repost-Event-Id` and instead only has a `Repost-Event-Uri`
 
+- `Repost-User-Id` - provides the `User-Id` associated with the `Repost-Event-Id`
+- `Repost-Event-Uri` is sometimes present in the data field (todo: this may actually contain the `Event-Id` and `User-Id`)
 
 ### Kind `Like`
 
@@ -161,6 +174,8 @@ In addition, there can also be:
 - `Source` - designates a name of the protocol source, currently mainly this refers to Mastodon via the Mostr bridge relays.
 - `Source-Uri` - can encode a protocol specific Uniform Resource Identifier that can be used to search for the original event from the source.
 
+> [Code location](https://github.com/Hubmakerlabs/hoover/blob/master/pkg/nostr/nostr.go) of implementation.
+
 #### Bluesky
 
 - `Like-Path` - a protocol specific path referring to the `Like-Event-Id`
@@ -168,7 +183,9 @@ In addition, there can also be:
 
 #### Farcaster
 
+Also like the Repost, it can be that the event only has a `Like-Event-Uri` but again todo: probably is the same data and should be decomposed.
 
+- `Like-User-Id` provides the farcaster ID of the user in addition to the common `Like-Event-Id`
 
 ### Kind `Follow`
 
@@ -183,13 +200,15 @@ The data field of the bundle can contain the following two items in lists:
 - `Follow-User-Id` - the public key identifiers of other users the publisher subscribes to.
 - `Follow-Tag` - a list of hashtags the user subscribes to.
 
+> [Code location](https://github.com/Hubmakerlabs/hoover/blob/master/pkg/nostr/nostr.go) of implementation.
+
 #### Bluesky
 
 No specific protocol tags for this event, except just to note that Bluesky follows contain just one, and we have not implemented the unfollow event, which would be sourced from the delete events streme in Bluesky.
 
 #### Farcaster
 
-
+Nothing different here, except possibly there are delete events same as Bluesky.
 
 ### Kind `Profile`
 
@@ -225,18 +244,23 @@ Additional fields which are placed in the data field of the bundle:
 And a number of fields that refer to items mentioned in the `Bio` field:
 
 - `Mention-Event-Id` - `Event-Id` values that appear in the `Bio`
-- `Hashtag` - hashtags 
+- `Hashtag` - hashtags.
 - `Mention` - tagging another user.
 - `Source` - designates a name of the protocol source, currently mainly this refers to Mastodon via the Mostr bridge relays.
 - `Source-Uri` - can encode a protocol specific Uniform Resource Identifier that can be used to search for the original event from the source.
 
+> [Code location](https://github.com/Hubmakerlabs/hoover/blob/master/pkg/nostr/nostr.go) of implementation.
+
 #### Bluesky
 
-Bluesky does not have `User-Name` and the `Avatar-Image` and `Banner-Image` are inside data field tags under `Avatar-Image` and `Avatar-Banner` - this is due to the 
+Bluesky does not have `User-Name` 
+
+- `Avatar-Image` has additional fields in the data for Mimetype and Size.
+- `Banner-Image` same as `Avatar-Image`.
 
 #### Farcaster
 
-
+todo: uncertain from looking at the API whether any of the fields even exist or if this event type even exists.
 
 ## Notes
 
