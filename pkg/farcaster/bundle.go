@@ -38,7 +38,7 @@ func MessageToBundleItem(msg *pb.Message) (bundle *types.BundleItem, err error) 
 		return
 	}
 	bundle = &types.BundleItem{}
-	var data *ao.EventData
+	data := ao.NewEventData("")
 	bundle.Tags = []types.Tag{
 		{Name: J(App, Name), Value: AppNameValue},
 		{Name: J(App, Version), Value: AppVersion},
@@ -53,7 +53,7 @@ func MessageToBundleItem(msg *pb.Message) (bundle *types.BundleItem, err error) 
 
 	switch k {
 	case Post:
-		data = ao.NewEventData(msg.GetData().GetCastAddBody().GetText())
+		data.Content = msg.GetData().GetCastAddBody().GetText()
 		embeds_deprecated := msg.GetData().GetCastAddBody().GetEmbedsDeprecated()
 		for i := range embeds_deprecated {
 			embed := embeds_deprecated[i]
@@ -136,7 +136,7 @@ func MessageToBundleItem(msg *pb.Message) (bundle *types.BundleItem, err error) 
 		ao.AppendTag(bundle, J(Follow, User, Id), follow_id)
 
 	case Profile:
-		data = ao.NewEventData(msg.GetData().GetUserDataBody().GetValue())
+		data.Content = msg.GetData().GetUserDataBody().GetValue()
 	}
 
 	if data != nil && (data.Content != "" || len(data.EventTags) > 0) {
