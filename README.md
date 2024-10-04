@@ -1,5 +1,5 @@
 # Hoover
-![logo](hoover.png)
+![logo](doc/hoover.PNG)
 Data aggregator for Nostr, Bluesky and Farcaster to Arweave AO, with a basic event data browser
 
 ## Documentation
