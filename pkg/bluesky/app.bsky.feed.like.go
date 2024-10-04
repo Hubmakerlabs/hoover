@@ -3,6 +3,7 @@ package bluesky
 import (
 	"errors"
 	"strings"
+	"time"
 
 	. "github.com/Hubmakerlabs/hoover/pkg"
 	ao "github.com/Hubmakerlabs/hoover/pkg/arweave"
@@ -33,10 +34,9 @@ import (
 // FromBskyFeedLike is for a like.
 //
 // In bluesky protocol, the reverse operation, unlike, is actually from a delete operation.
-//
-// Todo: for now, the reverse operations will not be handled but it should be done for MS2
-func FromBskyFeedLike(evt Ev, op Op, rr Repo, rec Rec) (bundle BundleItem, err error) {
-	var createdAt Time
+func FromBskyFeedLike(evt Ev, op Op, rr Repo, rec Rec, data *ao.EventData) (bundle BundleItem,
+	err error) {
+	var createdAt time.Time
 	var to any
 	if to, createdAt, err = UnmarshalEvent(evt, rec, &bsky.FeedLike{}); err != nil {
 		return
@@ -59,16 +59,15 @@ func FromBskyFeedLike(evt Ev, op Op, rr Repo, rec Rec) (bundle BundleItem, err e
 		return
 	}
 	ao.AppendTag(bundle, J(Like, Event, Id), like.Subject.Cid)
-	// ao.AppendTag(bundle, J(Like, Uri), like.Subject.Uri)
 	// so there is a mention with the poster's ID to search on
 	s1 := strings.Split(like.Subject.Uri, "://")
 	if len(s1) > 1 {
 		s2 := strings.Split(s1[1], "/")
 		if len(s2) > 1 {
-			ao.AppendTag(bundle, J(Like, Path), strings.Join(s2[1:], "/"))
+			data.Append(J(Like, Path), strings.Join(s2[1:], "/"))
 		}
 		if len(s2) > 0 {
-			ao.AppendTag(bundle, Mention, s2[0])
+			data.Append(Mention, s2[0])
 		}
 	}
 	return

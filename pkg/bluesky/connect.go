@@ -7,8 +7,8 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-func Connect(c context.Context) (conn *websocket.Conn, err error) {
-	api := "wss://bsky.network/xrpc/com.atproto.sync.subscribeRepos"
+func Connect(c context.Context, api string) (conn *websocket.Conn, err error) {
+	// api := "wss://bsky.network/xrpc/com.atproto.sync.subscribeRepos"
 	// fmt.Println("dialing: ", api)
 	d := websocket.DefaultDialer
 	conn, _, err = d.Dial(api, http.Header{})

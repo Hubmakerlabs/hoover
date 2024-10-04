@@ -29,10 +29,10 @@ func TestEventToBundleItem(t *testing.T) {
 			t.Fatal(err)
 		}
 		var bundle *types.BundleItem
-		if bundle, err = EventToBundleItem(ev); chk.E(err) {
+		if bundle, err = EventToBundleItem(ev, "archive"); chk.E(err) {
 			t.Fatal(err)
 		}
-		if bundle==nil{
+		if bundle == nil {
 			continue
 		}
 		// fmt.Println()
