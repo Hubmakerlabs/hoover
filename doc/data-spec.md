@@ -8,7 +8,7 @@ This section lists the core data fields common across all event types (`Post`, `
 
 | **Field Name**  | **Explanation of Field**                                                                                                                                                                                                                                 |
 | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Kind**        | The event type: one of [`Post`](#post), [`Repost`](#repost), [`Like`](#like), [`Follow`](#follow), or [`Profile`](#profile)<br>(Each event type also has event specific sub-headings. Please click on each event type above to view relevant sub-fields) |
+| **Kind**        | The event type: one of [`Post`](#1-post), [`Repost`](#2-repost), [`Like`](#3-like), [`Follow`](#4-follow), or [`Profile`](#5-profile)<br>(Each event type also has event specific sub-headings. Please click on each event type above to view relevant sub-fields) |
 | **Protocol**    | The protocol of the event, e.g., `Bluesky`, `Nostr`, or `Farcaster`                                                                                                                                                                                      |
 | **Repository**  | For `Nostr`, this is the relay where the event was found; for `Bluesky`, the main Bluesky API endpoint; for `Farcaster`, one of several API access points                                                                                                |
 | **Event-Id**    | The protocol-specific event identifier, which is a hash of the canonically structured event data. Bluesky uses base32, Farcaster and Nostr use hexadecimal                                                                                               |
@@ -21,7 +21,7 @@ This section lists the core data fields common across all event types (`Post`, `
 ## Event Specific Data
 This section explains the fields specific to each event type (`Post`, `Repost`, `Like`, `Follow`, `Profile`) across different social network protocols, detailing how data is structured and handled.
 
-### Post
+### 1. Post
 Posts are the primary form of content shared on social networks. They may include replies to other posts, media embeds, mentions of other users, and more. Each protocol handles this event type slightly differently, and the table below outlines the specific fields used across different protocols.
 
 | **Field**            | **Protocol** | **Explanation**                                                                                               |
@@ -52,7 +52,7 @@ Posts are the primary form of content shared on social networks. They may includ
 | **Embed-Event-Id**    | Farcaster    | The `Event-Id` of the embedded post when embedding posts.                                                     |
 
 
-### Repost
+### 2. Repost
 Reposts are used to share or amplify content from other users. This section describes the fields used to identify the original post being reposted and relevant metadata across different protocols.
 
 | **Field**            | **Protocol** | **Explanation**                                                                                               |
@@ -67,7 +67,7 @@ Reposts are used to share or amplify content from other users. This section desc
 | **Repost-Event-Uri**  | Farcaster    | URI for the reposted event, sometimes containing `Event-Id` and `User-Id`.                                    |
 
 
-### Like
+### 3. Like
 The Like event represents a user’s interaction with another post, usually signaling approval or acknowledgment. This section outlines the metadata associated with liking a post, including the reference to the liked event and optional emojis.
 
 | **Field**            | **Protocol** | **Explanation**                                                                                               |
@@ -82,7 +82,7 @@ The Like event represents a user’s interaction with another post, usually sign
 | **Like-Event-Uri**    | Farcaster    | URI of the liked event (could be the same as the `Like-Event-Id`).                                            |
 | **Like-User-Id**      | Farcaster    | Provides the Farcaster ID of the user who liked the event, in addition to the `Like-Event-Id`.                |
 
-### Follow
+### 4. Follow
 Follow events represent a user’s subscription to another user’s activity. This section details the fields that represent this relationship and how it is handled differently across protocols.
 
 | **Field**            | **Protocol** | **Explanation**                                                                                               |
@@ -93,7 +93,7 @@ Follow events represent a user’s subscription to another user’s activity. Th
 
 
 
-### Profile
+### 5. Profile
 Profile events contain metadata and personal information about users, such as usernames, display names, avatars, and other personal details. This section covers how each protocol structures and manages user profiles.
 
 | **Field**                          | **Protocol**     | **Explanation**                                                                                                                                            |
