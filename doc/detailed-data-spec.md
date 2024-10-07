@@ -260,7 +260,7 @@ Bluesky does not have `User-Name`
 
 #### Farcaster
 
-todo: uncertain from looking at the API whether any of the fields even exist or if this event type even exists.
+- Has `Avatar-Image`, `Display-Name`, `Bio`,`Website`, and `User-Name` same as those seen in Nostr above
 
 ## Notes
 
