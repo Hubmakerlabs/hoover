@@ -48,6 +48,9 @@ Posts are the primary form of content shared on social networks. They may includ
 | **Mention**           | Farcaster    | References to mentioned users, with start and end positions in the content field for locating the mentions.    |
 | **Reply-Parent-User-Id** | Farcaster | The `User-Id` of the parent event of a reply post.                                                            |
 | **Reply-Parent-Uri**  | Farcaster    | URI of the parent reply post, if present.                                                                     |
+| **Embed-User-Id**     | Farcaster    | The `User-Id` of the embedded post's author when embedding posts.                                             |
+| **Embed-Event-Id**    | Farcaster    | The `Event-Id` of the embedded post when embedding posts.                                                     |
+
 
 ### Repost
 Reposts are used to share or amplify content from other users. This section describes the fields used to identify the original post being reposted and relevant metadata across different protocols.
@@ -87,8 +90,7 @@ Follow events represent a user’s subscription to another user’s activity. Th
 | **Follow-User-Id**    | All          | The `User-Id` of the user being followed.                                                                     |
 | **Follow-User-Id**    | Nostr        | Public key identifiers of users the publisher subscribes to.                                                  |
 | **Follow-Tag**        | Nostr        | A list of hashtags the user subscribes to (contained in the data field).                                      |
-| **Follow Event**      | Bluesky      | No specific protocol tags except the user being followed. Unfollow events come from the delete stream.        |
-| **Follow Event**      | Farcaster    | Same as Bluesky, with delete events for unfollowing users.                                                    |
+
 
 
 ### Profile
