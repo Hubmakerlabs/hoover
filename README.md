@@ -1,15 +1,10 @@
 # Hoover
 
-Data aggregator for Nostr, Bluesky and Farcaster to Arweave AO
+Data aggregator for Nostr, Bluesky and Farcaster to Arweave AO, with a basic event data browser
 
 ## Documentation
 
-- [Arweave AO Social Network Data Hoover](doc/readme.md) - detailed documentation of how 
-  data is 
-  aggregated and the schema for bundling and searchability for Arweave AO
-
-Specifications of elements of the Hoover:
-
-- [browser](doc/browser.md) - specification of minimal data browser for hoover social network event data
-- [bundles](doc/bundles.md) - initial draft of schema for common data
-- [data format](doc/data.md) - defining the data that is captured and how it is packaged for Arweave AO
+- [Project Milestones](doc/milestones.md) - task description and goals of the stages of development
+- [Social Network Data Hoover](doc/readme.md) - general overview of Hoover project 
+- [Arweave Social Media Data and Explorer](doc/data-spec.md) - specification of the Arweave social media data format and explorer
+- [Setting up a Test Environment](doc/testing.md) - how to set up to build with the Hoover

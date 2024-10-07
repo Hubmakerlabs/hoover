@@ -144,7 +144,7 @@ func FromBskyFeedPost(evt Ev, op Op, rr Repo, rec Rec, data *ao.EventData) (bund
 	if pst.Embed != nil {
 		if pst.Embed.EmbedRecord != nil {
 			data.Append(J(Embed, Record, Uri), pst.Embed.EmbedRecord.Record.Uri)
-			data.Append(J(Embed, Record, Id), pst.Embed.EmbedRecord.Record.Cid)
+			data.Append(J(Mention, Event, Id), pst.Embed.EmbedRecord.Record.Cid)
 		}
 		if pst.Embed.EmbedImages != nil {
 			var count int
@@ -259,12 +259,8 @@ func FromBskyFeedPost(evt Ev, op Op, rr Repo, rec Rec, data *ao.EventData) (bund
 		// AppendTags(bundle, "#langs", pst.Langs)
 	}
 	if pst.Tags != nil && len(pst.Tags) > 0 {
-		if len(pst.Tags) == 1 {
-			data.Append(Tag, pst.Tags[0])
-		} else {
-			for i := range pst.Tags {
-				data.Append(J(Tag, i), pst.Tags[i])
-			}
+		for i := range pst.Tags {
+			data.Append(J(Hashtag, i), pst.Tags[i])
 		}
 	}
 	return

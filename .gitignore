@@ -35,6 +35,15 @@
 !*.bin
 !*.example
 !*.html
+!*.ts
+!*.prettierignore
+!*.prettierrc
+!*.tsx
+!*.jsx
+!*.css
+!*.scss
+!*.svg
+!*.cjs
 
 # ...even if they are in subdirectories
 !*/
@@ -55,3 +64,4 @@ node_modules/**
 **/node_modules
 **/node_modules/
 **/node_modules/**
+**/dist

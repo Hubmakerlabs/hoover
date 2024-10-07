@@ -118,7 +118,7 @@ out:
 					desc = t[1]
 				}
 				// these also need to be indexable i think
-				ao.AppendTag(bundle, ContentWarning, desc)
+				ao.AppendTag(bundle, J(Content, Warning), desc)
 			case "l":
 				if len(t) > 1 {
 					data.Append(Label, t[1])
@@ -208,20 +208,20 @@ out:
 			break out
 		}
 		if prf.Name != "" {
-			data.Append(J(User, Name),
+			ao.AppendTag(bundle, J(User, Name),
 				prf.Name)
 		}
 		if prf.DisplayName != "" {
-			data.Append(J(Display, Name), prf.DisplayName)
+			ao.AppendTag(bundle, J(Display, Name), prf.DisplayName)
 		}
 		if prf.About != "" {
 			data.Append(Bio, prf.About)
 		}
 		if prf.Picture != "" {
-			data.Append(J(Avatar, Image), prf.Picture)
+			ao.AppendTag(bundle, J(Avatar, Image), prf.Picture)
 		}
 		if prf.Banner != "" {
-			data.Append(J(Banner, Image), prf.Banner)
+			ao.AppendTag(bundle, J(Banner, Image), prf.Banner)
 		}
 		if prf.Website != "" {
 			data.Append(Website, prf.Website)
@@ -238,7 +238,7 @@ out:
 			switch ev.Tags[i][0] {
 			case "e":
 				if len(t) > 1 {
-					data.Append(J(Reply, Parent, Id), t[1])
+					data.Append(J(Mention, Event, Id), t[1])
 				}
 			case "p":
 				if len(t) > 1 {
@@ -255,7 +255,8 @@ out:
 					if len(t) > 2 {
 						sauce = t[2]
 					}
-					data.Append(Source, fmt.Sprintf("%s,%s", sauce, uri))
+					data.Append(Source, sauce, uri)
+					data.Append(J(Source, Uri), uri)
 				}
 			case "emoji":
 				if len(t) > 1 {
@@ -271,7 +272,7 @@ out:
 				if len(t) > 1 {
 					desc = t[1]
 				}
-				ao.AppendTag(bundle, ContentWarning, desc)
+				data.Append(J(Content, Warning), desc)
 			case "l":
 				if len(t) > 1 {
 					data.Append(Label, t[1])

@@ -10,11 +10,19 @@ import (
 	"github.com/Hubmakerlabs/replicatr/pkg/nostr/context"
 )
 
-func Firehose(c context.T, cancel context.F, wait *sync.WaitGroup, nostrRelays []string,
-	fn func(bundle *types.BundleItem) (err error)) {
-	go bluesky.Firehose(c, cancel, wait, fn)
+// Firehose runs concurrent connections capturing new events appearing on each
+// of the social network protocols, and calls a closure that provides access to
+// the bundle formatted from a protocol event.
+func Firehose(
+	c context.T,
+	cancel context.F,
+	wait *sync.WaitGroup,
+	nostrRelays, blueskyEndpoints, farcasterHubs []string,
+	fn func(bundle *types.BundleItem) (err error),
+) {
+	go bluesky.Firehose(c, cancel, wait, blueskyEndpoints, fn)
 	go nostr.Firehose(c, cancel, wait, nostrRelays, fn)
-	go farcaster.Firehose(c, cancel, wait, fn)
+	go farcaster.Firehose(c, cancel, wait, farcasterHubs, fn)
 	select {
 	case <-c.Done():
 		return
