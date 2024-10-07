@@ -136,7 +136,21 @@ func MessageToBundleItem(msg *pb.Message) (bundle *types.BundleItem, err error) 
 		ao.AppendTag(bundle, J(Follow, User, Id), follow_id)
 
 	case Profile:
+		//add data to EventData in all cases because there is a None user data type as well
 		data.Content = msg.GetData().GetUserDataBody().GetValue()
+		switch msg.GetData().GetUserDataBody().GetType() {
+		case pb.UserDataType_USER_DATA_TYPE_PFP:
+			ao.AppendTag(bundle, J(Avatar, Image), data.Content)
+		case pb.UserDataType_USER_DATA_TYPE_DISPLAY:
+			ao.AppendTag(bundle, J(Display, Name), data.Content)
+		case pb.UserDataType_USER_DATA_TYPE_BIO:
+			data.Append(Bio, data.Content)
+		case pb.UserDataType_USER_DATA_TYPE_URL:
+			data.Append(Website, data.Content)
+		case pb.UserDataType_USER_DATA_TYPE_USERNAME:
+			ao.AppendTag(bundle, J(User, Name), data.Content)
+		}
+
 	}
 
 	if data != nil && (data.Content != "" || len(data.EventTags) > 0) {
