@@ -100,7 +100,7 @@ Profile events contain metadata and personal information about users, such as us
 | ---------------------------------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Display-Name**                   | All              | The name the user wishes to be displayed with their profile.                                                                                               |
 | **Avatar-Image**                   | All              | URL pointing to the user’s avatar image. For Bluesky, this contains additional fields for image mimetype and size.                                         |
-| **User-Name**                      | Nostr, Farcaster | A short handle for the user, usually containing no spaces. (Bluesky does not have `User-Name`.)                                                            |
+| **User-Name**                      | Nostr, Farcaster | A short handle for the user, usually containing no spaces.                                                          |
 | **Bio**                            | Nostr, Farcaster | Arbitrary-length text field containing personal details, hashtags, or references to other users and events.                                                |
 | **Website**                        | Nostr, Farcaster | URL for a website the user wants to advertise (e.g., GitHub profile).                                                                                      |
 | **Banner-Image**                   | Nostr, Bluesky   | URL pointing to the user’s banner image, usually at the top of the profile page. For Bluesky, this contains additional fields for image mimetype and size. |
@@ -111,5 +111,3 @@ Profile events contain metadata and personal information about users, such as us
 | **Hashtag**                        | Nostr            | Hashtags mentioned in the bio.                                                                                                                             |
 | **Source**                         | Nostr            | Designates the name of the protocol source (e.g., Mastodon via Mostr bridge relays).                                                                       |
 | **Source-Uri**                     | Nostr            | URI to search for the event from the protocol source.                                                                                                      |
-| **Avatar-Image**, **Banner-Image** | Bluesky          | Contain additional fields for image mimetype and size.                                                                                                     |
-
