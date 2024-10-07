@@ -63,5 +63,11 @@ Our project milestones cover the development process, goals, and task completion
 
 - **David Vennik** (Nostr & Bluesky Aggregation, Arweave Test Harness) - <me@mleku.dev>
 - **Akash Kumar** (Farcaster Aggregation) - <akashkumar1691@gmail.com>
-- **Selami** (Data Browser example app)
+- **Selami Cetinguney** (Data Browser example app) - <selami.c@sbytes-it.com>
+
+## Acknowledgments
+
+This project was made possible through the support and funding provided by [Arweave](https://www.arweave.org). Their commitment to decentralized, permanent storage has enabled the development of Hoover, allowing the aggregation and long-term storage of social network data across Nostr, Bluesky, and Farcaster. We are grateful for their contributions to the ecosystem and their sponsorship of this project.
+
+
 
