@@ -59,15 +59,16 @@ For full details on data formats and bundling principles, see the [Data Specific
 
 Our project milestones cover the development process, goals, and task completion. Check out the detailed milestones in the [Project Milestones Document](doc/milestones.md).
 
-## Contributors
+## Credits
 
+This project was developed by [Hubmaker Labs](https://hubmaker.io/), a company specializing in decentralized applications and infrastructure, under contract with [Arweave](https://www.arweave.org), whose support and funding made this work possible.
+
+### Team:
 - **David Vennik** (Nostr & Bluesky Aggregation, Arweave Test Harness) - <me@mleku.dev>
 - **Akash Kumar** (Farcaster Aggregation) - <akashkumar1691@gmail.com>
 - **Selami Cetinguney** (Data Browser example app) - <selami.c@sbytes-it.com>
 
-## Acknowledgments
-
-This project was made possible through the support and funding provided by [Arweave](https://www.arweave.org). Their commitment to decentralized, permanent storage has enabled the development of Hoover, allowing the aggregation and long-term storage of social network data across Nostr, Bluesky, and Farcaster. We are grateful for their contributions to the ecosystem and their sponsorship of this project.
+We are grateful to Arweave for enabling the development of Hoover and its role in advancing decentralized, long-term data storage.
 
 
 
