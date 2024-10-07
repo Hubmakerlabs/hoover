@@ -1,7 +1,7 @@
 
 
 # Hoover - Decentralized Social Network Data Aggregator
-<img src="doc/hoover.PNG" width="20%" />
+<img src="doc/hoover.PNG" width="30%" />
 Hoover is a data aggregator that collects and indexes event data from decentralized social networks, including Nostr, Bluesky, and Farcaster, and stores it on Arweave. This enables Arweave developers to integrate social network data into their distributed applications, enhancing user experiences in areas such as media sharing, community building, and more.
 
 ## Key Features
