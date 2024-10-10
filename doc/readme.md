@@ -18,7 +18,7 @@ David Vennik <me@mleku.dev> - Nostr and Bluesky Aggregation and Arweave test har
 
 Akash Kumar <akashkumar1691@gmail.com> - Farcaster Aggregation 
 
-Selami - Hoover Data Browser example application
+Selami Cetinguney <selami.c@sbytes-it.com> - Hoover Data Browser example application
 
 ## Introduction
 
