@@ -34,7 +34,7 @@
 ### 5. Arweave Smart Contract Development  
 *(In Progress)*
 - [ ] Develop a smart contract that can:
-  - [ ] Verify cryptographic signatures for the native data of:
+  - [ ] Verify cryptographic signatures for the Arweave bundled posts from:
     - [x] Nostr
     - [ ] Bluesky
     - [ ] Farcaster
