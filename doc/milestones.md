@@ -40,7 +40,7 @@
     - [ ] Farcaster
 
 
-## Phase 3: Long-Term Enhancements
+## Phase 3: Future Enhancements
 
 ### 6. Data Reconstitution  
 *(Pending)*
