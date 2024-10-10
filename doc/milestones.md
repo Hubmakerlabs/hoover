@@ -44,7 +44,7 @@
 
 ### 6. Data Reconstitution  
 *(Pending)*
-- [ ] Add the ability to fully restore original social media posts from the Arweave-formatted data, especially for more complex protocols like Bluesky and Farcaster. This enhancement will enable Arweave applications not only to display posts from these protocols but also to create and publish posts. Thanks to the unified data format, a single post can be seamlessly shared across Nostr, Bluesky, and Farcaster simultaneously, allowing for true bidirectional interaction across multiple platforms.
+- [ ] Add the ability to fully restore original social media posts from the Arweave-formatted data, especially for more complex protocols like Bluesky and Farcaster. This enhancement will enable Arweave applications not only to display posts from these protocols but also to create and publish posts. Thanks to the unified data format, a single post may be seamlessly shared across Nostr, Bluesky, and Farcaster simultaneously, allowing for true bidirectional interaction across multiple platforms.
 
 
 
