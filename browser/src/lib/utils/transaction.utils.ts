@@ -11,47 +11,62 @@ export const isTxValid = (edge: Edge) => {
 	const signature = edge.node.tags.find(tag => tag.name === 'Signature')?.value;
 	const signatureId = edge.node.tags.find(tag => tag.name === 'Signature-Id')?.value;
 	const signatureType = edge.node.tags.find(tag => tag.name === 'Signature-Type')?.value;
-	
-
-	if (signatureType && signatureId && signature && eventId && userId){
-		if (parseInt(signatureType) == 1){
-			try {
-				const res = ed25519.verify(signature, eventId, userId);
-				return res;
-			} catch (error) {
-				console.log('Error verifying signature:', error);
+	if(signatureType){
+		const signatureTypeInt = parseInt(signatureType);
+		if (signatureTypeInt ==1){
+			if (signatureId && signature && eventId && userId){
+				try {
+					const res = ed25519.verify(signature, eventId, userId);
+					return res;
+				} catch (error) {
+					console.log('Error verifying signature:', error);
+					return false;
+				}
+			}else{
+				console.log('Missing signatureId, signature, eventId, or userId');
 				return false;
 			}
-		} else if (parseInt(signatureType) == 2){
-			
-			try {
-				const provider = new ethers.JsonRpcProvider('https://polygon-rpc.com') as unknown as Provider;
-				const res = verifyMessage({
-					signer: signatureId,
-					message: eventId,
-					signature: signature,
-					// this is needed so that smart contract signatures can be verified; this property can also be a viem PublicClient
-					provider,
-				})
-				return res;
-			} catch (error) {
-				console.log('Error verifying signature:', error);
+		}else if (signatureTypeInt == 2){
+			if (signatureId && signature && eventId && userId){
+				try {
+					const provider = new ethers.JsonRpcProvider('https://polygon-rpc.com') as unknown as Provider;
+					const res = verifyMessage({
+						signer: signatureId,
+						message: eventId,
+						signature: signature,
+						// this is needed so that smart contract signatures can be verified; this property can also be a viem PublicClient
+						provider,
+					})
+					return res;
+				} catch (error) {
+					console.log('Error verifying signature:', error);
+					return false;
+				}
+			}else{
+				console.log('Missing signatureId, signature, eventId, or userId');
 				return false;
+			}
+		}else if (signatureTypeInt == 3){
+			if (eventId && userId && signature){
+				try {
+					const res = schnorr.verify(signature, eventId, userId);
+					return res;
+				} catch (error) {
+					console.log('Error verifying signature:', error);
+					return false;
+				}
+			}else{
+				console.log('Missing signatureId, signature, eventId, or userId');
+				return false;
+				
 			}
 		}else{
+			console.log('Signature type is invalid or None');
 			return false;
 		}
-	} else if (eventId && userId && signature){
-		try {
-			const res = schnorr.verify(signature, eventId, userId);
-			return res;
-		} catch (error) {
-			console.log('Error verifying signature:', error);
-			return false;
-		}
-	}else{
-		return false;
 	}
+	console.log('Signature type is missing');
+	return false;
 
 	
 };

@@ -64,6 +64,7 @@ func EventToBundleItem(ev *event.T, relay string) (bundle *types.BundleItem, err
 		{J(User, Id), ev.PubKey},
 		{J(Unix, Time), strconv.FormatInt(ev.CreatedAt.I64(), 10)},
 		{Signature, ev.Sig},
+		{Name: J(Signature, Type), Value: fmt.Sprintf("%d", 3)},
 	}
 out:
 	switch k {
