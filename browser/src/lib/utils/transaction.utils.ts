@@ -14,9 +14,9 @@ export const isTxValid = (edge: Edge) => {
 	if(signatureType){
 		const signatureTypeInt = parseInt(signatureType);
 		if (signatureTypeInt ==1){
-			if (signatureId && signature && eventId && userId){
+			if (signatureId && signature && eventId){
 				try {
-					const res = ed25519.verify(signature, eventId, userId);
+					const res = ed25519.verify(signature, eventId, signatureId);
 					return res;
 				} catch (error) {
 					console.log('Error verifying signature:', error);
@@ -61,7 +61,7 @@ export const isTxValid = (edge: Edge) => {
 				
 			}
 		}else{
-			console.log('Signature type is invalid or None');
+			console.log('Signature type is unsupported or None');
 			return false;
 		}
 	}
