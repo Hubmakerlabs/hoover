@@ -2,6 +2,8 @@
 
 ## Social Network Data Hoover
 
+> **Disclaimer:** This document contains the developer’s notes for the Hoover project. It includes thoughts from the developers in a more conversational tone. For a more formal and concise overview of the project, please refer to the main README.
+
 #### Aggregator for social network data for use of Arweave developers as part of Arweave AO enabled applications
 
 -----
@@ -16,7 +18,7 @@ David Vennik <me@mleku.dev> - Nostr and Bluesky Aggregation and Arweave test har
 
 Akash Kumar <akashkumar1691@gmail.com> - Farcaster Aggregation 
 
-Selami - Hoover Data Browser example application
+Selami Cetinguney <selami.c@sbytes-it.com> - Hoover Data Browser example application
 
 ## Introduction
 
