@@ -267,7 +267,7 @@ The explorer is a simple one page browser that loads the latest transactions cre
 
 Its output is extremely rudimentary, and some of the non-searchable fields, contained in JSON data alongside the content field of the event data, is not displayed.
 
-The purpose of the Explorer is to demonstrate a simple GraphQL based search for Hoover data and shows a checkmark symbol on Nostr events that have valid User-Id/Event-Id/Signature data.
+The purpose of the Explorer is to demonstrate a simple GraphQL based search for Hoover data and shows a checkmark symbol on validated Farcaster and Nostr events
 
 Note that as mentioned previously, there are some fields that can be omitted from the event data and full reversal of the conversion cannot currently be achieved to enable full authentication of the data. This could be the subject of later work... for Bluesky especially it is complex. One possibility is to sub-bundle the raw event data, which would be a very simple change, however, this also means a lot more data per event.
 
