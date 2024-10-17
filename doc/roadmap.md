@@ -37,7 +37,7 @@
   - [ ] Verify cryptographic signatures for the Arweave bundled posts from:
     - [x] Nostr
     - [ ] Bluesky
-    - [ ] Farcaster
+    - [x] Farcaster
 
 
 ## Phase 3: Future Enhancements
