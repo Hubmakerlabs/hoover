@@ -4,15 +4,6 @@ The Hoover is a social media protocol data aggregator that pulls a small subset 
 
 The purpose of this application is to aggregate these disparate social media databases and allow them to be integrated into Arweave applications. It is a possible future use case where the data that can be generated to put into the Hoover data set could also generate events to send out to the respective social networks and create a full bridge between them all.
 
-## Explorer
-
-The explorer is a simple one page browser that loads the latest transactions created by the Hoover found in an arweave gateway and displays them, with the ability to step backwards in the history to earlier events.
-
-Its output is extremely rudimentary, and some of the non-searchable fields, contained in JSON data alongside the content field of the event data, is not displayed.
-
-The purpose of the Explorer is to demonstrate a simple GraphQL based search for Hoover data and shows a checkmark symbol on Nostr events that have valid User-Id/Event-Id/Signature data.
-
-Note that as mentioned previously, there are some fields that can be omitted from the event data and full reversal of the conversion cannot currently be achieved to enable full authentication of the data. This could be the subject of later work... for Bluesky especially it is complex. One possibility is to sub-bundle the raw event data, which would be a very simple change, however, this also means a lot more data per event.
 
 ## Common Data Format and Conventions
 
@@ -269,3 +260,14 @@ Bluesky does not have `User-Name`
 Currently there is no direct mechanism for reversing the bundling process, some data is omitted and especially with Bluesky the data format is very complex.
 
 Some options for solving this problem include extending the data specification with a full bidirectional transformation matrix, or alternatively, sub-bundling the native raw event data, with the idea that one can be used for most simple on-chain applications where the extra data can be used for more complex data bridging.
+
+### Explorer
+
+The explorer is a simple one page browser that loads the latest transactions created by the Hoover found in an arweave gateway and displays them, with the ability to step backwards in the history to earlier events.
+
+Its output is extremely rudimentary, and some of the non-searchable fields, contained in JSON data alongside the content field of the event data, is not displayed.
+
+The purpose of the Explorer is to demonstrate a simple GraphQL based search for Hoover data and shows a checkmark symbol on Nostr events that have valid User-Id/Event-Id/Signature data.
+
+Note that as mentioned previously, there are some fields that can be omitted from the event data and full reversal of the conversion cannot currently be achieved to enable full authentication of the data. This could be the subject of later work... for Bluesky especially it is complex. One possibility is to sub-bundle the raw event data, which would be a very simple change, however, this also means a lot more data per event.
+
