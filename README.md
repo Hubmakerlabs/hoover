@@ -42,7 +42,7 @@ To get started with Hoover, follow these steps:
    Upon running this command, you should be presented with a clickable http link which allows you to view the Hoover's output.
    > To learn more about the browser, click [here](doc/browser.md)
    
-   > note: arlocal, the test harness, and the hoover must be ran in the background in that order for the browser to work
+   > note: arlocal, the test harness, and the `hoover` must be ran in the background in that order for the browser to work
 
 > For a full guide to set up and run the `hoover`, see the [Testing Environment Setup](doc/testing.md)
 
