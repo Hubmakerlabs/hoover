@@ -19,14 +19,14 @@ The Hoover Data Browser performs basic signature verification for supported prot
 
 The browser supports signature verification for the following protocols:
 
-- **Nostr (Signature Type 3)**:  
+- **Nostr**:  
   Verified using the `schnorr` signature scheme on the secp256k1 curve.
   
-- **Farcaster (Signature Types 1 and 2)**:  
+- **Farcaster**:  
   - Type 1: Verified using the `ed25519` curve.
   - Type 2: Verified using Ethereum smart contract signatures through an Ethereum provider.
 
-- **Bluesky (Signature Type 0)**:  
+- **Bluesky**:  
   Currently, no signature verification is implemented for Bluesky events. Signature Type 0 indicates that verification is not performed in the browser at this time.
 
 ### 3. Output
