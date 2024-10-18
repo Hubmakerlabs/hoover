@@ -12,11 +12,11 @@ The primary purpose of the Hoover Data Browser is to showcase how data from mult
 
 The browser fetches and displays the 25 most recent social media events stored on an Arweave gateway. It provides users the ability to navigate backward through earlier events, giving insight into how data flows from the decentralized networks into Arweave.
 
-### 2. Signature Verification
+### 2. <img src="verified.png" width="5%" /> Signature Verification <img src="verified.png" width="5%" />
 
-The Hoover Data Browser performs basic signature verification for supported protocols. Verification status is represented visually within the interface (e.g., a green checkmark icon as shown below in the top right-hand corner of validated events).
+The Hoover Data Browser performs basic signature verification for supported protocols. Verification status is represented visually within the interface (e.g., a green checkmark icon as shown above in the top right-hand corner of validated events).
 
- <img src="verified.png" width="5%" />
+ 
 
 
 The browser supports signature verification for the following protocols:
