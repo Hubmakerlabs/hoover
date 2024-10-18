@@ -54,10 +54,6 @@ This will then start up the Nostr, Farcaster and Bluesky firehose feeds and bund
 
 To actually see some of this data, you can then run the browser web app, which is a simple single page that shows 25 items from the newest on the `arlocal` instance and has the ability to step backwards through the history prior to this and see more events.
 
-> The output is very rudimentary, and only the Nostr event signatures are verified because of the circuitous processes required to perform this on the other two protocols, and we have not implemented this as a result for this proof of concept/tooling project.
-
-This is a simple demo that shows that the data can be accessed on the `arlocal` endpoint, just as it would on the live mainnet, and a more sophisticated browsing application could be built that enables you to unwrap the embeds and links in the `Content` fields of the Hoover bundles and linkify them and enable the ability to browse through the event history as it accumulates.
-
 Run the browser as follows:
 
     cd browser
