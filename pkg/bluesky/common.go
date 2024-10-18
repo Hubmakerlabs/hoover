@@ -38,6 +38,7 @@ func GetCommon(bundle *types.BundleItem, rr *repo.Repo, createdAt time.Time, op 
 	ao.AppendTag(bundle, J(Unix, Time), strconv.FormatInt(createdAt.Unix(), 10))
 	ao.AppendTag(bundle, Path, op.Path)
 	ao.AppendTag(bundle, Signature, hex.EncodeToString(rr.SignedCommit().Sig))
+	ao.AppendTag(bundle, J(Signature, Type), fmt.Sprintf("%d", 0))
 	return
 }
 

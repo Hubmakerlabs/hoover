@@ -51,12 +51,9 @@ Same as the other commands, this needs to be run from the root of the repository
 This will then start up the Nostr, Farcaster and Bluesky firehose feeds and bundle up the events in the format described in [data-spec.md](data-spec.md) and publish them to the `arlocal` instance.
 
 ## Browser
+> to run the browser, arlocal, the test harness, and the hoover should be running in the background simultaneously as described above
 
 To actually see some of this data, you can then run the browser web app, which is a simple single page that shows 25 items from the newest on the `arlocal` instance and has the ability to step backwards through the history prior to this and see more events.
-
-> The output is very rudimentary, and only the Nostr event signatures are verified because of the circuitous processes required to perform this on the other two protocols, and we have not implemented this as a result for this proof of concept/tooling project.
-
-This is a simple demo that shows that the data can be accessed on the `arlocal` endpoint, just as it would on the live mainnet, and a more sophisticated browsing application could be built that enables you to unwrap the embeds and links in the `Content` fields of the Hoover bundles and linkify them and enable the ability to browse through the event history as it accumulates.
 
 Run the browser as follows:
 
@@ -74,6 +71,19 @@ VITE v5.4.8  ready in 276 ms
 ```
 
 you should be able to then click on the linkified http link there and it will open the web browser and show you the newest 25 events that arlocal has received.
+
+### Available Commands Once Browser is Running
+
+After the browser is running, you can use the following commands in the terminal:
+
+- **h + enter**: Show help menu (list of available commands).
+- **r + enter**: Restart the server.
+- **u + enter**: Show the server URL.
+- **o + enter**: Open the application in your default web browser.
+- **c + enter**: Clear the console.
+- **q + enter**: Quit the server.
+
+These commands allow you to manage the browser server easily while testing and navigating through the Hoover data.
 
 ## Conclusion
 
