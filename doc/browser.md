@@ -14,7 +14,9 @@ The browser fetches and displays the 25 most recent social media events stored o
 
 ### 2. Signature Verification
 
-The Hoover Data Browser performs basic signature verification for supported protocols. Verification status is represented visually within the interface (e.g., a green checkmark icon in the top right-hand corner of validated posts). <img src="verified.png" width="5%" />
+The Hoover Data Browser performs basic signature verification for supported protocols. Verification status is represented visually within the interface (e.g., a green checkmark icon as shown below in the top right-hand corner of validated posts).
+
+ <img src="verified.png" width="5%" />
 
 
 The browser supports signature verification for the following protocols:
@@ -23,15 +25,19 @@ The browser supports signature verification for the following protocols:
   Verified using the `schnorr` signature scheme on the secp256k1 curve.
   
 - **Farcaster**:  
-  - Type 1: Verified using the `ed25519` curve.
-  - Type 2: Verified using Ethereum smart contract signatures through an Ethereum provider.
+  - Type 1: Most Farcaster posts are verified using the `ed25519` curve.
+  - Type 2: Some Farcaster posts require verification via Ethereum smart contract signatures through an Ethereum provider.
 
 - **Bluesky**:  
-  Currently, no signature verification is implemented for Bluesky events. Signature Type 0 indicates that verification is not performed in the browser at this time.
+  Currently, no signature verification is implemented for Bluesky events.
 
 ### 3. Output
 
-As a proof-of-concept, the browser’s output is minimal and focuses on the core functionality of retrieving and verifying event data. Some non-essential fields from the event data are not displayed. For an explanation of each field found in the outputted posts, please see the  [Data Specification document](data-spec.md)
+**Example Output:**
+
+<img src="browser.png"  />
+
+As a proof-of-concept, the browser’s output is minimal and focuses on the core functionality of retrieving and verifying event data. Some non-essential fields from the event data are not displayed. As can be seen, the first field contains the native social media protocol the post is sourced from. An explanation of the remaining fields can be found in the [Data Specification document](data-spec.md).
 
 ### 4. Running the Browser
 Please refer to the [Getting Started](../README.md#getting-started) section of the main README for instructions on running the browser.
