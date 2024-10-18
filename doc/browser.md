@@ -14,7 +14,7 @@ The browser fetches and displays the 25 most recent social media events stored o
 
 ### 2. Signature Verification
 
-The Hoover Data Browser performs basic signature verification for supported protocols. Verification status is represented visually within the interface (e.g., a green checkmark icon in the top right-hand corner of validated posts). <img src="doc/verified.png" width="5%" />
+The Hoover Data Browser performs basic signature verification for supported protocols. Verification status is represented visually within the interface (e.g., a green checkmark icon in the top right-hand corner of validated posts). <img src="verified.png" width="5%" />
 
 
 The browser supports signature verification for the following protocols:
