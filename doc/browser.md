@@ -26,7 +26,7 @@ The browser supports signature verification for the following protocols:
   
 - **Farcaster**:  
   - Type 1: Most Farcaster events are verified using the `ed25519` curve.
-  - Type 2: Some Farcaster events require verification via Ethereum smart contract signatures through an Ethereum provider.
+  - Type 2: Some Farcaster events require verification via Ethereum smart contract signatures through an Ethereum provider (utilizing the `EIP-712` standard).
 
 - **Bluesky**:  
   Currently, no signature verification is implemented for Bluesky events.
