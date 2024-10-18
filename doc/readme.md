@@ -2,7 +2,7 @@
 
 ## Social Network Data Hoover
 
-> **Disclaimer:** This document contains the developer’s notes for the Hoover project. It includes thoughts from the developers in a more conversational tone. For a more formal and concise overview of the project, please refer to the main README.
+> **Disclaimer:** This document contains the developer’s notes for the Hoover project. It includes thoughts from the developers in a more conversational tone. For a more formal and concise overview of the project, please refer to the main [README](../README.md).
 
 #### Aggregator for social network data for use of Arweave developers as part of Arweave AO enabled applications
 
