@@ -9,7 +9,7 @@ Hoover is a data aggregator built for Arweave developers to collect and unify ev
 - Aggregates data from Nostr, Bluesky, and Farcaster into a common schema.
 - Stores data on Arweave for long-term, decentralized storage.
 - Supports five primary event types: `Post`, `Repost`, `Like`, `Follow`, `Profile`.
-- Includes a basic event browser for viewing and searching indexed data.
+- Includes a basic event [browser](doc/browser.md) for viewing and searching indexed data.
 
 ## Supported Social Networks
 
@@ -40,8 +40,9 @@ To get started with Hoover, follow these steps:
    npm run dev
    ```
    Upon running this command, you should be presented with a clickable http link which allows you to view the Hoover's output.
-  
-> For a full guide, see the [Testing Environment Setup](doc/testing.md)
+   > To learn more about the browser, click [here](doc/browser.md)
+
+> For a full guide to set up and run the `hoover`, see the [Testing Environment Setup](doc/testing.md)
 
 ## Architecture & Data Formats
 
