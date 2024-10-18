@@ -31,13 +31,20 @@ The browser supports signature verification for the following protocols:
 - **Bluesky**:  
   Currently, no signature verification is implemented for Bluesky events.
 
-### 3. Output
+### 3. Example Output
 
-**Example Output:**
+<table>
+  <tr>
+    <td>
+      <img src="browser.png" width="1500" />
+    </td>
+    <td>
+      As a proof-of-concept, the browser’s output is minimal and focuses on the core functionality of retrieving and verifying event data. Some non-essential fields from the event data are not displayed. <br><br> As can be seen, the first field contains the native social media protocol the event is sourced from (Nostr, Bluesky, or Farcaster) . Additionally, the green check mark denoting the verification of the Farcaster and Nostr event can be seen in the top, righthand corner of the respective events. An explanation of the remaining fields can be found in the <a href="data-spec.md">Data Specification document</a>.
+    </td>
+  </tr>
+</table>
 
-<img src="browser.png"  />
 
-As a proof-of-concept, the browser’s output is minimal and focuses on the core functionality of retrieving and verifying event data. Some non-essential fields from the event data are not displayed. As can be seen, the first field contains the native social media protocol the event is sourced from. Additionally, the green check mark denoting the verification of the Farcaster and Nostr event can be seen in the top, righthand corner of the respective events. An explanation of the remaining fields can be found in the [Data Specification document](data-spec.md).
 
 ### 4. Running the Browser
 Please refer to the [Getting Started](../README.md#getting-started) section of the main README for instructions on running the browser.
