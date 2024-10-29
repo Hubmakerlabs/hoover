@@ -9,7 +9,7 @@ export const isTxValid = (edge: Edge) => {
 	const eventId = edge.node.tags.find(tag => tag.name === 'Event-Id')?.value;
 	const userId = edge.node.tags.find(tag => tag.name === 'User-Id')?.value;
 	const signature = edge.node.tags.find(tag => tag.name === 'Signature')?.value;
-	const signatureId = edge.node.tags.find(tag => tag.name === 'Signature-Id')?.value;
+	const signatureId = edge.node.tags.find(tag => tag.name === 'Forward-For')?.value;
 	const signatureType = edge.node.tags.find(tag => tag.name === 'Signature-Type')?.value;
 	if(signatureType){
 		const signatureTypeInt = parseInt(signatureType);
@@ -17,6 +17,9 @@ export const isTxValid = (edge: Edge) => {
 			if (signatureId && signature && eventId){
 				try {
 					const res = ed25519.verify(signature, eventId, signatureId);
+					if (!res){
+						console.log('Signature is invalid');
+					}
 					return res;
 				} catch (error) {
 					console.log('Error verifying signature:', error);
@@ -37,6 +40,9 @@ export const isTxValid = (edge: Edge) => {
 						// this is needed so that smart contract signatures can be verified; this property can also be a viem PublicClient
 						provider,
 					})
+					if (!res){
+						console.log('Signature is invalid');
+					}
 					return res;
 				} catch (error) {
 					console.log('Error verifying signature:', error);
@@ -50,6 +56,9 @@ export const isTxValid = (edge: Edge) => {
 			if (eventId && userId && signature){
 				try {
 					const res = schnorr.verify(signature, eventId, userId);
+					if (!res){
+						console.log('Signature is invalid');
+					}
 					return res;
 				} catch (error) {
 					console.log('Error verifying signature:', error);

@@ -49,7 +49,7 @@ func MessageToBundleItem(msg *pb.Message) (bundle *types.BundleItem, err error) 
 		{Name: J(Unix, Time), Value: fmt.Sprintf("%d",
 			int64(msg.GetData().GetTimestamp())+1609459200)}, // offset from 2021-01-10T00:00
 		{Name: Signature, Value: hex.EncodeToString(msg.GetSignature())},
-		{Name: J(Signature, Id), Value: hex.EncodeToString(msg.GetSigner())},
+		{Name: "Forward-For", Value: hex.EncodeToString(msg.GetSigner())},
 		{Name: J(Signature, Type), Value: fmt.Sprintf("%d", msg.GetSignatureScheme())},
 	}
 
