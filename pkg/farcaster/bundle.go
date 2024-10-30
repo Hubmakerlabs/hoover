@@ -51,6 +51,13 @@ func MessageToBundleItem(msg *pb.Message) (bundle *types.BundleItem, err error) 
 		{Name: Signature, Value: hex.EncodeToString(msg.GetSignature())},
 		{Name: "Signer", Value: hex.EncodeToString(msg.GetSigner())},
 		{Name: J(Signature, Type), Value: fmt.Sprintf("%d", msg.GetSignatureScheme())},
+		{Name: Topic, Value: Farcaster},
+		{Name: Topic, Value: k},
+	}
+	if k == Profile {
+		ao.AppendTag(bundle, Type, ProfileType)
+	} else {
+		ao.AppendTag(bundle, Type, PostType)
 	}
 
 	switch k {

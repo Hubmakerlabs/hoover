@@ -39,6 +39,13 @@ func GetCommon(bundle *types.BundleItem, rr *repo.Repo, createdAt time.Time, op 
 	ao.AppendTag(bundle, Path, op.Path)
 	ao.AppendTag(bundle, Signature, hex.EncodeToString(rr.SignedCommit().Sig))
 	ao.AppendTag(bundle, J(Signature, Type), fmt.Sprintf("%d", 0))
+	ao.AppendTag(bundle, Topic, Bsky)
+	ao.AppendTag(bundle, Topic, k)
+	if k == Profile {
+		ao.AppendTag(bundle, Type, ProfileType)
+	} else {
+		ao.AppendTag(bundle, Type, PostType)
+	}
 	return
 }
 

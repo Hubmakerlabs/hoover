@@ -55,16 +55,23 @@ func EventToBundleItem(ev *event.T, relay string) (bundle *types.BundleItem, err
 	// bundle.Data = ev.Content
 	data := ao.NewEventData(ev.Content)
 	bundle.Tags = []types.Tag{
-		{J(App, Name), AppNameValue},
-		{J(App, Version), AppVersion},
-		{Protocol, Nostr},
-		{Repository, relay},
-		{Kind, k},
-		{J(Event, Id), ev.ID.String()},
-		{J(User, Id), ev.PubKey},
-		{J(Unix, Time), strconv.FormatInt(ev.CreatedAt.I64(), 10)},
-		{Signature, ev.Sig},
+		{Name: J(App, Name), Value: AppNameValue},
+		{Name: J(App, Version), Value: AppVersion},
+		{Name: Protocol, Value: Nostr},
+		{Name: Repository, Value: relay},
+		{Name: Kind, Value: k},
+		{Name: J(Event, Id), Value: ev.ID.String()},
+		{Name: J(User, Id), Value: ev.PubKey},
+		{Name: J(Unix, Time), Value: strconv.FormatInt(ev.CreatedAt.I64(), 10)},
+		{Name: Signature, Value: ev.Sig},
 		{Name: J(Signature, Type), Value: fmt.Sprintf("%d", 3)},
+		{Name: Topic, Value: Nostr},
+		{Name: Topic, Value: k},
+	}
+	if k == Profile {
+		ao.AppendTag(bundle, Type, ProfileType)
+	} else {
+		ao.AppendTag(bundle, Type, PostType)
 	}
 out:
 	switch k {
