@@ -219,6 +219,7 @@ func FromBskyFeedPost(evt Ev, op Op, rr Repo, rec Rec, data *ao.EventData) (bund
 						if feats.RichtextFacet_Tag.Tag != "" {
 							data.Append(J(Hashtag),
 								feats.RichtextFacet_Tag.Tag)
+							ao.AppendTag(bundle, Topic, feats.RichtextFacet_Tag.Tag)
 						}
 					}
 				}
@@ -274,6 +275,8 @@ func FromBskyFeedPost(evt Ev, op Op, rr Repo, rec Rec, data *ao.EventData) (bund
 	if pst.Tags != nil && len(pst.Tags) > 0 {
 		for i := range pst.Tags {
 			data.Append(J(Hashtag, i), pst.Tags[i])
+			ao.AppendTag(bundle, Topic, pst.Tags[i])
+
 		}
 	}
 	return

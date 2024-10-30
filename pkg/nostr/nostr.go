@@ -115,6 +115,7 @@ out:
 			case "t":
 				if len(t) > 1 {
 					data.Append(Hashtag, t[1])
+					ao.AppendTag(bundle, Topic, t[1])
 				}
 			case "proxy":
 				if len(t) > 1 {
@@ -293,6 +294,7 @@ out:
 			case "t":
 				if len(t) > 1 {
 					data.Append(Hashtag, t[1])
+					ao.AppendTag(bundle, Topic, t[1])
 				}
 			case "proxy":
 				if len(t) > 1 {
