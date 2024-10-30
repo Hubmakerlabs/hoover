@@ -9,7 +9,7 @@ Hoover is a data aggregator built for Arweave developers to collect and unify ev
 - Aggregates data from Nostr, Bluesky, and Farcaster into a common [schema](#architecture-and-data-formats).
 - Stores data on Arweave for long-term, decentralized storage.
 - Supports five primary event types: `Post`, `Repost`, `Like`, `Follow`, `Profile`. 
-- Includes a basic event [browser](doc/browser.md) for viewing and searching indexed data.
+- Includes a basic event [browser](doc/browser.md) for viewing and searching indexed data. Additionally, this browser performs in-place signature validations of Nostr and Farcaster posts ensuring their integrity
 
 ## Supported Social Networks
 
