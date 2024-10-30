@@ -47,11 +47,19 @@ func FromBskyFeedRepost(evt Ev, op Op, rr Repo, rec Rec, data *ao.EventData) (bu
 		return
 	}
 	bundle = &types.BundleItem{}
-	if err = GetCommon(bundle, rr, createdAt, op, evt); chk.E(err) {
+	var userID, protocol, timestamp string
+	if userID, protocol, timestamp, err = GetCommon(bundle, rr, createdAt, op, evt); chk.E(err) {
 		return
 	}
-	ao.AppendTag(bundle, J(Repost, Event, Id), repost.Subject.Cid)
+	postId := repost.Subject.Cid
+	ao.AppendTag(bundle, J(Repost, Event, Id), postId)
 	data.Append(J(Repost, Event, Uri), repost.Subject.Uri)
+
+	title := userID + " reposted on " + protocol + " at " + timestamp
+	ao.AppendTag(bundle, Title, title)
+
+	description := userID + " reposted on " + protocol + " at " + timestamp + ". Id of original post: " + postId
+	ao.AppendTag(bundle, Description, description)
 	return
 }
 

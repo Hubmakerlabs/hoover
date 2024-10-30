@@ -153,11 +153,13 @@ out:
 			}
 		}
 	case Repost:
+		var postId string
 		for i, t := range ev.Tags {
 			switch ev.Tags[i][0] {
 			case "e":
 				if len(t) > 1 {
-					ao.AppendTag(bundle, J(Repost, Event, Id), t[1])
+					postId = t[1]
+					ao.AppendTag(bundle, J(Repost, Event, Id), postId)
 				}
 			case "proxy":
 				if len(t) > 1 {
@@ -183,6 +185,11 @@ out:
 				}
 			}
 		}
+		title := userID + " reposted on " + protocol + " at " + timestamp
+		ao.AppendTag(bundle, Title, title)
+
+		description := userID + " reposted on " + protocol + " at " + timestamp + ". Id of original post: " + postId
+		ao.AppendTag(bundle, Description, description)
 	case Like:
 		for i, t := range ev.Tags {
 			switch ev.Tags[i][0] {
