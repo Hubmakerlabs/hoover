@@ -7,6 +7,7 @@ package nostr
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"strconv"
 
 	. "github.com/Hubmakerlabs/hoover/pkg"
@@ -53,16 +54,20 @@ func EventToBundleItem(ev *event.T, relay string) (bundle *types.BundleItem, err
 	}
 	bundle = &types.BundleItem{}
 	// bundle.Data = ev.Content
-	data := ao.NewEventData(ev.Content)
+	content := ev.Content
+	data := ao.NewEventData(content)
+	userID := ev.PubKey
+	timestamp := strconv.FormatInt(ev.CreatedAt.I64(), 10)
+	protocol := Nostr
 	bundle.Tags = []types.Tag{
 		{Name: J(App, Name), Value: AppNameValue},
 		{Name: J(App, Version), Value: AppVersion},
-		{Name: Protocol, Value: Nostr},
+		{Name: Protocol, Value: protocol},
 		{Name: Repository, Value: relay},
 		{Name: Kind, Value: k},
 		{Name: J(Event, Id), Value: ev.ID.String()},
-		{Name: J(User, Id), Value: ev.PubKey},
-		{Name: J(Unix, Time), Value: strconv.FormatInt(ev.CreatedAt.I64(), 10)},
+		{Name: J(User, Id), Value: userID},
+		{Name: J(Unix, Time), Value: timestamp},
 		{Name: Signature, Value: ev.Sig},
 		{Name: J(Signature, Type), Value: fmt.Sprintf("%d", 3)},
 		{Name: Topic, Value: Nostr},
@@ -76,6 +81,16 @@ func EventToBundleItem(ev *event.T, relay string) (bundle *types.BundleItem, err
 out:
 	switch k {
 	case Post:
+		titleBeginning := userID + " on " + protocol + " at " + timestamp + ":\""
+		maxContentLength := int(math.Min(float64(len(content)), float64(149-len(titleBeginning))))
+		contentSlice := content[:maxContentLength]
+		ao.AppendTag(bundle, Title, titleBeginning+contentSlice+"\"")
+
+		descriptionBeginning := userID + "shared a post on " + protocol + " at " + timestamp + ". Content:\""
+		maxContentLength = int(math.Min(float64(len(content)), float64(299-len(descriptionBeginning))))
+		contentSlice = content[:maxContentLength]
+		ao.AppendTag(bundle, Description, descriptionBeginning+contentSlice+"\"")
+
 		for i, t := range ev.Tags {
 			switch ev.Tags[i][0] {
 			case "e":
