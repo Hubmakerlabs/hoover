@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"math"
 	"strconv"
 
 	. "github.com/Hubmakerlabs/hoover/pkg"
@@ -37,17 +38,19 @@ func MessageToBundleItem(msg *pb.Message) (bundle *types.BundleItem, err error) 
 	if k = BundlerKind(msg.GetData()); k == "" {
 		return
 	}
+	userID := fmt.Sprintf("%d", msg.GetData().GetFid())
+	timestamp := fmt.Sprintf("%d", int64(msg.GetData().GetTimestamp())+1609459200) // offset from 2021-01-10T00:00
+	protocol := Farcaster
 	bundle = &types.BundleItem{}
 	data := ao.NewEventData("")
 	bundle.Tags = []types.Tag{
 		{Name: J(App, Name), Value: AppNameValue},
 		{Name: J(App, Version), Value: AppVersion},
-		{Name: Protocol, Value: Farcaster},
+		{Name: Protocol, Value: protocol},
 		{Name: Kind, Value: k},
 		{Name: J(Event, Id), Value: hex.EncodeToString(msg.GetHash())},
-		{Name: J(User, Id), Value: fmt.Sprintf("%d", msg.GetData().GetFid())},
-		{Name: J(Unix, Time), Value: fmt.Sprintf("%d",
-			int64(msg.GetData().GetTimestamp())+1609459200)}, // offset from 2021-01-10T00:00
+		{Name: J(User, Id), Value: userID},
+		{Name: J(Unix, Time), Value: timestamp},
 		{Name: Signature, Value: hex.EncodeToString(msg.GetSignature())},
 		{Name: "Signer", Value: hex.EncodeToString(msg.GetSigner())},
 		{Name: J(Signature, Type), Value: fmt.Sprintf("%d", msg.GetSignatureScheme())},
@@ -62,7 +65,8 @@ func MessageToBundleItem(msg *pb.Message) (bundle *types.BundleItem, err error) 
 
 	switch k {
 	case Post:
-		data.Content = msg.GetData().GetCastAddBody().GetText()
+		content := msg.GetData().GetCastAddBody().GetText()
+		data.Content = content
 		embeds_deprecated := msg.GetData().GetCastAddBody().GetEmbedsDeprecated()
 		for i := range embeds_deprecated {
 			embed := embeds_deprecated[i]
@@ -98,7 +102,6 @@ func MessageToBundleItem(msg *pb.Message) (bundle *types.BundleItem, err error) 
 							strconv.FormatUint(uint64(mention_position), 10))
 					}
 				}
-
 			}
 			embeds := msg.GetData().GetCastAddBody().GetEmbeds()
 			for i := range embeds {
@@ -112,53 +115,96 @@ func MessageToBundleItem(msg *pb.Message) (bundle *types.BundleItem, err error) 
 				}
 			}
 		}
+		titleBeginning := userID + " on " + protocol + " at " + timestamp + ":\""
+		maxContentLength := int(math.Min(float64(len(content)), float64(149-len(titleBeginning))))
+		contentSlice := content[:maxContentLength]
+		ao.AppendTag(bundle, Title, titleBeginning+contentSlice+"\"")
+
+		descriptionBeginning := userID + "shared a post on " + protocol + " at " + timestamp + ". Content:\""
+		maxContentLength = int(math.Min(float64(len(content)), float64(299-len(descriptionBeginning))))
+		contentSlice = content[:maxContentLength]
+		ao.AppendTag(bundle, Description, descriptionBeginning+contentSlice+"\"")
 
 	case Repost:
 		target := msg.GetData().GetReactionBody().GetTarget()
+		var postId string
 		if x, ok := target.(*pb.ReactionBody_TargetCastId); ok {
 			targetFid := x.TargetCastId.Fid
 			targetHash := x.TargetCastId.Hash
+			postId = fmt.Sprintf("%0x", targetHash)
 			ao.AppendTag(bundle, J(Repost, Event, Id),
 				fmt.Sprintf("%0x", targetHash))
 			data.Append(J(Repost, User, Id),
 				fmt.Sprintf("%d", targetFid))
 		} else {
 			target_url := target.(*pb.ReactionBody_TargetUrl).TargetUrl
+			postId = target_url
 			data.Append(J(Repost, Event, Uri), target_url)
 		}
 
+		title := userID + " reposted on " + protocol + " at " + timestamp
+		ao.AppendTag(bundle, Title, title)
+
+		description := userID + " reposted on " + protocol + " at " + timestamp + ". Id of original post: " + postId
+		ao.AppendTag(bundle, Description, description)
+
 	case Like:
+		var postId string
 		target := msg.GetData().GetReactionBody().GetTarget()
 		if x, ok := target.(*pb.ReactionBody_TargetCastId); ok {
 			targetFid := x.TargetCastId.Fid
 			targetHash := x.TargetCastId.Hash
+			postId = fmt.Sprintf("%0x", targetHash)
 			ao.AppendTag(bundle, J(Like, Event, Id),
 				fmt.Sprintf("%0x", targetHash))
 			data.Append(J(Like, User, Id), fmt.Sprint(targetFid))
 		} else {
 			target_url := target.(*pb.ReactionBody_TargetUrl).TargetUrl
+			postId = target_url
 			data.Append(J(Like, Event, Uri), target_url)
 		}
+
+		title := userID + " liked a post on " + protocol + " at " + timestamp
+		ao.AppendTag(bundle, Title, title)
+
+		description := userID + " liked a post on " + protocol + " at " + timestamp + ". Id of original post: " + postId
+		ao.AppendTag(bundle, Description, description)
 
 	case Follow:
 		follow_id := fmt.Sprintf("%d", msg.GetData().GetLinkBody().GetTargetFid())
 		ao.AppendTag(bundle, J(Follow, User, Id), follow_id)
 
+		title := userID + " followed another user on " + protocol + " at " + timestamp
+		ao.AppendTag(bundle, Title, title)
+
+		description := userID + " followed " + follow_id + " on " + protocol + " at " + timestamp
+		ao.AppendTag(bundle, Description, description)
+
 	case Profile:
 		//add data to EventData in all cases because there is a None user data type as well
 		data.Content = msg.GetData().GetUserDataBody().GetValue()
+		var changeType string
 		switch msg.GetData().GetUserDataBody().GetType() {
 		case pb.UserDataType_USER_DATA_TYPE_PFP:
 			ao.AppendTag(bundle, J(Avatar, Image), data.Content)
+			changeType = "picture"
 		case pb.UserDataType_USER_DATA_TYPE_DISPLAY:
 			ao.AppendTag(bundle, J(Display, Name), data.Content)
+			changeType = "display name"
 		case pb.UserDataType_USER_DATA_TYPE_BIO:
 			data.Append(Bio, data.Content)
+			changeType = "bio"
 		case pb.UserDataType_USER_DATA_TYPE_URL:
 			data.Append(Website, data.Content)
+			changeType = "website"
 		case pb.UserDataType_USER_DATA_TYPE_USERNAME:
 			ao.AppendTag(bundle, J(User, Name), data.Content)
+			changeType = "username"
 		}
+		title := "Profile Update:" + userID + " changed their " + changeType + " on " + protocol + " at " + timestamp
+		ao.AppendTag(bundle, Title, title)
+		description := "Profile Update:" + userID + " changed their " + changeType + " on " + protocol + " at " + timestamp + ". New " + changeType + ": " + data.Content
+		ao.AppendTag(bundle, Description, description[:300])
 
 	}
 
