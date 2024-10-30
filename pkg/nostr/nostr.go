@@ -217,11 +217,13 @@ out:
 	case Follow:
 		// we don't need the content field of follow events
 		data.Content = ""
+		var follow_id string
 		for i, t := range ev.Tags {
 			switch ev.Tags[i][0] {
 			case "p":
 				if len(t) > 1 {
-					data.Append(J(Follow, User, Id), t[1])
+					follow_id = t[1]
+					data.Append(J(Follow, User, Id), follow_id)
 				}
 			case "t":
 				if len(t) > 1 {
@@ -229,6 +231,11 @@ out:
 				}
 			}
 		}
+		title := userID + " followed another user on " + protocol + " at " + timestamp
+		ao.AppendTag(bundle, Title, title)
+
+		description := userID + " followed " + follow_id + " on " + protocol + " at " + timestamp
+		ao.AppendTag(bundle, Description, description)
 	case Profile:
 		// remove data field in case it's empty
 		bundle.Data = ""
@@ -237,32 +244,41 @@ out:
 			log.I.F("%s", ev.Content)
 			break out
 		}
+		changes := []string{}
 		if prf.Name != "" {
 			ao.AppendTag(bundle, J(User, Name),
 				prf.Name)
+			changes = append(changes, "username")
 		}
 		if prf.DisplayName != "" {
 			ao.AppendTag(bundle, J(Display, Name), prf.DisplayName)
+			changes = append(changes, "display name")
 		}
 		if prf.About != "" {
 			data.Append(Bio, prf.About)
+			changes = append(changes, "bio")
 		}
 		if prf.Picture != "" {
 			ao.AppendTag(bundle, J(Avatar, Image), prf.Picture)
+			changes = append(changes, "avatar")
 		}
 		if prf.Banner != "" {
 			ao.AppendTag(bundle, J(Banner, Image), prf.Banner)
+			changes = append(changes, "banner")
 		}
 		if prf.Website != "" {
 			data.Append(Website, prf.Website)
+			changes = append(changes, "website")
 		}
 		if nip05, ok := prf.NIP05.(string); ok {
 			if nip05 != "" {
 				data.Append(Verification, nip05)
 			}
+			changes = append(changes, "verification")
 		}
 		if prf.LUD16 != "" {
 			data.Append(J(Payment, Address), prf.LUD16)
+			changes = append(changes, "payment address")
 		}
 		for i, t := range ev.Tags {
 			switch ev.Tags[i][0] {
@@ -313,6 +329,31 @@ out:
 				}
 			}
 		}
+		var change string
+		var noChange bool
+		if len(changes) == 0 {
+			noChange = true
+		} else if len(changes) == 1 {
+			change = changes[0]
+		} else if len(changes) == 2 {
+			change = changes[0] + " and " + changes[1]
+		} else {
+			for i, s := range changes {
+
+				if i == len(changes)-1 {
+					change += "and a " + s
+				} else {
+					change += "a " + s + ", "
+				}
+			}
+		}
+		if !noChange {
+			change = ". New profile includes " + change
+		}
+		title := "Profile Update:" + userID + " updated their profile on " + protocol + " at " + timestamp
+		ao.AppendTag(bundle, Title, title)
+		description := "Profile Update:" + userID + " updated their profile on " + protocol + " at " + timestamp + change
+		ao.AppendTag(bundle, Description, description[:300])
 	}
 	// put the ao.EventData into JSON form and place in the bundle.Data field
 	var b []byte

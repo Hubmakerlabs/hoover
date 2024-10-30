@@ -55,10 +55,17 @@ func FromBskyFeedLike(evt Ev, op Op, rr Repo, rec Rec, data *ao.EventData) (bund
 		return
 	}
 	bundle = new(types.BundleItem)
-	if err = GetCommon(bundle, rr, createdAt, op, evt); chk.E(err) {
+	var userID, protocol, timestamp string
+	if userID, protocol, timestamp, err = GetCommon(bundle, rr, createdAt, op, evt); chk.E(err) {
 		return
 	}
-	ao.AppendTag(bundle, J(Like, Event, Id), like.Subject.Cid)
+	postId := like.Subject.Cid
+	ao.AppendTag(bundle, J(Like, Event, Id), postId)
+	title := userID + " liked a post on " + protocol + " at " + timestamp
+	ao.AppendTag(bundle, Title, title)
+
+	description := userID + " liked a post on " + protocol + " at " + timestamp + ". Id of original post: " + postId
+	ao.AppendTag(bundle, Description, description)
 	// so there is a mention with the poster's ID to search on
 	s1 := strings.Split(like.Subject.Uri, "://")
 	if len(s1) > 1 {

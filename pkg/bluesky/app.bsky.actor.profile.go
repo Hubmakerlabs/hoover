@@ -77,23 +77,54 @@ func FromBskyActorProfile(evt Ev, op Op, rr Repo, rec Rec,
 		return
 	}
 	bundle = &types.BundleItem{}
-	if err = GetCommon(bundle, rr, createdAt, op, evt); chk.E(err) {
+	var userID, protocol, timestamp string
+	if userID, protocol, timestamp, err = GetCommon(bundle, rr, createdAt, op, evt); chk.E(err) {
 		return
 	}
+	changes := []string{}
 	if profile.DisplayName != nil && *profile.DisplayName != "" {
 		ao.AppendTag(bundle, J(Display, Name), *profile.DisplayName)
+		changes = append(changes, "display name")
 	}
 	if profile.Description != nil {
 		data.Append(Bio, *profile.Description)
+		changes = append(changes, "bio")
 	}
 	if profile.Avatar != nil {
 		ao.AppendTag(bundle, J(Avatar, Image), profile.Avatar.Ref.String())
 		AppendLexBlobTags(data, J(Avatar, Image), profile.Avatar)
+		changes = append(changes, "avatar")
 	}
 	if profile.Banner != nil {
 		ao.AppendTag(bundle, J(Banner, Image), profile.Banner.Ref.String())
 		AppendLexBlobTags(data, J(Banner, Image), profile.Banner)
+		changes = append(changes, "banner")
 	}
+	var change string
+	var noChange bool
+	if len(changes) == 0 {
+		noChange = true
+	} else if len(changes) == 1 {
+		change = changes[0]
+	} else if len(changes) == 2 {
+		change = changes[0] + " and " + changes[1]
+	} else {
+		for i, s := range changes {
+
+			if i == len(changes)-1 {
+				change += "and a " + s
+			} else {
+				change += "a " + s + ", "
+			}
+		}
+	}
+	if !noChange {
+		change = ". New profile includes " + change
+	}
+	title := "Profile Update:" + userID + " updated their profile on " + protocol + " at " + timestamp
+	ao.AppendTag(bundle, Title, title)
+	description := "Profile Update:" + userID + " updated their profile on " + protocol + " at " + timestamp + change
+	ao.AppendTag(bundle, Description, description[:300])
 	return
 }
 

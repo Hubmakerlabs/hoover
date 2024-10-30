@@ -50,10 +50,17 @@ func FromBskyGraphFollow(evt Ev, op Op, rr Repo, rec Rec) (bundle BundleItem, er
 		return
 	}
 	bundle = &types.BundleItem{}
-	if err = GetCommon(bundle, rr, createdAt, op, evt); chk.E(err) {
+	var userID, protocol, timestamp string
+	if userID, protocol, timestamp, err = GetCommon(bundle, rr, createdAt, op, evt); chk.E(err) {
 		return
 	}
-	ao.AppendTag(bundle, J(Follow, User, Id), fol.Subject)
+	follow_id := fol.Subject
+	ao.AppendTag(bundle, J(Follow, User, Id), follow_id)
+	title := userID + " followed another user on " + protocol + " at " + timestamp
+	ao.AppendTag(bundle, Title, title)
+
+	description := userID + " followed " + follow_id + " on " + protocol + " at " + timestamp
+	ao.AppendTag(bundle, Description, description)
 	return
 }
 

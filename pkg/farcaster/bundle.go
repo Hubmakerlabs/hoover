@@ -187,7 +187,7 @@ func MessageToBundleItem(msg *pb.Message) (bundle *types.BundleItem, err error) 
 		switch msg.GetData().GetUserDataBody().GetType() {
 		case pb.UserDataType_USER_DATA_TYPE_PFP:
 			ao.AppendTag(bundle, J(Avatar, Image), data.Content)
-			changeType = "picture"
+			changeType = "avatar"
 		case pb.UserDataType_USER_DATA_TYPE_DISPLAY:
 			ao.AppendTag(bundle, J(Display, Name), data.Content)
 			changeType = "display name"
