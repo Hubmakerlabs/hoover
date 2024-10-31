@@ -2,6 +2,7 @@ package bluesky
 
 import (
 	"fmt"
+	"math"
 	"strconv"
 	"time"
 
@@ -125,12 +126,24 @@ func FromBskyFeedPost(evt Ev, op Op, rr Repo, rec Rec, data *ao.EventData) (bund
 		return
 	}
 	bundle = &types.BundleItem{}
-	if err = GetCommon(bundle, rr, createdAt, op, evt); chk.E(err) {
+	var userID, protocol, timestamp string
+	if userID, protocol, timestamp, err = GetCommon(bundle, rr, createdAt, op, evt); chk.E(err) {
 		return
 	}
 	if pst.Text != "" {
 		data.Content = pst.Text
 	}
+
+	titleBeginning := userID + " on " + protocol + " at " + timestamp + ":\""
+	maxContentLength := int(math.Min(float64(len(data.Content)), float64(149-len(titleBeginning))))
+	contentSlice := data.Content[:maxContentLength]
+	ao.AppendTag(bundle, Title, titleBeginning+contentSlice+"\"")
+
+	descriptionBeginning := userID + "shared a post on " + protocol + " at " + timestamp + ". Content:\""
+	maxContentLength = int(math.Min(float64(len(data.Content)), float64(299-len(descriptionBeginning))))
+	contentSlice = data.Content[:maxContentLength]
+	ao.AppendTag(bundle, Description, descriptionBeginning+contentSlice+"\"")
+
 	if pst.Reply != nil {
 		if pst.Reply.Root != nil && pst.Reply.Root.Uri != "" {
 			ao.AppendTag(bundle, J(Reply, Root, Id), pst.Reply.Parent.Cid)
@@ -206,6 +219,7 @@ func FromBskyFeedPost(evt Ev, op Op, rr Repo, rec Rec, data *ao.EventData) (bund
 						if feats.RichtextFacet_Tag.Tag != "" {
 							data.Append(J(Hashtag),
 								feats.RichtextFacet_Tag.Tag)
+							ao.AppendTag(bundle, Topic, feats.RichtextFacet_Tag.Tag)
 						}
 					}
 				}
@@ -261,6 +275,8 @@ func FromBskyFeedPost(evt Ev, op Op, rr Repo, rec Rec, data *ao.EventData) (bund
 	if pst.Tags != nil && len(pst.Tags) > 0 {
 		for i := range pst.Tags {
 			data.Append(J(Hashtag, i), pst.Tags[i])
+			ao.AppendTag(bundle, Topic, pst.Tags[i])
+
 		}
 	}
 	return

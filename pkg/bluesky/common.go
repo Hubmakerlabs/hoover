@@ -18,27 +18,38 @@ import (
 )
 
 func GetCommon(bundle *types.BundleItem, rr *repo.Repo, createdAt time.Time, op Op,
-	evt Ev) (err error) {
+	evt Ev) (userid string, protocol string, timestamp string, err error) {
 	split := strings.Split(op.Path, "/")
 	if len(split) < 1 {
-		return fmt.Errorf("invalid Op.Path: '%s'", op.Path)
+		return "", "", "", fmt.Errorf("invalid Op.Path: '%s'", op.Path)
 	}
-	k := BskyKinds(split[0])
-	if k == "" {
-		return fmt.Errorf("invalid Op.Path kind: '%s'", k)
+	kind := BskyKinds(split[0])
+	if kind == "" {
+		return "", "", "", fmt.Errorf("invalid Op.Path kind: '%s'", kind)
 	}
+
+	userid = rr.SignedCommit().Did
+	protocol = Bsky
+	timestamp = strconv.FormatInt(createdAt.Unix(), 10)
 
 	ao.AppendTag(bundle, J(App, Name), AppNameValue)
 	ao.AppendTag(bundle, J(App, Version), AppVersion)
-	ao.AppendTag(bundle, Protocol, Bsky)
+	ao.AppendTag(bundle, Protocol, protocol)
 	ao.AppendTag(bundle, Repository, evt.Repo)
-	ao.AppendTag(bundle, Kind, k)
+	ao.AppendTag(bundle, Kind, kind)
 	ao.AppendTag(bundle, J(Event, Id), op.Cid.String())
-	ao.AppendTag(bundle, J(User, Id), rr.SignedCommit().Did)
-	ao.AppendTag(bundle, J(Unix, Time), strconv.FormatInt(createdAt.Unix(), 10))
+	ao.AppendTag(bundle, J(User, Id), userid)
+	ao.AppendTag(bundle, J(Unix, Time), timestamp)
 	ao.AppendTag(bundle, Path, op.Path)
 	ao.AppendTag(bundle, Signature, hex.EncodeToString(rr.SignedCommit().Sig))
 	ao.AppendTag(bundle, J(Signature, Type), fmt.Sprintf("%d", 0))
+	ao.AppendTag(bundle, Topic, Bsky)
+	ao.AppendTag(bundle, Topic, kind)
+	if kind == Profile {
+		ao.AppendTag(bundle, Type, ProfileType)
+	} else {
+		ao.AppendTag(bundle, Type, PostType)
+	}
 	return
 }
 

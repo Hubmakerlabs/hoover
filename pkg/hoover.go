@@ -118,4 +118,9 @@ var (
 	Size       = "Size"
 	Dimensions = "Dimensions"
 	Duration   = "Duration"
+
+	//ANS-110
+	Topic       = "Topic"
+	PostType    = "social-post"
+	ProfileType = "profile"
 )

@@ -7,6 +7,7 @@ package nostr
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"strconv"
 
 	. "github.com/Hubmakerlabs/hoover/pkg"
@@ -53,22 +54,43 @@ func EventToBundleItem(ev *event.T, relay string) (bundle *types.BundleItem, err
 	}
 	bundle = &types.BundleItem{}
 	// bundle.Data = ev.Content
-	data := ao.NewEventData(ev.Content)
+	content := ev.Content
+	data := ao.NewEventData(content)
+	userID := ev.PubKey
+	timestamp := strconv.FormatInt(ev.CreatedAt.I64(), 10)
+	protocol := Nostr
 	bundle.Tags = []types.Tag{
-		{J(App, Name), AppNameValue},
-		{J(App, Version), AppVersion},
-		{Protocol, Nostr},
-		{Repository, relay},
-		{Kind, k},
-		{J(Event, Id), ev.ID.String()},
-		{J(User, Id), ev.PubKey},
-		{J(Unix, Time), strconv.FormatInt(ev.CreatedAt.I64(), 10)},
-		{Signature, ev.Sig},
+		{Name: J(App, Name), Value: AppNameValue},
+		{Name: J(App, Version), Value: AppVersion},
+		{Name: Protocol, Value: protocol},
+		{Name: Repository, Value: relay},
+		{Name: Kind, Value: k},
+		{Name: J(Event, Id), Value: ev.ID.String()},
+		{Name: J(User, Id), Value: userID},
+		{Name: J(Unix, Time), Value: timestamp},
+		{Name: Signature, Value: ev.Sig},
 		{Name: J(Signature, Type), Value: fmt.Sprintf("%d", 3)},
+		{Name: Topic, Value: Nostr},
+		{Name: Topic, Value: k},
+	}
+	if k == Profile {
+		ao.AppendTag(bundle, Type, ProfileType)
+	} else {
+		ao.AppendTag(bundle, Type, PostType)
 	}
 out:
 	switch k {
 	case Post:
+		titleBeginning := userID + " on " + protocol + " at " + timestamp + ":\""
+		maxContentLength := int(math.Min(float64(len(content)), float64(149-len(titleBeginning))))
+		contentSlice := content[:maxContentLength]
+		ao.AppendTag(bundle, Title, titleBeginning+contentSlice+"\"")
+
+		descriptionBeginning := userID + "shared a post on " + protocol + " at " + timestamp + ". Content:\""
+		maxContentLength = int(math.Min(float64(len(content)), float64(299-len(descriptionBeginning))))
+		contentSlice = content[:maxContentLength]
+		ao.AppendTag(bundle, Description, descriptionBeginning+contentSlice+"\"")
+
 		for i, t := range ev.Tags {
 			switch ev.Tags[i][0] {
 			case "e":
@@ -93,6 +115,7 @@ out:
 			case "t":
 				if len(t) > 1 {
 					data.Append(Hashtag, t[1])
+					ao.AppendTag(bundle, Topic, t[1])
 				}
 			case "proxy":
 				if len(t) > 1 {
@@ -131,11 +154,13 @@ out:
 			}
 		}
 	case Repost:
+		var postId string
 		for i, t := range ev.Tags {
 			switch ev.Tags[i][0] {
 			case "e":
 				if len(t) > 1 {
-					ao.AppendTag(bundle, J(Repost, Event, Id), t[1])
+					postId = t[1]
+					ao.AppendTag(bundle, J(Repost, Event, Id), postId)
 				}
 			case "proxy":
 				if len(t) > 1 {
@@ -161,6 +186,11 @@ out:
 				}
 			}
 		}
+		title := userID + " reposted on " + protocol + " at " + timestamp
+		ao.AppendTag(bundle, Title, title)
+
+		description := userID + " reposted on " + protocol + " at " + timestamp + ". Id of original post: " + postId
+		ao.AppendTag(bundle, Description, description)
 	case Like:
 		for i, t := range ev.Tags {
 			switch ev.Tags[i][0] {
@@ -188,11 +218,13 @@ out:
 	case Follow:
 		// we don't need the content field of follow events
 		data.Content = ""
+		var follow_id string
 		for i, t := range ev.Tags {
 			switch ev.Tags[i][0] {
 			case "p":
 				if len(t) > 1 {
-					data.Append(J(Follow, User, Id), t[1])
+					follow_id = t[1]
+					data.Append(J(Follow, User, Id), follow_id)
 				}
 			case "t":
 				if len(t) > 1 {
@@ -200,6 +232,11 @@ out:
 				}
 			}
 		}
+		title := userID + " followed another user on " + protocol + " at " + timestamp
+		ao.AppendTag(bundle, Title, title)
+
+		description := userID + " followed " + follow_id + " on " + protocol + " at " + timestamp
+		ao.AppendTag(bundle, Description, description)
 	case Profile:
 		// remove data field in case it's empty
 		bundle.Data = ""
@@ -208,32 +245,41 @@ out:
 			log.I.F("%s", ev.Content)
 			break out
 		}
+		changes := []string{}
 		if prf.Name != "" {
 			ao.AppendTag(bundle, J(User, Name),
 				prf.Name)
+			changes = append(changes, "username")
 		}
 		if prf.DisplayName != "" {
 			ao.AppendTag(bundle, J(Display, Name), prf.DisplayName)
+			changes = append(changes, "display name")
 		}
 		if prf.About != "" {
 			data.Append(Bio, prf.About)
+			changes = append(changes, "bio")
 		}
 		if prf.Picture != "" {
 			ao.AppendTag(bundle, J(Avatar, Image), prf.Picture)
+			changes = append(changes, "avatar")
 		}
 		if prf.Banner != "" {
 			ao.AppendTag(bundle, J(Banner, Image), prf.Banner)
+			changes = append(changes, "banner")
 		}
 		if prf.Website != "" {
 			data.Append(Website, prf.Website)
+			changes = append(changes, "website")
 		}
 		if nip05, ok := prf.NIP05.(string); ok {
 			if nip05 != "" {
 				data.Append(Verification, nip05)
 			}
+			changes = append(changes, "verification")
 		}
 		if prf.LUD16 != "" {
 			data.Append(J(Payment, Address), prf.LUD16)
+			changes = append(changes, "payment address")
 		}
 		for i, t := range ev.Tags {
 			switch ev.Tags[i][0] {
@@ -248,6 +294,7 @@ out:
 			case "t":
 				if len(t) > 1 {
 					data.Append(Hashtag, t[1])
+					ao.AppendTag(bundle, Topic, t[1])
 				}
 			case "proxy":
 				if len(t) > 1 {
@@ -284,6 +331,31 @@ out:
 				}
 			}
 		}
+		var change string
+		var noChange bool
+		if len(changes) == 0 {
+			noChange = true
+		} else if len(changes) == 1 {
+			change = changes[0]
+		} else if len(changes) == 2 {
+			change = changes[0] + " and " + changes[1]
+		} else {
+			for i, s := range changes {
+
+				if i == len(changes)-1 {
+					change += "and a " + s
+				} else {
+					change += "a " + s + ", "
+				}
+			}
+		}
+		if !noChange {
+			change = ". New profile includes " + change
+		}
+		title := "Profile Update:" + userID + " updated their profile on " + protocol + " at " + timestamp
+		ao.AppendTag(bundle, Title, title)
+		description := "Profile Update:" + userID + " updated their profile on " + protocol + " at " + timestamp + change
+		ao.AppendTag(bundle, Description, description[:300])
 	}
 	// put the ao.EventData into JSON form and place in the bundle.Data field
 	var b []byte
