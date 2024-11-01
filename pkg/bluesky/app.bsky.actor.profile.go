@@ -124,7 +124,7 @@ func FromBskyActorProfile(evt Ev, op Op, rr Repo, rec Rec,
 	title := "Profile Update:" + userID + " updated their profile on " + protocol + " at " + timestamp
 	ao.AppendTag(bundle, Title, title)
 	description := "Profile Update:" + userID + " updated their profile on " + protocol + " at " + timestamp + change
-	ao.AppendTag(bundle, Description, description[:300])
+	ao.AppendTag(bundle, Description, description[:min(300, len(description))])
 	return
 }
 

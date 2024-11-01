@@ -65,7 +65,7 @@ func FromBskyFeedLike(evt Ev, op Op, rr Repo, rec Rec, data *ao.EventData) (bund
 	ao.AppendTag(bundle, Title, title)
 
 	description := userID + " liked a post on " + protocol + " at " + timestamp + ". Id of original post: " + postId
-	ao.AppendTag(bundle, Description, description)
+	ao.AppendTag(bundle, Description, description[:min(len(description), 300)])
 	// so there is a mention with the poster's ID to search on
 	s1 := strings.Split(like.Subject.Uri, "://")
 	if len(s1) > 1 {

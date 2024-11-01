@@ -146,7 +146,7 @@ func MessageToBundleItem(msg *pb.Message) (bundle *types.BundleItem, err error) 
 		ao.AppendTag(bundle, Title, title)
 
 		description := userID + " reposted on " + protocol + " at " + timestamp + ". Id of original post: " + postId
-		ao.AppendTag(bundle, Description, description)
+		ao.AppendTag(bundle, Description, description[:min(len(description), 300)])
 
 	case Like:
 		var postId string
@@ -156,7 +156,7 @@ func MessageToBundleItem(msg *pb.Message) (bundle *types.BundleItem, err error) 
 			targetHash := x.TargetCastId.Hash
 			postId = fmt.Sprintf("%0x", targetHash)
 			ao.AppendTag(bundle, J(Like, Event, Id),
-				fmt.Sprintf("%0x", targetHash))
+				postId)
 			data.Append(J(Like, User, Id), fmt.Sprint(targetFid))
 		} else {
 			target_url := target.(*pb.ReactionBody_TargetUrl).TargetUrl
@@ -168,7 +168,7 @@ func MessageToBundleItem(msg *pb.Message) (bundle *types.BundleItem, err error) 
 		ao.AppendTag(bundle, Title, title)
 
 		description := userID + " liked a post on " + protocol + " at " + timestamp + ". Id of original post: " + postId
-		ao.AppendTag(bundle, Description, description)
+		ao.AppendTag(bundle, Description, description[:min(len(description), 300)])
 
 	case Follow:
 		follow_id := fmt.Sprintf("%d", msg.GetData().GetLinkBody().GetTargetFid())
@@ -204,7 +204,7 @@ func MessageToBundleItem(msg *pb.Message) (bundle *types.BundleItem, err error) 
 		title := "Profile Update:" + userID + " changed their " + changeType + " on " + protocol + " at " + timestamp
 		ao.AppendTag(bundle, Title, title)
 		description := "Profile Update:" + userID + " changed their " + changeType + " on " + protocol + " at " + timestamp + ". New " + changeType + ": " + data.Content
-		ao.AppendTag(bundle, Description, description[:300])
+		ao.AppendTag(bundle, Description, description[:min(len(description), 300)])
 
 	}
 

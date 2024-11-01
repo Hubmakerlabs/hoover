@@ -59,7 +59,7 @@ func FromBskyFeedRepost(evt Ev, op Op, rr Repo, rec Rec, data *ao.EventData) (bu
 	ao.AppendTag(bundle, Title, title)
 
 	description := userID + " reposted on " + protocol + " at " + timestamp + ". Id of original post: " + postId
-	ao.AppendTag(bundle, Description, description)
+	ao.AppendTag(bundle, Description, description[:min(len(description), 300)])
 	return
 }
 

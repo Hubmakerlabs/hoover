@@ -190,14 +190,16 @@ out:
 		ao.AppendTag(bundle, Title, title)
 
 		description := userID + " reposted on " + protocol + " at " + timestamp + ". Id of original post: " + postId
-		ao.AppendTag(bundle, Description, description)
+		ao.AppendTag(bundle, Description, description[:min(300, len(description))])
 	case Like:
+		var postId string
 		for i, t := range ev.Tags {
 			switch ev.Tags[i][0] {
 			case "e":
 				if len(t) > 1 {
 					// likes need to also be in the tags
-					ao.AppendTag(bundle, J(Like, Event, Id), t[1])
+					postId = t[1]
+					ao.AppendTag(bundle, J(Like, Event, Id), postId)
 				}
 			case "p":
 				if len(t) > 1 {
@@ -215,6 +217,11 @@ out:
 				}
 			}
 		}
+		title := userID + " liked a post on " + protocol + " at " + timestamp
+		ao.AppendTag(bundle, Title, title)
+
+		description := userID + " liked a post on " + protocol + " at " + timestamp + ". Id of original post: " + postId
+		ao.AppendTag(bundle, Description, description[:min(len(description), 300)])
 	case Follow:
 		// we don't need the content field of follow events
 		data.Content = ""
@@ -355,7 +362,7 @@ out:
 		title := "Profile Update:" + userID + " updated their profile on " + protocol + " at " + timestamp
 		ao.AppendTag(bundle, Title, title)
 		description := "Profile Update:" + userID + " updated their profile on " + protocol + " at " + timestamp + change
-		ao.AppendTag(bundle, Description, description[:300])
+		ao.AppendTag(bundle, Description, description[:min(300, len(description))])
 	}
 	// put the ao.EventData into JSON form and place in the bundle.Data field
 	var b []byte
