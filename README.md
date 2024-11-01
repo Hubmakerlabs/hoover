@@ -22,7 +22,7 @@ Hoover is a data aggregator built for Arweave developers to collect and unify ev
 To get started with Hoover, follow these steps:
 
 1. **Install Go** (version 1.22.6 or higher) [Go Download](https://go.dev/dl)
-2. **Set up Arlocal** for local Arweave testing [Arlocal Setup](https://github.com/textury/arlocal)
+2. **Set up & Run Arlocal** for local Arweave testing [Arlocal Setup](https://github.com/textury/arlocal)
 3. **Run the Test Harness**:
    The test harness will simulate a running Arweave environment.
 
