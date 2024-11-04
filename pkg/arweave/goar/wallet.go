@@ -202,7 +202,7 @@ func (w *Wallet) SendTransactionConcurrent(ctx context.Context,
 
 func (w *Wallet) getUploader(tx *types.Transaction) (*TransactionUploader,
 	error) {
-
+	var err error
 	// anchor, err := w.Client.GetTransactionAnchor()
 	// if err != nil {
 	// 	return nil, err
