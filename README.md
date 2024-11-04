@@ -37,6 +37,7 @@ To get started with Hoover, follow these steps:
 5. **Start the Browser Interface**: Finally, start the browser to view and interact with the Hoover data:
    ```bash
    cd browser
+   npm install
    npm run dev
    ```
    Upon running this command, you should be presented with a clickable http link which allows you to view the Hoover's output.

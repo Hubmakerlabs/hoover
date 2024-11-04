@@ -348,16 +348,41 @@ func (c *Client) GetTransactionPrice(dataSize int,
 	if code != 200 {
 		return 0, fmt.Errorf("get reward error: %s", string(body))
 	}
-
 	reward, err = strconv.ParseInt(string(body), 10, 64)
 	if err != nil {
 		return
 	}
-
 	// reward can not be 0
 	if reward <= 0 {
 		err = errors.New("reward must more than 0")
 	}
+	return
+}
+
+func (c *Client) GetTransactionPriceFloat(dataSize int,
+	target *string) (reward float64, err error) {
+	url := fmt.Sprintf("price/%d", dataSize)
+	if target != nil {
+		url = fmt.Sprintf("%v/%v", url, *target)
+	}
+
+	body, code, err := c.httpGet(url)
+	if code == 429 {
+		return 0, ErrRequestLimit
+	}
+	if err != nil {
+		return
+	}
+	if code != 200 {
+		return 0, fmt.Errorf("get reward error: %s", string(body))
+	}
+	if reward, err = strconv.ParseFloat(string(body), 64); err != nil {
+		return
+	}
+	// reward can not be 0
+	// if reward <= 0 {
+	// 	err = errors.New("reward must more than 0")
+	// }
 	return
 }
 

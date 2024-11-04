@@ -144,7 +144,7 @@ func (w *Wallet) SendDataStreamSpeedUp(data *os.File, tags []types.Tag,
 func (w *Wallet) SendDataConcurrentSpeedUp(ctx context.Context,
 	concurrentNum int, data interface{}, tags []types.Tag,
 	speedFactor int64) (types.Transaction, error) {
-	var reward int64
+	var reward float64
 	var dataLen int
 	isByteArr := true
 	if _, isByteArr = data.([]byte); isByteArr {
@@ -156,7 +156,7 @@ func (w *Wallet) SendDataConcurrentSpeedUp(ctx context.Context,
 		}
 		dataLen = int(fileInfo.Size())
 	}
-	reward, err := w.Client.GetTransactionPrice(dataLen, nil)
+	reward, err := w.Client.GetTransactionPriceFloat(dataLen, nil)
 	if err != nil {
 		return types.Transaction{}, err
 	}
@@ -167,7 +167,7 @@ func (w *Wallet) SendDataConcurrentSpeedUp(ctx context.Context,
 		Quantity: "0",
 		Tags:     utils.TagsEncode(tags),
 		DataSize: fmt.Sprintf("%d", dataLen),
-		Reward:   fmt.Sprintf("%d", reward*(100+speedFactor)/100),
+		Reward:   fmt.Sprintf("%d", int(reward*float64(100+speedFactor)/100)),
 	}
 
 	if isByteArr {
@@ -202,11 +202,12 @@ func (w *Wallet) SendTransactionConcurrent(ctx context.Context,
 
 func (w *Wallet) getUploader(tx *types.Transaction) (*TransactionUploader,
 	error) {
-	anchor, err := w.Client.GetTransactionAnchor()
-	if err != nil {
-		return nil, err
-	}
-	tx.LastTx = anchor
+
+	// anchor, err := w.Client.GetTransactionAnchor()
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// tx.LastTx = anchor
 	tx.Owner = w.Owner()
 	if err = w.Signer.SignTx(tx); err != nil {
 		return nil, err

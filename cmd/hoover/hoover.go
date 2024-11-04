@@ -26,7 +26,7 @@ type Config struct {
 	Root             string   `env:"ROOT_DIR" usage:"root path for all other path configurations (defaults OS user home if empty)"`
 	Profile          string   `env:"PROFILE" default:".hoover" usage:"name of directory in root path to store state data and database"`
 	WalletFile       string   `env:"WALLET_FILE" default:"keyfile.json" usage:"full path of wallet file to use for uploading to arweave"`
-	SpeedFactor      float32  `env:"SPEED_FACTOR" default:"1" usage:"change priority of bundle uploads by this ratio"`
+	SpeedFactor      float64  `env:"SPEED_FACTOR" default:"1" usage:"change priority of bundle uploads by this ratio"`
 	ArweaveGateways  []string `env:"ARWEAVE_GATEWAYS" usage:""`
 	NostrRelays      []string `env:"NOSTR_RELAYS" usage:"nostr relays, comma separated, in standard format 'wss://example.com', ports and insecure ws:// also permissible"`
 	FarcasterHubs    []string `env:"FARCASTER_HUBS" usage:"farcaster hub network addresses, comma separated"`
@@ -150,6 +150,8 @@ func GetWallet(walletFile, endpoint string) (address string, wallet *goar.Wallet
 	return
 }
 
+const batchSize = 75000
+
 func main() {
 	slog.SetLogLevel(slog.Info)
 	var err error
@@ -177,43 +179,74 @@ func main() {
 		break
 	}
 	c, cancel := context.WithCancel(context.Background())
+	batchChan := make(chan *types.BundleItem)
+	// bundle batcher worker
+	go func() {
+		bundles := make([]types.BundleItem, 0, 200)
+		var total int
+		for {
+			select {
+			case <-c.Done():
+				return
+			case item := <-batchChan:
+				if item == nil {
+					continue
+				}
+				if err = goar.SignBundleItem(types.ArweaveSignType, wallet.Signer,
+					item); chk.E(err) {
+					continue
+				}
+				// log.I.F("bundle id %s", item.Id)
+				dataLen := len(item.Data)
+				tx := &types.Transaction{
+					ID:       item.Id,
+					Format:   2,
+					Target:   "",
+					Quantity: "0",
+					Tags:     utils.TagsEncode(item.Tags),
+					Data:     utils.Base64Encode([]byte(item.Data)),
+					DataSize: fmt.Sprintf("%d", dataLen),
+				}
+				var sum int
+				for i := range tx.Tags {
+					sum += len(tx.Tags[i].Name) + len(tx.Tags[i].Value)
+				}
+				itemSize := sum + dataLen
+				total += itemSize
+				// reward price does not need to be set for the bundler https://up.arweave.net
+				// var reward float64
+				// if reward, err = wallet.Client.GetTransactionPriceFloat(itemSize,
+				// 	nil); chk.E(err) {
+				// }
+				// log.I.Ln(reward)
+				// rew := int(reward * (100 + cfg.SpeedFactor) / 100)
+				// tx.Reward = fmt.Sprintf("%d", rew)
+				bundles = append(bundles, *item)
+				if total > batchSize {
+					log.I.Ln("batch size collected", total)
+					// we can create a bundle now
+					var bundle *types.Bundle
+					if bundle, err = utils.NewBundle(bundles...); chk.E(err) {
+						// this shouldn't happen really
+						return
+					}
+					log.I.S(bundle)
+					var t types.Transaction
+					if _, err = wallet.SendBundleTx(c, 1,
+						bundle.BundleBinary, []types.Tag{}); chk.E(err) {
+					}
+					log.I.S(t)
+					total = 0
+					bundles = bundles[:0]
+				}
+			}
+		}
+	}()
 	interrupt.AddHandler(cancel)
 	var wg sync.WaitGroup
 	multi.Firehose(c, cancel, &wg, cfg.NostrRelays, cfg.BlueskyEndpoints, cfg.FarcasterHubs,
 		func(bundle *types.BundleItem) (err error) {
-			tx := &types.Transaction{
-				Format:   2,
-				Target:   "",
-				Quantity: "0",
-				Tags:     utils.TagsEncode(bundle.Tags),
-				Data:     utils.Base64Encode([]byte(bundle.Data)),
-				DataSize: fmt.Sprintf("%d", len(bundle.Data)),
-			}
-			var sum int
-			for i := range tx.Tags {
-				sum += len(tx.Tags[i].Name) + len(tx.Tags[i].Value)
-			}
-			var reward int64
-			if reward, err = wallet.Client.GetTransactionPrice(len(bundle.Data)+sum,
-				nil); chk.E(err) {
-				cancel()
-				wg.Wait()
-			}
-			rew := int(float32(reward) * (100 + cfg.SpeedFactor) / 100)
-			if rew == 0 {
-				rew = 1000
-			}
-			tx.Reward = fmt.Sprintf("%d", rew)
-			// spew.Dump(tx)
-			if _, err = wallet.SendTransaction(tx); err != nil {
-				// try again or? this can mean the wallet is out of funds, this will trigger a
-				// shutdown for now to prevent pointless retries.
-				log.E.F(
-					"ERROR: %s - you may need to add funds to your arweave wallet %s",
-					err.Error(), address)
-				cancel()
-				wg.Wait()
-			}
+			batchChan <- bundle
 			return
 		})
 }
