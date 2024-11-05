@@ -10,7 +10,7 @@ The primary purpose of the Hoover Data Browser is to showcase how data from mult
 
 ### 1. Display Latest Events
 
-The browser fetches and displays the 25 most recent social media events stored on an Arweave gateway. It provides users the ability to navigate backward through earlier events, giving insight into how data flows from the decentralized networks into Arweave.
+The browser fetches and displays the 25 most recent social media events stored on an Arweave (or arlocal optionally). It provides users the ability to navigate backward through earlier events, giving insight into how data flows from the decentralized networks into Arweave.
 
 ### 2. <img src="verified.png" width="5%" /> Signature Verification <img src="verified.png" width="5%" />
 
