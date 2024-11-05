@@ -50,7 +50,7 @@ export const TransactionsList = () => {
 				`
 			};
 
-			const response = await fetch('http://localhost:1984/graphql', {
+			const response = await fetch('https://arweave.net/graphql', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
