@@ -23,11 +23,10 @@ To get started with Hoover, follow these steps:
 
 1. **Install Go** (version 1.22.6 or higher) [Go Download](https://go.dev/dl)
 2.  **Generate Key**: Generate new RSA key or load an old one for Arweave uploading
-   
-   Run the following command from the project root:
-   ```bash
-   go run ./cmd/keygen/. > keyfile.json
-   ```
+      Run the following command from the project root:
+      ```bash
+      go run ./cmd/keygen/. > keyfile.json
+      ```
 3. **Run the Hoover**: You can now start Hoover:
    ```bash
    ARWEAVE_GATEWAYS=https://up.arweave.net WALLET_FILE=keyfile.json go run ./cmd/hoover/.
