@@ -13,7 +13,6 @@ import (
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/utils"
-
 	"github.com/Hubmakerlabs/hoover/pkg/config"
 	"github.com/Hubmakerlabs/hoover/pkg/multi"
 	"github.com/Hubmakerlabs/replicatr/pkg/apputil"
@@ -28,7 +27,7 @@ type Config struct {
 	Profile          string   `env:"PROFILE" default:".hoover" usage:"name of directory in root path to store state data and database"`
 	WalletFile       string   `env:"WALLET_FILE" default:"keyfile.json" usage:"full path of wallet file to use for uploading to arweave"`
 	SpeedFactor      float64  `env:"SPEED_FACTOR" default:"1" usage:"change priority of bundle uploads by this ratio"`
-	ArweaveGateways  []string `env:"ARWEAVE_GATEWAYS" usage:""`
+	ArweaveGateways  []string `env:"ARWEAVE_GATEWAYS" default:"https://up.arweave.net" usage:"arweave endpoints to upload the bundles to"`
 	NostrRelays      []string `env:"NOSTR_RELAYS" usage:"nostr relays, comma separated, in standard format 'wss://example.com', ports and insecure ws:// also permissible"`
 	FarcasterHubs    []string `env:"FARCASTER_HUBS" usage:"farcaster hub network addresses, comma separated"`
 	BlueskyEndpoints []string `env:"BLUESKY_ENDPOINTS" usage:"bluesky endpoints to use, comma separated"`
@@ -198,7 +197,8 @@ func main() {
 				}
 				bundle.SignatureType = types.ArweaveSignType
 				var item types.BundleItem
-				if item, err = itemSigner.CreateAndSignItem([]byte(bundle.Data), bundle.Target, bundle.Anchor, bundle.Tags); chk.E(err) {
+				if item, err = itemSigner.CreateAndSignItem([]byte(bundle.Data), bundle.Target,
+					bundle.Anchor, bundle.Tags); chk.E(err) {
 					continue
 				} else {
 					var resp *types.BundlrResp
@@ -206,7 +206,8 @@ func main() {
 						log.E.F("failed to submit item to bundlr: %s", err)
 						continue
 					}
-					log.I.F("successfully submitted item to bundlr, bundler response id: %s", resp.Id)
+					log.I.F("successfully submitted item to bundlr, bundler response id: %s",
+						resp.Id)
 				}
 
 			}

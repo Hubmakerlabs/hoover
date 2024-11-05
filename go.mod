@@ -6,6 +6,7 @@ toolchain go1.23.1
 
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.3.2
+	github.com/Dev43/arweave-go v0.0.3
 	github.com/Hubmakerlabs/replicatr v1.2.17
 	github.com/Microsoft/go-winio v0.6.2
 	github.com/VictoriaMetrics/fastcache v1.12.2
@@ -241,6 +242,7 @@ require (
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-runewidth v0.0.15 // indirect
+	github.com/mendsley/gojwk v0.0.0-20141217222730-4d5ec6e58103 // indirect
 	github.com/mitchellh/pointerstructure v1.2.1 // indirect
 	github.com/mleku/btcec v1.0.1 // indirect
 	github.com/mmcloughlin/addchain v0.4.0 // indirect
