@@ -199,21 +199,27 @@ func main() {
 					continue
 				}
 				var b []byte
-				b, err = utils.GenerateItemBinary(bundleItem)
-				bundleLen := len(b)
-				tt := utils.TagsEncode(bundleItem.Tags)
-				for i := range tt {
-					bundleLen += len(tt[i].Name) + len(tt[i].Value)
-				}
-				// log.I.F("len %d total %d", bundleLen, total)
 				bundleItem.SignatureType = types.ArweaveSignType
 				if err = goar.SignBundleItem(types.ArweaveSignType, wallet.Signer,
 					bundleItem); chk.E(err) {
 					log.E.F("failed to sign bundle item: %s", err)
 					continue
 				}
+				var item types.BundleItem
+				if item, err = itemSigner.CreateAndSignItem([]byte(bundleItem.Data), bundleItem.Target, bundleItem.Anchor, bundleItem.Tags); chk.E(err) {
+					log.E.F("failed to sign bundle item: %s", err)
+					continue
+				}
+				b, err = utils.GenerateItemBinary(&item)
+				bundleLen := len(b)
+				tt := utils.TagsEncode(bundleItem.Tags)
+				for i := range tt {
+					bundleLen += len(tt[i].Name) + len(tt[i].Value)
+				}
+				// log.I.F("len %d total %d", bundleLen, total)
+
 				total += len(bundleItem.Data) + bundleLen
-				items = append(items, *bundleItem)
+				items = append(items, item)
 				if total >= batchSize {
 					total = 0
 					tags := []types.Tag{
