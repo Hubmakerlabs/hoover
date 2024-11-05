@@ -127,7 +127,7 @@ Profile events contain metadata and personal information about users, such as us
 | **Source**                   | Nostr            | Designates the name of the protocol source (e.g., Mastodon via Mostr bridge relays).                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | **Source-Uri**               | Nostr            | URI to search for the event from the protocol source.                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 #### Change-type
-refers to profile change types in ANS-110 Profile Title and Description
+Refers to profile change types in ANS-110 Profile Title and Description
 
 | Protocol(s)   | change-type's                                                                                       |
 | ------------- | --------------------------------------------------------------------------------------------------- |
