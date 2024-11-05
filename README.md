@@ -31,7 +31,7 @@ To get started with Hoover, follow these steps:
    ```
 5. **Run the Hoover**: You can now start Hoover:
    ```bash
-  ARWEAVE_GATEWAYS=https://up.arweave.net WALLET_FILE=keyfile.json go run ./cmd/hoover/.
+   ARWEAVE_GATEWAYS=https://up.arweave.net WALLET_FILE=keyfile.json go run ./cmd/hoover/.
    ```
 6. **Start the Browser Interface**: Finally, start the browser to view and interact with the Hoover data:
    ```bash
