@@ -13,6 +13,7 @@ import (
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/utils"
+
 	"github.com/Hubmakerlabs/hoover/pkg/config"
 	"github.com/Hubmakerlabs/hoover/pkg/multi"
 	"github.com/Hubmakerlabs/replicatr/pkg/apputil"
@@ -150,7 +151,7 @@ func GetWallet(walletFile, endpoint string) (address string, wallet *goar.Wallet
 	return
 }
 
-const batchSize = 75000
+// const batchSize = 75000
 
 func main() {
 	slog.SetLogLevel(slog.Info)
@@ -169,8 +170,9 @@ func main() {
 		os.Exit(1)
 	}
 	var address string
+	var gateway string
 	var wallet *goar.Wallet
-	for _, gateway := range cfg.ArweaveGateways {
+	for _, gateway = range cfg.ArweaveGateways {
 		if address, wallet, err = GetWallet(cfg.WalletFile, gateway); err != nil {
 			continue
 		}
@@ -180,70 +182,39 @@ func main() {
 	}
 	c, cancel := context.WithCancel(context.Background())
 	batchChan := make(chan *types.BundleItem)
+	var itemSigner *goar.ItemSigner
+	if itemSigner, err = goar.NewItemSigner(wallet.Signer); chk.E(err) {
+		return
+	}
 	// bundle batcher worker
 	go func() {
-		bundles := make([]types.BundleItem, 0, 200)
-		var total int
 		for {
 			select {
 			case <-c.Done():
 				return
-			case item := <-batchChan:
-				if item == nil {
+			case bundle := <-batchChan:
+				if bundle == nil {
 					continue
 				}
-				if err = goar.SignBundleItem(types.ArweaveSignType, wallet.Signer,
-					item); chk.E(err) {
+				bundle.SignatureType = types.ArweaveSignType
+				var item types.BundleItem
+				if item, err = itemSigner.CreateAndSignItem([]byte(bundle.Data), bundle.Target, bundle.Anchor, bundle.Tags); chk.E(err) {
 					continue
-				}
-				// log.I.F("bundle id %s", item.Id)
-				dataLen := len(item.Data)
-				tx := &types.Transaction{
-					ID:       item.Id,
-					Format:   2,
-					Target:   "",
-					Quantity: "0",
-					Tags:     utils.TagsEncode(item.Tags),
-					Data:     utils.Base64Encode([]byte(item.Data)),
-					DataSize: fmt.Sprintf("%d", dataLen),
-				}
-				var sum int
-				for i := range tx.Tags {
-					sum += len(tx.Tags[i].Name) + len(tx.Tags[i].Value)
-				}
-				itemSize := sum + dataLen
-				total += itemSize
-				// reward price does not need to be set for the bundler https://up.arweave.net
-				// var reward float64
-				// if reward, err = wallet.Client.GetTransactionPriceFloat(itemSize,
-				// 	nil); chk.E(err) {
-				// }
-				// log.I.Ln(reward)
-				// rew := int(reward * (100 + cfg.SpeedFactor) / 100)
-				// tx.Reward = fmt.Sprintf("%d", rew)
-				bundles = append(bundles, *item)
-				if total > batchSize {
-					log.I.Ln("batch size collected", total)
-					// we can create a bundle now
-					var bundle *types.Bundle
-					if bundle, err = utils.NewBundle(bundles...); chk.E(err) {
-						// this shouldn't happen really
-						return
+				} else {
+					var resp *types.BundlrResp
+					if resp, err = utils.SubmitItemToBundlr(item, gateway); chk.E(err) {
+						log.E.F("failed to submit item to bundlr: %s", err)
+						continue
 					}
-					log.I.S(bundle)
-					var t types.Transaction
-					if _, err = wallet.SendBundleTx(c, 1,
-						bundle.BundleBinary, []types.Tag{}); chk.E(err) {
-					}
-					log.I.S(t)
-					total = 0
-					bundles = bundles[:0]
+					log.I.F("successfully submitted item to bundlr, bundler response id: %s", resp.Id)
 				}
+
 			}
 		}
 	}()
 	interrupt.AddHandler(cancel)
 	var wg sync.WaitGroup
+
 	multi.Firehose(c, cancel, &wg, cfg.NostrRelays, cfg.BlueskyEndpoints, cfg.FarcasterHubs,
 		func(bundle *types.BundleItem) (err error) {
 			batchChan <- bundle
