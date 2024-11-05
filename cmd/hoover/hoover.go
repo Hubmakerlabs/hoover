@@ -205,12 +205,14 @@ func main() {
 				for i := range tt {
 					bundleLen += len(tt[i].Name) + len(tt[i].Value)
 				}
-				total += len(bundleItem.Data) + bundleLen
-				log.I.F("len %d total %d", bundleLen, total)
+				// log.I.F("len %d total %d", bundleLen, total)
+				bundleItem.SignatureType = types.ArweaveSignType
 				if err = goar.SignBundleItem(types.ArweaveSignType, wallet.Signer,
 					bundleItem); chk.E(err) {
-					bundleItem.SignatureType = types.ArweaveSignType
+					log.E.F("failed to sign bundle item: %s", err)
+					continue
 				}
+				total += len(bundleItem.Data) + bundleLen
 				items = append(items, *bundleItem)
 				if total >= batchSize {
 					total = 0
