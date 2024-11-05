@@ -13,6 +13,7 @@ import (
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/utils"
+
 	"github.com/Hubmakerlabs/hoover/pkg/config"
 	"github.com/Hubmakerlabs/hoover/pkg/multi"
 	"github.com/Hubmakerlabs/replicatr/pkg/apputil"
@@ -26,7 +27,7 @@ type Config struct {
 	Root             string   `env:"ROOT_DIR" usage:"root path for all other path configurations (defaults OS user home if empty)"`
 	Profile          string   `env:"PROFILE" default:".hoover" usage:"name of directory in root path to store state data and database"`
 	WalletFile       string   `env:"WALLET_FILE" default:"keyfile.json" usage:"full path of wallet file to use for uploading to arweave"`
-	SpeedFactor      float32  `env:"SPEED_FACTOR" default:"1" usage:"change priority of bundle uploads by this ratio"`
+	SpeedFactor      float64  `env:"SPEED_FACTOR" default:"1" usage:"change priority of bundle uploads by this ratio"`
 	ArweaveGateways  []string `env:"ARWEAVE_GATEWAYS" usage:""`
 	NostrRelays      []string `env:"NOSTR_RELAYS" usage:"nostr relays, comma separated, in standard format 'wss://example.com', ports and insecure ws:// also permissible"`
 	FarcasterHubs    []string `env:"FARCASTER_HUBS" usage:"farcaster hub network addresses, comma separated"`
@@ -150,6 +151,8 @@ func GetWallet(walletFile, endpoint string) (address string, wallet *goar.Wallet
 	return
 }
 
+// const batchSize = 75000
+
 func main() {
 	slog.SetLogLevel(slog.Info)
 	var err error
@@ -167,8 +170,9 @@ func main() {
 		os.Exit(1)
 	}
 	var address string
+	var gateway string
 	var wallet *goar.Wallet
-	for _, gateway := range cfg.ArweaveGateways {
+	for _, gateway = range cfg.ArweaveGateways {
 		if address, wallet, err = GetWallet(cfg.WalletFile, gateway); err != nil {
 			continue
 		}
@@ -177,43 +181,43 @@ func main() {
 		break
 	}
 	c, cancel := context.WithCancel(context.Background())
+	batchChan := make(chan *types.BundleItem)
+	var itemSigner *goar.ItemSigner
+	if itemSigner, err = goar.NewItemSigner(wallet.Signer); chk.E(err) {
+		return
+	}
+	// bundle batcher worker
+	go func() {
+		for {
+			select {
+			case <-c.Done():
+				return
+			case bundle := <-batchChan:
+				if bundle == nil {
+					continue
+				}
+				bundle.SignatureType = types.ArweaveSignType
+				var item types.BundleItem
+				if item, err = itemSigner.CreateAndSignItem([]byte(bundle.Data), bundle.Target, bundle.Anchor, bundle.Tags); chk.E(err) {
+					continue
+				} else {
+					var resp *types.BundlrResp
+					if resp, err = utils.SubmitItemToBundlr(item, gateway); chk.E(err) {
+						log.E.F("failed to submit item to bundlr: %s", err)
+						continue
+					}
+					log.I.F("successfully submitted item to bundlr, bundler response id: %s", resp.Id)
+				}
+
+			}
+		}
+	}()
 	interrupt.AddHandler(cancel)
 	var wg sync.WaitGroup
+
 	multi.Firehose(c, cancel, &wg, cfg.NostrRelays, cfg.BlueskyEndpoints, cfg.FarcasterHubs,
 		func(bundle *types.BundleItem) (err error) {
-			tx := &types.Transaction{
-				Format:   2,
-				Target:   "",
-				Quantity: "0",
-				Tags:     utils.TagsEncode(bundle.Tags),
-				Data:     utils.Base64Encode([]byte(bundle.Data)),
-				DataSize: fmt.Sprintf("%d", len(bundle.Data)),
-			}
-			var sum int
-			for i := range tx.Tags {
-				sum += len(tx.Tags[i].Name) + len(tx.Tags[i].Value)
-			}
-			var reward int64
-			if reward, err = wallet.Client.GetTransactionPrice(len(bundle.Data)+sum,
-				nil); chk.E(err) {
-				cancel()
-				wg.Wait()
-			}
-			rew := int(float32(reward) * (100 + cfg.SpeedFactor) / 100)
-			if rew == 0 {
-				rew = 1000
-			}
-			tx.Reward = fmt.Sprintf("%d", rew)
-			// spew.Dump(tx)
-			if _, err = wallet.SendTransaction(tx); err != nil {
-				// try again or? this can mean the wallet is out of funds, this will trigger a
-				// shutdown for now to prevent pointless retries.
-				log.E.F(
-					"ERROR: %s - you may need to add funds to your arweave wallet %s",
-					err.Error(), address)
-				cancel()
-				wg.Wait()
-			}
+			batchChan <- bundle
 			return
 		})
 }

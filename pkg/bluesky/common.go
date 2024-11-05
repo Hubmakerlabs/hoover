@@ -81,9 +81,20 @@ func AppendLexBlobTagsWithoutRef(data *ao.EventData, prefix string, img *lexutil
 }
 
 func AppendLexBlobTags(data *ao.EventData, prefix string, img *lexutil.LexBlob) {
-	data.Append(J(prefix, Ref), img.Ref.String())
-	data.Append(J(prefix, Mimetype), img.MimeType)
-	data.Append(J(prefix, Size), strconv.FormatInt(img.Size, 10))
+	//added some iffies due receiving some null pointer panics
+	if img != nil {
+		if img.Ref != (lexutil.LexLink{}) && img.Ref.String() != "" {
+			data.Append(J(prefix, Ref), img.Ref.String())
+		}
+		if img.MimeType != "" {
+			data.Append(J(prefix, Mimetype), img.MimeType)
+		}
+		if img.Size != 0 {
+			data.Append(J(prefix, Size), strconv.FormatInt(img.Size, 10))
+		}
+
+	}
+
 }
 
 func AppendImageTags(data *ao.EventData, prefix string,
