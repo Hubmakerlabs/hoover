@@ -22,19 +22,16 @@ Hoover is a data aggregator built for Arweave developers to collect and unify ev
 To get started with Hoover, follow these steps:
 
 1. **Install Go** (version 1.22.6 or higher) [Go Download](https://go.dev/dl)
-2. **Set up & Run Arlocal** for local Arweave testing [Arlocal Setup](https://github.com/textury/arlocal)
-3. **Run the Test Harness**:
-   The test harness will simulate a running Arweave environment.
-
-   Run the following command from the project root:
+2.  **Generate Key**: Generate new RSA key or load an old one for Arweave uploading
+      Run the following command from the project root:
+      ```bash
+      go run ./cmd/keygen/. > keyfile.json
+      ```
+3. **Run the Hoover**: You can now start Hoover:
    ```bash
-   go run ./cmd/testharness/. http://localhost:1984 27xHJ0MNsBUKFIdOiQ3OlrZdDzSNfBPGnp6YVmWKKxU 1000
+   ARWEAVE_GATEWAYS=https://up.arweave.net WALLET_FILE=keyfile.json go run ./cmd/hoover/.
    ```
-4. **Run the Hoover**: With the test harness running, you can now start Hoover:
-   ```bash
-   WALLET_FILE=cmd/testharness/keyfile.json go run ./cmd/hoover/.
-   ```
-5. **Start the Browser Interface**: Finally, start the browser to view and interact with the Hoover data:
+4. **Start the Browser Interface**: Finally, start the browser to view and interact with the Hoover data:
    ```bash
    cd browser
    npm install
@@ -43,9 +40,8 @@ To get started with Hoover, follow these steps:
    Upon running this command, you should be presented with a clickable http link which allows you to view the Hoover's output.
    > To learn more about the browser, click [here](doc/browser.md)
    
-   > note: arlocal, the test harness, and the `hoover` must be ran in the background in that order for the browser to work
 
-> For a full guide to set up and run the `hoover`, see the [Testing Environment Setup](doc/testing.md)
+> To run the `hoover` on arlocal for testing purposes, see the [Testing Environment Setup](doc/testing.md)
 
 ## Architecture and Data Formats
 
