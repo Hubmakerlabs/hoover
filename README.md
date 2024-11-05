@@ -41,7 +41,7 @@ To get started with Hoover, follow these steps:
    > To learn more about the browser, click [here](doc/browser.md)
    
 
-> For a full guide to set up and run the `hoover`, see the [Testing Environment Setup](doc/testing.md)
+> To run the `hoover` on arlocal for testing purposes, see the [Testing Environment Setup](doc/testing.md)
 
 ## Architecture and Data Formats
 
