@@ -2,7 +2,7 @@
 
 ## Overview
 
-The **Hoover Data Browser** is a simple, single-page application that displays the latest social media events aggregated by the Hoover from decentralized networks such as Nostr, Bluesky, and Farcaster. These events are stored on Arweave, and the browser allows users to view and step backward through the history of events, demonstrating how the Hoover system aggregates and manages decentralized social media data.
+The **Hoover Data Browser** is a simple, single-page application that displays the latest social media events aggregated by the Hoover from decentralized networks such as Nostr, Bluesky, and Farcaster. These events are queried from the Arweave mainnet, and the browser allows users to view and step backward through the history of events, demonstrating how the Hoover system aggregates and manages decentralized social media data.
 
 The primary purpose of the Hoover Data Browser is to showcase how data from multiple decentralized networks is collected and stored on Arweave, as well as provide basic verification for the events from each protocol. This verification helps ensure the integrity of the event data and confirms that events have not been tampered with.
 
@@ -48,6 +48,11 @@ The browser supports signature verification for the following protocols:
 
 ## Running the Browser
 Please refer to the [Getting Started](../README.md#getting-started) section of the main README for instructions on running the browser.
+
+> To get the browser to pick up local events from arlocal for testing purposes, change line 53 [here](../browser/src/components/Transactions/TransactionsList.component.tsx#L53) to:
+> ```bash
+> const response = await fetch('http://localhost:1984/graphql', {
+> ```
 
 ## Conclusion
 The Hoover Data Browser is a simple yet effective tool to demonstrate how decentralized social media data can be aggregated, stored on Arweave, and verified using the Hoover system. While the current version focuses on basic event display and verification, it lays the groundwork for more advanced features, such as Bluesky verification and improved browsing capabilities.
