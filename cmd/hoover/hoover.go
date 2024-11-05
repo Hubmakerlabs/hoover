@@ -150,11 +150,12 @@ func GetWallet(walletFile, endpoint string) (address string, wallet *goar.Wallet
 	return
 }
 
-// const batchSize = 75000
+const batchSize = 75000
 
 func main() {
 	slog.SetLogLevel(slog.Info)
 	var err error
+	var total int
 	var cfg *Config
 	if cfg, err = NewConfig(); err != nil || HelpRequested() {
 		if err != nil {
@@ -185,31 +186,57 @@ func main() {
 	if itemSigner, err = goar.NewItemSigner(wallet.Signer); chk.E(err) {
 		return
 	}
+	_ = itemSigner
 	// bundle batcher worker
 	go func() {
+		var items []types.BundleItem
 		for {
 			select {
 			case <-c.Done():
 				return
-			case bundle := <-batchChan:
-				if bundle == nil {
+			case bundleItem := <-batchChan:
+				if bundleItem == nil {
 					continue
 				}
-				bundle.SignatureType = types.ArweaveSignType
-				var item types.BundleItem
-				if item, err = itemSigner.CreateAndSignItem([]byte(bundle.Data), bundle.Target,
-					bundle.Anchor, bundle.Tags); chk.E(err) {
-					continue
-				} else {
+				var b []byte
+				b, err = utils.GenerateItemBinary(bundleItem)
+				bundleLen := len(b)
+				tt := utils.TagsEncode(bundleItem.Tags)
+				for i := range tt {
+					bundleLen += len(tt[i].Name) + len(tt[i].Value)
+				}
+				total += len(bundleItem.Data) + bundleLen
+				log.I.F("len %d total %d", bundleLen, total)
+				if err = goar.SignBundleItem(types.ArweaveSignType, wallet.Signer,
+					bundleItem); chk.E(err) {
+					bundleItem.SignatureType = types.ArweaveSignType
+				}
+				items = append(items, *bundleItem)
+				if total >= batchSize {
+					total = 0
+					tags := []types.Tag{
+						{Name: "Bundle-Format", Value: "binary"},
+						{Name: "Bundle-Version", Value: "2.0.0"},
+					}
+					var bundl *types.Bundle
+					if bundl, err = utils.NewBundle(items...); chk.E(err) {
+						continue
+					}
+					items = items[:0]
+					var bi types.BundleItem
+					bi, err = itemSigner.CreateAndSignItem(
+						bundl.BundleBinary, "", "", tags)
+					if err != nil {
+						continue
+					}
 					var resp *types.BundlrResp
-					if resp, err = utils.SubmitItemToBundlr(item, gateway); chk.E(err) {
+					if resp, err = utils.SubmitItemToBundlr(bi, gateway); chk.E(err) {
 						log.E.F("failed to submit item to bundlr: %s", err)
 						continue
 					}
 					log.I.F("successfully submitted item to bundlr, bundler response id: %s",
 						resp.Id)
 				}
-
 			}
 		}
 	}()
@@ -218,6 +245,7 @@ func main() {
 
 	multi.Firehose(c, cancel, &wg, cfg.NostrRelays, cfg.BlueskyEndpoints, cfg.FarcasterHubs,
 		func(bundle *types.BundleItem) (err error) {
+			bundle.SignatureType = types.ArweaveSignType
 			batchChan <- bundle
 			return
 		})
