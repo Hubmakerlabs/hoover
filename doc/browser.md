@@ -55,6 +55,6 @@ Please refer to the [Getting Started](../README.md#getting-started) section of t
 > ```
 
 ## Conclusion
-The Hoover Data Browser is a simple yet effective tool to demonstrate how decentralized social media data can be aggregated, stored on Arweave, and verified using the Hoover system. While the current version focuses on basic event display and verification, it lays the groundwork for more advanced features, such as Bluesky verification and improved browsing capabilities.
+The Hoover Data Browser is a simple yet effective tool to demonstrate how decentralized social media data can be aggregated, stored on Arweave, and verified using the Hoover system. While the current version focuses on basic event display and verification, it lays the groundwork for more advanced features, such as improved browsing capabilities.
 
 
