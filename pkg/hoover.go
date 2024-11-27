@@ -34,6 +34,7 @@ var (
 	Event        = "Event"
 	Protocol     = "Protocol"
 	User         = "User"
+	Signer       = "Signer"
 	Unix         = "Unix"
 	Time         = "Time"
 	Timestamp    = "Timestamp"
@@ -119,7 +120,7 @@ var (
 	Dimensions = "Dimensions"
 	Duration   = "Duration"
 
-	//ANS-110
+	// ANS-110
 	Topic       = "Topic"
 	PostType    = "social-post"
 	ProfileType = "profile"

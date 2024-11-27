@@ -5,11 +5,12 @@ package bluesky
 import (
 	"sync"
 
-	. "github.com/Hubmakerlabs/hoover/pkg"
-	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
 	"github.com/bluesky-social/indigo/api/atproto"
 	"github.com/bluesky-social/indigo/repo"
 	typegen "github.com/whyrusleeping/cbor-gen"
+
+	. "github.com/Hubmakerlabs/hoover/pkg"
+	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
 )
 
 // bluesky names are crazy ugly stutter parties

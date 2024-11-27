@@ -10,15 +10,16 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/Hubmakerlabs/replicatr/pkg/apputil"
+	"github.com/Hubmakerlabs/replicatr/pkg/interrupt"
+	"github.com/Hubmakerlabs/replicatr/pkg/slog"
+	"go-simpler.org/env"
+
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/utils"
 	"github.com/Hubmakerlabs/hoover/pkg/config"
 	"github.com/Hubmakerlabs/hoover/pkg/multi"
-	"github.com/Hubmakerlabs/replicatr/pkg/apputil"
-	"github.com/Hubmakerlabs/replicatr/pkg/interrupt"
-	"github.com/Hubmakerlabs/replicatr/pkg/slog"
-	"go-simpler.org/env"
 )
 
 type Config struct {
@@ -153,7 +154,7 @@ func GetWallet(walletFile, endpoint string) (address string, wallet *goar.Wallet
 const batchSize = 75000
 
 func main() {
-	slog.SetLogLevel(slog.Info)
+	slog.SetLogLevel(slog.Trace)
 	var err error
 	var total int
 	var cfg *Config
@@ -206,7 +207,8 @@ func main() {
 					continue
 				}
 				var item types.BundleItem
-				if item, err = itemSigner.CreateAndSignItem([]byte(bundleItem.Data), bundleItem.Target, bundleItem.Anchor, bundleItem.Tags); chk.E(err) {
+				if item, err = itemSigner.CreateAndSignItem([]byte(bundleItem.Data),
+					bundleItem.Target, bundleItem.Anchor, bundleItem.Tags); chk.E(err) {
 					log.E.F("failed to sign bundle item: %s", err)
 					continue
 				}
@@ -256,5 +258,6 @@ func main() {
 			bundle.SignatureType = types.ArweaveSignType
 			batchChan <- bundle
 			return
-		})
+		},
+		filepath.Join(cfg.Root, cfg.Profile))
 }

@@ -3,11 +3,12 @@ package multi
 import (
 	"sync"
 
+	"github.com/Hubmakerlabs/replicatr/pkg/nostr/context"
+
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
 	"github.com/Hubmakerlabs/hoover/pkg/bluesky"
 	"github.com/Hubmakerlabs/hoover/pkg/farcaster"
 	"github.com/Hubmakerlabs/hoover/pkg/nostr"
-	"github.com/Hubmakerlabs/replicatr/pkg/nostr/context"
 )
 
 // Firehose runs concurrent connections capturing new events appearing on each
@@ -19,8 +20,9 @@ func Firehose(
 	wait *sync.WaitGroup,
 	nostrRelays, blueskyEndpoints, farcasterHubs []string,
 	fn func(bundle *types.BundleItem) (err error),
+	resolverPath string,
 ) {
-	go bluesky.Firehose(c, cancel, wait, blueskyEndpoints, fn)
+	go bluesky.Firehose(c, cancel, wait, blueskyEndpoints, fn, resolverPath)
 	go nostr.Firehose(c, cancel, wait, nostrRelays, fn)
 	go farcaster.Firehose(c, cancel, wait, farcasterHubs, fn)
 	select {

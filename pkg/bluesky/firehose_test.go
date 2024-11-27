@@ -6,9 +6,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Hubmakerlabs/replicatr/pkg/interrupt"
+
 	arweave "github.com/Hubmakerlabs/hoover/pkg/arweave"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
-	"github.com/Hubmakerlabs/replicatr/pkg/interrupt"
 )
 
 func TestFirehose(t *testing.T) {

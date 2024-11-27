@@ -1,6 +1,7 @@
 package bluesky
 
 import (
+	"context"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -8,17 +9,25 @@ import (
 	"strings"
 	"time"
 
-	. "github.com/Hubmakerlabs/hoover/pkg"
-	ao "github.com/Hubmakerlabs/hoover/pkg/arweave"
-	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
 	"github.com/bluesky-social/indigo/api/bsky"
 	lexutil "github.com/bluesky-social/indigo/lex/util"
 	"github.com/bluesky-social/indigo/repo"
 	"github.com/bluesky-social/indigo/util"
+
+	. "github.com/Hubmakerlabs/hoover/pkg"
+	ao "github.com/Hubmakerlabs/hoover/pkg/arweave"
+	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
 )
 
-func GetCommon(bundle *types.BundleItem, rr *repo.Repo, createdAt time.Time, op Op,
-	evt Ev) (userid string, protocol string, timestamp string, err error) {
+func GetCommon(
+	bundle *types.BundleItem,
+	rr *repo.Repo,
+	createdAt time.Time,
+	op Op,
+	evt Ev,
+	resolv *Resolver,
+	c context.Context,
+) (userid, protocol, timestamp string, err error) {
 	split := strings.Split(op.Path, "/")
 	if len(split) < 1 {
 		return "", "", "", fmt.Errorf("invalid Op.Path: '%s'", op.Path)
@@ -29,6 +38,9 @@ func GetCommon(bundle *types.BundleItem, rr *repo.Repo, createdAt time.Time, op 
 	}
 
 	userid = rr.SignedCommit().Did
+	var pubkey string
+	pubkey, err = resolv.Find(userid, c)
+	chk.E(err)
 	protocol = Bsky
 	timestamp = strconv.FormatInt(createdAt.Unix(), 10)
 
@@ -39,6 +51,9 @@ func GetCommon(bundle *types.BundleItem, rr *repo.Repo, createdAt time.Time, op 
 	ao.AppendTag(bundle, Kind, kind)
 	ao.AppendTag(bundle, J(Event, Id), op.Cid.String())
 	ao.AppendTag(bundle, J(User, Id), userid)
+	if pubkey != "" {
+		ao.AppendTag(bundle, Signer, pubkey)
+	}
 	ao.AppendTag(bundle, J(Unix, Time), timestamp)
 	ao.AppendTag(bundle, Path, op.Path)
 	ao.AppendTag(bundle, Signature, hex.EncodeToString(rr.SignedCommit().Sig))
@@ -81,7 +96,7 @@ func AppendLexBlobTagsWithoutRef(data *ao.EventData, prefix string, img *lexutil
 }
 
 func AppendLexBlobTags(data *ao.EventData, prefix string, img *lexutil.LexBlob) {
-	//added some iffies due receiving some null pointer panics
+	// added some iffies due receiving some null pointer panics
 	if img != nil {
 		if img.Ref != (lexutil.LexLink{}) && img.Ref.String() != "" {
 			data.Append(J(prefix, Ref), img.Ref.String())

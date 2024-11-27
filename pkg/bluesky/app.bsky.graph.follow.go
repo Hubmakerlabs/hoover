@@ -1,12 +1,14 @@
 package bluesky
 
 import (
+	"context"
 	"time"
+
+	"github.com/bluesky-social/indigo/api/bsky"
 
 	. "github.com/Hubmakerlabs/hoover/pkg"
 	ao "github.com/Hubmakerlabs/hoover/pkg/arweave"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
-	"github.com/bluesky-social/indigo/api/bsky"
 )
 
 // {
@@ -34,7 +36,14 @@ import (
 // In bluesky protocol, the reverse operation, unfollow, is actually from a delete operation.
 //
 // Todo: for now, the reverse operations will not be handled but it should be done for MS2
-func FromBskyGraphFollow(evt Ev, op Op, rr Repo, rec Rec) (bundle BundleItem, err error) {
+func FromBskyGraphFollow(
+	evt Ev,
+	op Op,
+	rr Repo,
+	rec Rec,
+	resolv *Resolver,
+	c context.Context,
+) (bundle BundleItem, err error) {
 	var createdAt time.Time
 	var to any
 	if to, createdAt, err = UnmarshalEvent(evt, rec, &bsky.GraphFollow{}); chk.E(err) {
@@ -51,7 +60,8 @@ func FromBskyGraphFollow(evt Ev, op Op, rr Repo, rec Rec) (bundle BundleItem, er
 	}
 	bundle = &types.BundleItem{}
 	var userID, protocol, timestamp string
-	if userID, protocol, timestamp, err = GetCommon(bundle, rr, createdAt, op, evt); chk.E(err) {
+	if userID, protocol, timestamp, err = GetCommon(bundle, rr, createdAt, op,
+		evt, resolv, c); chk.E(err) {
 		return
 	}
 	follow_id := fol.Subject

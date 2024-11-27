@@ -1,14 +1,16 @@
 package bluesky
 
 import (
+	"context"
 	"errors"
 	"strings"
 	"time"
 
+	"github.com/bluesky-social/indigo/api/bsky"
+
 	. "github.com/Hubmakerlabs/hoover/pkg"
 	ao "github.com/Hubmakerlabs/hoover/pkg/arweave"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
-	"github.com/bluesky-social/indigo/api/bsky"
 )
 
 // {
@@ -34,8 +36,15 @@ import (
 // FromBskyFeedLike is for a like.
 //
 // In bluesky protocol, the reverse operation, unlike, is actually from a delete operation.
-func FromBskyFeedLike(evt Ev, op Op, rr Repo, rec Rec, data *ao.EventData) (bundle BundleItem,
-	err error) {
+func FromBskyFeedLike(
+	evt Ev,
+	op Op,
+	rr Repo,
+	rec Rec,
+	data *ao.EventData,
+	resolv *Resolver,
+	c context.Context,
+) (bundle BundleItem, err error) {
 	var createdAt time.Time
 	var to any
 	if to, createdAt, err = UnmarshalEvent(evt, rec, &bsky.FeedLike{}); err != nil {
@@ -56,7 +65,8 @@ func FromBskyFeedLike(evt Ev, op Op, rr Repo, rec Rec, data *ao.EventData) (bund
 	}
 	bundle = new(types.BundleItem)
 	var userID, protocol, timestamp string
-	if userID, protocol, timestamp, err = GetCommon(bundle, rr, createdAt, op, evt); chk.E(err) {
+	if userID, protocol, timestamp, err = GetCommon(bundle, rr, createdAt, op,
+		evt, resolv, c); chk.E(err) {
 		return
 	}
 	postId := like.Subject.Cid

@@ -1,15 +1,17 @@
 package bluesky
 
 import (
+	"context"
 	"fmt"
 	"math"
 	"strconv"
 	"time"
 
+	"github.com/bluesky-social/indigo/api/bsky"
+
 	. "github.com/Hubmakerlabs/hoover/pkg"
 	ao "github.com/Hubmakerlabs/hoover/pkg/arweave"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
-	"github.com/bluesky-social/indigo/api/bsky"
 )
 
 // {
@@ -109,8 +111,15 @@ import (
 // }
 
 // FromBskyFeedPost is
-func FromBskyFeedPost(evt Ev, op Op, rr Repo, rec Rec, data *ao.EventData) (bundle BundleItem,
-	err error) {
+func FromBskyFeedPost(
+	evt Ev,
+	op Op,
+	rr Repo,
+	rec Rec,
+	data *ao.EventData,
+	resolv *Resolver,
+	c context.Context,
+) (bundle BundleItem, err error) {
 	var createdAt time.Time
 	var to any
 	if to, createdAt, err = UnmarshalEvent(evt, rec, &bsky.FeedPost{}); chk.E(err) {
@@ -127,7 +136,8 @@ func FromBskyFeedPost(evt Ev, op Op, rr Repo, rec Rec, data *ao.EventData) (bund
 	}
 	bundle = &types.BundleItem{}
 	var userID, protocol, timestamp string
-	if userID, protocol, timestamp, err = GetCommon(bundle, rr, createdAt, op, evt); chk.E(err) {
+	if userID, protocol, timestamp, err = GetCommon(bundle, rr, createdAt, op,
+		evt, resolv, c); chk.E(err) {
 		return
 	}
 	if pst.Text != "" {
@@ -135,12 +145,14 @@ func FromBskyFeedPost(evt Ev, op Op, rr Repo, rec Rec, data *ao.EventData) (bund
 	}
 
 	titleBeginning := userID + " on " + protocol + " at " + timestamp + ":\""
-	maxContentLength := int(math.Min(float64(len(data.Content)), float64(149-len(titleBeginning))))
+	maxContentLength := int(math.Min(float64(len(data.Content)),
+		float64(149-len(titleBeginning))))
 	contentSlice := data.Content[:maxContentLength]
 	ao.AppendTag(bundle, Title, titleBeginning+contentSlice+"\"")
 
 	descriptionBeginning := userID + "shared a post on " + protocol + " at " + timestamp + ". Content:\""
-	maxContentLength = int(math.Min(float64(len(data.Content)), float64(299-len(descriptionBeginning))))
+	maxContentLength = int(math.Min(float64(len(data.Content)),
+		float64(299-len(descriptionBeginning))))
 	contentSlice = data.Content[:maxContentLength]
 	ao.AppendTag(bundle, Description, descriptionBeginning+contentSlice+"\"")
 

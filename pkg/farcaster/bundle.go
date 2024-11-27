@@ -7,10 +7,11 @@ import (
 	"math"
 	"strconv"
 
+	pb "github.com/juiceworks/hubble-grpc"
+
 	. "github.com/Hubmakerlabs/hoover/pkg"
 	ao "github.com/Hubmakerlabs/hoover/pkg/arweave"
 	"github.com/Hubmakerlabs/hoover/pkg/arweave/goar/types"
-	pb "github.com/juiceworks/hubble-grpc"
 )
 
 func BundlerKind(msg *pb.MessageData) (s string) {
@@ -39,7 +40,8 @@ func MessageToBundleItem(msg *pb.Message) (bundle *types.BundleItem, err error) 
 		return
 	}
 	userID := fmt.Sprintf("%d", msg.GetData().GetFid())
-	timestamp := fmt.Sprintf("%d", int64(msg.GetData().GetTimestamp())+1609459200) // offset from 2021-01-10T00:00
+	timestamp := fmt.Sprintf("%d",
+		int64(msg.GetData().GetTimestamp())+1609459200) // offset from 2021-01-10T00:00
 	protocol := Farcaster
 	bundle = &types.BundleItem{}
 	data := ao.NewEventData("")
@@ -52,7 +54,7 @@ func MessageToBundleItem(msg *pb.Message) (bundle *types.BundleItem, err error) 
 		{Name: J(User, Id), Value: userID},
 		{Name: J(Unix, Time), Value: timestamp},
 		{Name: Signature, Value: hex.EncodeToString(msg.GetSignature())},
-		{Name: "Signer", Value: hex.EncodeToString(msg.GetSigner())},
+		{Name: Signer, Value: hex.EncodeToString(msg.GetSigner())},
 		{Name: J(Signature, Type), Value: fmt.Sprintf("%d", msg.GetSignatureScheme())},
 		{Name: Topic, Value: Farcaster},
 		{Name: Topic, Value: k},
@@ -116,12 +118,14 @@ func MessageToBundleItem(msg *pb.Message) (bundle *types.BundleItem, err error) 
 			}
 		}
 		titleBeginning := userID + " on " + protocol + " at " + timestamp + ":\""
-		maxContentLength := int(math.Min(float64(len(content)), float64(149-len(titleBeginning))))
+		maxContentLength := int(math.Min(float64(len(content)),
+			float64(149-len(titleBeginning))))
 		contentSlice := content[:maxContentLength]
 		ao.AppendTag(bundle, Title, titleBeginning+contentSlice+"\"")
 
 		descriptionBeginning := userID + "shared a post on " + protocol + " at " + timestamp + ". Content:\""
-		maxContentLength = int(math.Min(float64(len(content)), float64(299-len(descriptionBeginning))))
+		maxContentLength = int(math.Min(float64(len(content)),
+			float64(299-len(descriptionBeginning))))
 		contentSlice = content[:maxContentLength]
 		ao.AppendTag(bundle, Description, descriptionBeginning+contentSlice+"\"")
 
@@ -181,7 +185,7 @@ func MessageToBundleItem(msg *pb.Message) (bundle *types.BundleItem, err error) 
 		ao.AppendTag(bundle, Description, description)
 
 	case Profile:
-		//add data to EventData in all cases because there is a None user data type as well
+		// add data to EventData in all cases because there is a None user data type as well
 		data.Content = msg.GetData().GetUserDataBody().GetValue()
 		var changeType string
 		switch msg.GetData().GetUserDataBody().GetType() {
