@@ -29,7 +29,7 @@ The browser supports signature verification for the following protocols:
   - Type 2: Some Farcaster events require verification via Ethereum smart contract signatures through an Ethereum provider (utilizing the `EIP-712` standard).
 
 - **Bluesky**:  
-  Currently, no signature verification is implemented for Bluesky events.
+  Verified using the secp256k1 curve.
 
 ## Example Output
 
@@ -39,7 +39,7 @@ The browser supports signature verification for the following protocols:
       <img src="browser.png" width="1500" />
     </td>
     <td>
-      As a proof-of-concept, the browser’s output is minimal and focuses on the core functionality of retrieving and verifying event data. Some non-essential fields from the event data are not displayed. <br><br> As can be seen, the first field contains the native social media protocol the event is sourced from (Nostr, Bluesky, or Farcaster) . Additionally, the green check mark denoting the verification of the Farcaster and Nostr event can be seen in the top, righthand corner of the respective events. An explanation of the remaining fields can be found in the <a href="data-spec.md">Data Specification document</a>.
+      As a proof-of-concept, the browser’s output is minimal and focuses on the core functionality of retrieving and verifying event data. Some non-essential fields from the event data are not displayed. <br><br> As can be seen, the first field contains the native social media protocol the event is sourced from (Nostr, Bluesky, or Farcaster) . Additionally, the green check mark denoting the verification of the Farcaster, Nostr, and Bluesky events can be seen in the top, righthand corner of the respective events. An explanation of the remaining fields can be found in the <a href="data-spec.md">Data Specification document</a>.
     </td>
   </tr>
 </table>
@@ -55,6 +55,6 @@ Please refer to the [Getting Started](../README.md#getting-started) section of t
 > ```
 
 ## Conclusion
-The Hoover Data Browser is a simple yet effective tool to demonstrate how decentralized social media data can be aggregated, stored on Arweave, and verified using the Hoover system. While the current version focuses on basic event display and verification, it lays the groundwork for more advanced features, such as Bluesky verification and improved browsing capabilities.
+The Hoover Data Browser is a simple yet effective tool to demonstrate how decentralized social media data can be aggregated, stored on Arweave, and verified using the Hoover system. While the current version focuses on basic event display and verification, it lays the groundwork for more advanced features, such as improved browsing capabilities.
 
 

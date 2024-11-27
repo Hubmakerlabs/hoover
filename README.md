@@ -9,7 +9,7 @@ Hoover is a data aggregator built for Arweave developers to collect and unify ev
 - Aggregates data from Nostr, Bluesky, and Farcaster into a common [schema](#architecture-and-data-formats).
 - Stores data on Arweave for long-term, decentralized storage.
 - Supports five primary event types: `Post`, `Repost`, `Like`, `Follow`, `Profile`. 
-- Includes a basic event [browser](doc/browser.md) for viewing and searching indexed data. Additionally, this browser performs in-place signature validations of Nostr and Farcaster posts ensuring their integrity.
+- Includes a basic event [browser](doc/browser.md) for viewing and searching indexed data. Additionally, this browser performs in-place signature validations of posts ensuring their integrity.
 
 ## Supported Social Networks
 
@@ -32,7 +32,7 @@ To get started with Hoover, follow these steps:
    ```bash
    ARWEAVE_GATEWAYS=https://up.arweave.net WALLET_FILE=keyfile.json go run ./cmd/hoover/.
    ```
-5. **Start the Browser Interface**: Finally, start the browser to view and interact with the Hoover data:
+5. **Start the Browser Interface**: Finally, start the browser to view and interact with the posts pulled from Arweave (previously uploaded by th Hoover):
    ```bash
    cd browser
    npm install
@@ -66,7 +66,7 @@ This project was developed by [Hubmaker Labs](https://hubmaker.io/), a company s
 
 ### Team:
 - **David Vennik** (Nostr & Bluesky Aggregation, Arweave Test Harness) - <me@mleku.dev>
-- **Akash Kumar** (Farcaster Aggregation, Arweave Integration, Documentation) - <akashkumar1691@gmail.com>
+- **Akash Kumar** (Farcaster & Bluesky Aggregation, Arweave Integration, Documentation) - <akashkumar1691@gmail.com>
 - **Selami Cetinguney** (Data Browser example app) - <selami.c@sbytes-it.com>
 
 We are grateful to Arweave for enabling the development of Hoover and its role in advancing decentralized, long-term data storage.
