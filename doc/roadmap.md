@@ -34,9 +34,9 @@
 ### 5. Arweave Smart Contract Development  
 *(In Progress)*
 - [ ] Develop a smart contract that can:
-  - [ ] Verify cryptographic signatures for the Arweave bundled posts from:
+  - [x] Verify cryptographic signatures for the Arweave bundled posts from:
     - [x] Nostr
-    - [ ] Bluesky
+    - [x] Bluesky
     - [x] Farcaster
 
 
@@ -57,10 +57,8 @@
 
 The incomplete tasks in the current phase are due to several technical challenges:
 
-1. **Data Reconstitution**: Protocols like Bluesky and Farcaster use highly structured and encoded formats, such as Bluesky’s base32 encoding and Farcaster’s Ethereum-based anchoring, making reconstituting the original data for signing verification more complex than anticipated.
-   
-2. **Signature Verification**: While Nostr's signature verification is straightforward, Bluesky and Farcaster require additional external data, such as user profile events or blockchain lookups. These protocols introduce more complex steps for verifying signatures inside the smart contract, which necessitates further research and optimization. That being said, the Farcaster verification has been completed and only Bluesky now remains.
+1. **Data Reconstitution**: Protocols like Bluesky and Farcaster use highly structured and encoded formats, such as Bluesky’s base32 encoding and Farcaster’s Ethereum-based anchoring, making reconstituting the original data more complex than anticipated.
 
-3. **Smart Contract Constraints**: The size and performance limitations of Arweave’s smart contract environment make implementing signature verification for multiple protocols challenging. Ensuring scalability without compromising the system’s security or efficiency requires additional time and architectural work.
+2. **Smart Contract Constraints**: The size and performance limitations of Arweave’s smart contract environment make implementing signature verification for multiple protocols on chain challenging. Ensuring scalability without compromising the system’s security or efficiency requires additional time and architectural work.
 
 These challenges are actively being addressed, with future iterations focused on resolving these complexities.
