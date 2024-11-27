@@ -66,7 +66,7 @@ This project was developed by [Hubmaker Labs](https://hubmaker.io/), a company s
 
 ### Team:
 - **David Vennik** (Nostr & Bluesky Aggregation, Arweave Test Harness) - <me@mleku.dev>
-- **Akash Kumar** (Farcaster Aggregation, Arweave Integration, Documentation) - <akashkumar1691@gmail.com>
+- **Akash Kumar** (Farcaster & Bluesky Aggregation, Arweave Integration, Documentation) - <akashkumar1691@gmail.com>
 - **Selami Cetinguney** (Data Browser example app) - <selami.c@sbytes-it.com>
 
 We are grateful to Arweave for enabling the development of Hoover and its role in advancing decentralized, long-term data storage.
